@@ -26144,5 +26144,1355 @@
   },
   "raw": "{\n  \"summary\": \"Executes the action of dropping a target by invoking the ShadowAI's drop logic.\",\n  \"overview\": \"The DropTargetAction class extends the base Action class to handle specific targeting behavior for dropping items. It initializes with a reference to the bot's AI instance and defines an Execute method that processes events related to dropping targets. This action is typically used within the game's strategy system to automate item disposal based on current game state.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI instance is valid before execution; edge cases include scenarios where the target is no longer accessible or the drop location is invalid.\"\n}",
   "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "5859b5cd91f7",
+  "doc": {
+   "summary": "Executes the travel target selection logic for a bot AI by validating and updating the current travel destination.",
+   "overview": "This function retrieves the existing travel target from the context and initializes a new TravelTarget object based on the bot's AI configuration. It determines whether to generate a new target or copy the old one depending on whether the previous target was forced or expired, then validates the resulting target before applying it.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "modifies global state via setNewTarget and GetValue operations",
+   "notes": "Returns false if no old target exists or if the new target is inactive and not forced; callers should check the return value to ensure a valid travel target was established.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the travel target selection logic for a bot AI by validating and updating the current travel destination.\",\n  \"overview\": \"This function retrieves the existing travel target from the context and initializes a new TravelTarget object based on the bot's AI configuration. It determines whether to generate a new target or copy the old one depending on whether the previous target was forced or expired, then validates the resulting target before applying it.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"modifies global state via setNewTarget and GetValue operations\",\n  \"notes\": \"Returns false if no old target exists or if the new target is inactive and not forced; callers should check the return value to ensure a valid travel target was established.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::getNewTarget@0e35b899:qwen3-5-4b": {
+  "hash": "fde5dc8620a4",
+  "doc": {
+   "summary": "Attempts to set a travel target by sequentially trying various targeting strategies based on bot level, random chance, and AI configuration flags.",
+   "overview": "This function iterates through multiple conditional blocks to determine the most appropriate method for setting a travel destination. It prioritizes group targets, then attempts RPG-specific or NPC flag-based targeting if the initial attempt fails and the bot is sufficiently developed. If no target is found after exhausting these options, it falls back to grind, quest, or explore strategies depending on specific AI values and random thresholds.",
+   "params": [
+    {
+     "name": "newTarget",
+     "desc": "Pointer to the TravelTarget object that will be updated with the selected destination."
+    },
+    {
+     "name": "oldTarget",
+     "desc": "Pointer to the previous TravelTarget, used as a reference in specific targeting logic."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "Network (potentially via botAI->TellMasterNoFacing), Global State (modifies foundTarget and newTarget)",
+   "notes": "Callers should ensure the bot has a valid context and level before invoking. Edge cases include scenarios where no targeting strategy matches the current game state, resulting in null targets.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Attempts to set a travel target by sequentially trying various targeting strategies based on bot level, random chance, and AI configuration flags.\",\n  \"overview\": \"This function iterates through multiple conditional blocks to determine the most appropriate method for setting a travel destination. It prioritizes group targets, then attempts RPG-specific or NPC flag-based targeting if the initial attempt fails and the bot is sufficiently developed. If no target is found after exhausting these options, it falls back to grind, quest, or explore strategies depending on specific AI values and random thresholds.\",\n  \"params\": [\n    {\n      \"name\": \"newTarget\",\n      \"desc\": \"Pointer to the TravelTarget object that will be updated with the selected destination.\"\n    },\n    {\n      \"name\": \"oldTarget\",\n      \"desc\": \"Pointer to the previous TravelTarget, used as a reference in specific targeting logic.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (potentially via botAI->TellMasterNoFacing), Global State (modifies foundTarget and newTarget)\",\n  \"notes\": \"Callers should ensure the bot has a valid context and level before invoking. Edge cases include scenarios where no targeting strategy matches the current game state, resulting in null targets.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::setNewTarget@e662641d:qwen3-5-4b": {
+  "hash": "c68ddb1098f8",
+  "doc": {
+   "summary": "Updates the travel target for a bot by copying properties from the old target to the new one and managing related AI values.",
+   "overview": "This function first checks if the bot belongs to a group or is the group master before reporting the target change. It then handles specific logic for ignoring RPG targets based on an ignore list, copies the travel data from the old target to the new one, and adjusts expiration times depending on whether the old target was active or forced.",
+   "params": [
+    {
+     "name": "newTarget",
+     "desc": "The new travel target object to be adopted by the bot."
+    },
+    {
+     "name": "oldTarget",
+     "desc": "The previous travel target object whose data is copied to the new target."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "Network (ReportTravelTarget), Global State (RESET_AI_VALUE)",
+   "notes": "Callers must ensure valid TravelTarget pointers are passed. Edge case: If oldTarget and newTarget are identical, the ignore list logic still executes.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Updates the travel target for a bot by copying properties from the old target to the new one and managing related AI values.\",\n  \"overview\": \"This function first checks if the bot belongs to a group or is the group master before reporting the target change. It then handles specific logic for ignoring RPG targets based on an ignore list, copies the travel data from the old target to the new one, and adjusts expiration times depending on whether the old target was active or forced.\",\n  \"params\": [\n    {\n      \"name\": \"newTarget\",\n      \"desc\": \"The new travel target object to be adopted by the bot.\"\n    },\n    {\n      \"name\": \"oldTarget\",\n      \"desc\": \"The previous travel target object whose data is copied to the new target.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (ReportTravelTarget), Global State (RESET_AI_VALUE)\",\n  \"notes\": \"Callers must ensure valid TravelTarget pointers are passed. Edge case: If oldTarget and newTarget are identical, the ignore list logic still executes.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::ReportTravelTarget@1d6794a0:qwen3-5-4b": {
+  "hash": "f9a28aceebfc",
+  "doc": {
+   "summary": "Generates and sends a formatted travel report message to the master AI indicating the destination, distance, purpose, and context of a new travel target.",
+   "overview": "This function constructs a descriptive string detailing the bot's upcoming movement based on the type of destination (Quest, RPG, Explore, Grind, Boss, or Null). It calculates the distance from the current location to the new target and includes specific modifiers such as 'Forced' status, group copying, or continuity with the previous path. The resulting message is then transmitted via `botAI->TellMaster` to provide real-time feedback on the bot's strategic actions.",
+   "params": [
+    {
+     "name": "newTarget",
+     "desc": "Pointer to the new travel destination object defining where the bot is heading."
+    },
+    {
+     "name": "oldTarget",
+     "desc": "Pointer to the previous travel destination object used to determine if the movement is a continuation of an existing path."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "Network (botAI->TellMaster)",
+   "notes": "The function performs type casting on `destination` based on its name, which may lead to undefined behavior if the destination type does not match one of the expected classes. It relies on global objects like `sObjectMgr`, `bot`, and `chat`. Edge case: If the new target is a NullTravelDestination and the old target was also null or different, it sends a specific idle warning message.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Generates and sends a formatted travel report message to the master AI indicating the destination, distance, purpose, and context of a new travel target.\",\n  \"overview\": \"This function constructs a descriptive string detailing the bot's upcoming movement based on the type of destination (Quest, RPG, Explore, Grind, Boss, or Null). It calculates the distance from the current location to the new target and includes specific modifiers such as 'Forced' status, group copying, or continuity with the previous path. The resulting message is then transmitted via `botAI->TellMaster` to provide real-time feedback on the bot's strategic actions.\",\n  \"params\": [\n    {\n      \"name\": \"newTarget\",\n      \"desc\": \"Pointer to the new travel destination object defining where the bot is heading.\"\n    },\n    {\n      \"name\": \"oldTarget\",\n      \"desc\": \"Pointer to the previous travel destination object used to determine if the movement is a continuation of an existing path.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (botAI->TellMaster)\",\n  \"notes\": \"The function performs type casting on `destination` based on its name, which may lead to undefined behavior if the destination type does not match one of the expected classes. It relies on global objects like `sObjectMgr`, `bot`, and `chat`. Edge case: If the new target is a NullTravelDestination and the old target was also null or different, it sends a specific idle warning message.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::getBestDestination@b9d0e201:qwen3-5-4b": {
+  "hash": "0b843fd59bf7",
+  "doc": {
+   "summary": "Selects the optimal travel destination from a provided list by finding the nearest available point and updating the action's target.",
+   "overview": "This function evaluates a set of active travel destinations and world points to determine the best target for an entity. It first checks if both input lists are populated, then retrieves the next available point in the game world relative to the bot's current location. The function identifies the destination closest to this new point, clears the previous selections, and pushes the chosen pair back into the active lists before returning success.",
+   "params": [
+    {
+     "name": "activeDestinations",
+     "desc": "A vector of pointers to TravelDestination objects representing potential targets currently being considered."
+    },
+    {
+     "name": "activePoints",
+     "desc": "A vector of pointers to WorldPosition objects representing available points in the game world."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Modifies activeDestinations and activePoints by clearing their contents and adding a new destination-point pair.",
+   "notes": "Returns false if either input list is empty, if no available points exist in the world, or if none of the destinations are adjacent to any available point.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Selects the optimal travel destination from a provided list by finding the nearest available point and updating the action's target.\",\n  \"overview\": \"This function evaluates a set of active travel destinations and world points to determine the best target for an entity. It first checks if both input lists are populated, then retrieves the next available point in the game world relative to the bot's current location. The function identifies the destination closest to this new point, clears the previous selections, and pushes the chosen pair back into the active lists before returning success.\",\n  \"params\": [\n    {\n      \"name\": \"activeDestinations\",\n      \"desc\": \"A vector of pointers to TravelDestination objects representing potential targets currently being considered.\"\n    },\n    {\n      \"name\": \"activePoints\",\n      \"desc\": \"A vector of pointers to WorldPosition objects representing available points in the game world.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Modifies activeDestinations and activePoints by clearing their contents and adding a new destination-point pair.\",\n  \"notes\": \"Returns false if either input list is empty, if no available points exist in the world, or if none of the destinations are adjacent to any available point.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetGroupTarget@d2cc0326:qwen3-5-4b": {
+  "hash": "baed3e443c0d",
+  "doc": {
+   "summary": "Sets the travel target for a group of players by filtering active destinations and assigning the best one to the provided TravelTarget object.",
+   "overview": "This function iterates through all members of the bot's group, excluding the bot itself, to identify valid travel targets. It collects active destinations that are not RPG-specific or marked as group copies, then delegates the selection logic to getBestDestination. Finally, it updates the provided target with the selected destination and position.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "A pointer to a TravelTarget object that will be updated with the selected destination and position."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function relies on external state including bot->GetGroup(), shadow AI contexts, and global travel target values. It assumes getBestDestination is available in the scope. Returns false if no valid destination can be found.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets the travel target for a group of players by filtering active destinations and assigning the best one to the provided TravelTarget object.\",\n  \"overview\": \"This function iterates through all members of the bot's group, excluding the bot itself, to identify valid travel targets. It collects active destinations that are not RPG-specific or marked as group copies, then delegates the selection logic to getBestDestination. Finally, it updates the provided target with the selected destination and position.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"A pointer to a TravelTarget object that will be updated with the selected destination and position.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on external state including bot->GetGroup(), shadow AI contexts, and global travel target values. It assumes getBestDestination is available in the scope. Returns false if no valid destination can be found.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetCurrentTarget@3209fbcd:qwen3-5-4b": {
+  "hash": "bba93c7a308a",
+  "doc": {
+   "summary": "Updates the current travel target for a bot by validating the old target's state and transitioning to the next available point.",
+   "overview": "This function attempts to advance a bot's travel path by checking if the previous target is still valid and active. If the old destination exists, is not at maximum retry count, and remains active, it calculates the next reachable world position and updates the new target with incremented retry logic.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to the TravelTarget object that will be updated with the new destination and status."
+    },
+    {
+     "name": "oldTarget",
+     "desc": "Pointer to the previous TravelTarget object used to validate state and determine the next point."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Returns false if the old target is null, inactive, or has reached its maximum retry limit; callers should check this return value before proceeding with travel logic.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Updates the current travel target for a bot by validating the old target's state and transitioning to the next available point.\",\n  \"overview\": \"This function attempts to advance a bot's travel path by checking if the previous target is still valid and active. If the old destination exists, is not at maximum retry count, and remains active, it calculates the next reachable world position and updates the new target with incremented retry logic.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the TravelTarget object that will be updated with the new destination and status.\"\n    },\n    {\n      \"name\": \"oldTarget\",\n      \"desc\": \"Pointer to the previous TravelTarget object used to validate state and determine the next point.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns false if the old target is null, inactive, or has reached its maximum retry limit; callers should check this return value before proceeding with travel logic.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetQuestTarget@b1cde609:qwen3-5-4b": {
+  "hash": "46ead2f639a0",
+  "doc": {
+   "summary": "Selects the optimal travel destination for a bot by filtering destinations based on quest status flags and class requirements.",
+   "overview": "This function determines the best travel target for a bot by aggregating available destinations from general quests and specific active or completed quests. It applies logic to exclude rewarded quests, filter by class requirements when both general and quest-specific destinations exist, and handles edge cases where no valid targets are found. The function returns false if no suitable destination can be determined.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to the TravelTarget object that will store the selected destination."
+    },
+    {
+     "name": "newQuests",
+     "desc": "Boolean flag indicating whether to include destinations for newly available quests."
+    },
+    {
+     "name": "activeQuests",
+     "desc": "Boolean flag indicating whether to include destinations for currently active quests."
+    },
+    {
+     "name": "completedQuests",
+     "desc": "Boolean flag indicating whether to include destinations for completed quests."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (botAI->TellMasterNoFacing), I/O (target modification)",
+   "notes": "The 'onlyClassQuest' parameter is unused but affects internal logic; callers should ensure quest templates match class requirements when both general and specific destinations are present.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Selects the optimal travel destination for a bot by filtering destinations based on quest status flags and class requirements.\",\n  \"overview\": \"This function determines the best travel target for a bot by aggregating available destinations from general quests and specific active or completed quests. It applies logic to exclude rewarded quests, filter by class requirements when both general and quest-specific destinations exist, and handles edge cases where no valid targets are found. The function returns false if no suitable destination can be determined.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the TravelTarget object that will store the selected destination.\"\n    },\n    {\n      \"name\": \"newQuests\",\n      \"desc\": \"Boolean flag indicating whether to include destinations for newly available quests.\"\n    },\n    {\n      \"name\": \"activeQuests\",\n      \"desc\": \"Boolean flag indicating whether to include destinations for currently active quests.\"\n    },\n    {\n      \"name\": \"completedQuests\",\n      \"desc\": \"Boolean flag indicating whether to include destinations for completed quests.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (botAI->TellMasterNoFacing), I/O (target modification)\",\n  \"notes\": \"The 'onlyClassQuest' parameter is unused but affects internal logic; callers should ensure quest templates match class requirements when both general and specific destinations are present.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetNewQuestTarget@c0fd4653:qwen3-5-4b": {
+  "hash": "6a19f88ebc73",
+  "doc": {
+   "summary": "Sets a new travel destination for the bot by evaluating available quest destinations and selecting the optimal one.",
+   "overview": "This function retrieves all active travel destinations associated with the current quest, filters them based on the bot's location, and identifies the best target using an external selection algorithm. It then assigns this selected destination to the provided TravelTarget object and returns its active status.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to a TravelTarget object that will be updated with the newly selected destination."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function relies on external state from sTravelMgr and botAI; ensure the quest is active before calling. Returns false if no suitable destination can be determined.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets a new travel destination for the bot by evaluating available quest destinations and selecting the optimal one.\",\n  \"overview\": \"This function retrieves all active travel destinations associated with the current quest, filters them based on the bot's location, and identifies the best target using an external selection algorithm. It then assigns this selected destination to the provided TravelTarget object and returns its active status.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to a TravelTarget object that will be updated with the newly selected destination.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on external state from sTravelMgr and botAI; ensure the quest is active before calling. Returns false if no suitable destination can be determined.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetRpgTarget@9e1ca5ed:qwen3-5-4b": {
+  "hash": "dffb312659bd",
+  "doc": {
+   "summary": "Sets the travel target for a bot by retrieving available RPG destinations and selecting the best one based on current location.",
+   "overview": "This function retrieves all active RPG travel destinations for the bot, filtering them to include only those with valid next points. It then determines the optimal destination using an external selection algorithm and assigns it to the provided target object before returning its active status.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to a TravelTarget object that will be updated with the selected destination and path."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on external functions getBestDestination() and sTravelMgr->getRpgTravelDestinations(); returns false if no valid destination is found.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets the travel target for a bot by retrieving available RPG destinations and selecting the best one based on current location.\",\n  \"overview\": \"This function retrieves all active RPG travel destinations for the bot, filtering them to include only those with valid next points. It then determines the optimal destination using an external selection algorithm and assigns it to the provided target object before returning its active status.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to a TravelTarget object that will be updated with the selected destination and path.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external functions getBestDestination() and sTravelMgr->getRpgTravelDestinations(); returns false if no valid destination is found.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetGrindTarget@61c18450:qwen3-5-4b": {
+  "hash": "e363952867bf",
+  "doc": {
+   "summary": "Sets the grind travel target for a bot by evaluating available destinations and their next points to determine the optimal path.",
+   "overview": "This function retrieves all currently active grind travel destinations for the bot, filtering them based on real player master status. It then iterates through these destinations to collect their immediate next waypoints, ultimately selecting the best destination using an external helper function before assigning it to the provided target object.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to a TravelTarget object that will be updated with the selected destination and its path."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on external functions getBestDestination() and TravelDestination::nextPoint(); returns false if no valid target can be determined.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets the grind travel target for a bot by evaluating available destinations and their next points to determine the optimal path.\",\n  \"overview\": \"This function retrieves all currently active grind travel destinations for the bot, filtering them based on real player master status. It then iterates through these destinations to collect their immediate next waypoints, ultimately selecting the best destination using an external helper function before assigning it to the provided target object.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to a TravelTarget object that will be updated with the selected destination and its path.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external functions getBestDestination() and TravelDestination::nextPoint(); returns false if no valid target can be determined.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetBossTarget@0722d032:qwen3-5-4b": {
+  "hash": "23467a2db2e9",
+  "doc": {
+   "summary": "Sets the travel target for a boss by evaluating available destinations and selecting the optimal one based on current location.",
+   "overview": "This function retrieves all active travel destinations for the boss, filters them to find valid next points from the bot's current position, and selects the best destination using an external helper. It then assigns this target to the provided TravelTarget object and returns its active status.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to a TravelTarget object that will be updated with the selected destination and path points."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on getBestDestination() for selection logic; returns false if no valid destination is found or if the target cannot be set.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets the travel target for a boss by evaluating available destinations and selecting the optimal one based on current location.\",\n  \"overview\": \"This function retrieves all active travel destinations for the boss, filters them to find valid next points from the bot's current position, and selects the best destination using an external helper. It then assigns this target to the provided TravelTarget object and returns its active status.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to a TravelTarget object that will be updated with the selected destination and path points.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on getBestDestination() for selection logic; returns false if no valid destination is found or if the target cannot be set.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetExploreTarget@3ecde19e:qwen3-5-4b": {
+  "hash": "f4140e06d273",
+  "doc": {
+   "summary": "Sets the exploration target for a bot by selecting the best available travel destination and its next waypoint.",
+   "overview": "This function retrieves active travel destinations for the specified bot, prioritizing those with valid next waypoints if none are initially found. It utilizes the global travel manager to fetch potential destinations and evaluates them using the getBestDestination helper to determine the optimal target. Finally, it assigns this target to the provided TravelTarget object and returns its active status.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to a TravelTarget object that will be updated with the selected destination and waypoint."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (via sTravelMgr), Global state (uses global travel manager)",
+   "notes": "Callers must ensure target is not null. Returns false if no suitable destination or waypoint exists; otherwise returns true.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets the exploration target for a bot by selecting the best available travel destination and its next waypoint.\",\n  \"overview\": \"This function retrieves active travel destinations for the specified bot, prioritizing those with valid next waypoints if none are initially found. It utilizes the global travel manager to fetch potential destinations and evaluates them using the getBestDestination helper to determine the optimal target. Finally, it assigns this target to the provided TravelTarget object and returns its active status.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to a TravelTarget object that will be updated with the selected destination and waypoint.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (via sTravelMgr), Global state (uses global travel manager)\",\n  \"notes\": \"Callers must ensure target is not null. Returns false if no suitable destination or waypoint exists; otherwise returns true.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetNpcFlagTarget@03f4f1f2:qwen3-5-4b": {
+  "hash": "f06e2303a3a4",
+  "doc": {
+   "summary": "Sets a travel target for an NPC bot by filtering destinations based on flags, name, items, and faction reaction.",
+   "overview": "This function iterates through all available RPG travel destinations to find the nearest one that satisfies specific criteria. It filters candidates by checking if they possess required flags, match a provided name or sub-name, contain requested vendor items, and maintain a neutral or better faction reaction with the bot's current faction. Once a valid destination is found, it calculates the optimal path from the bot's position and assigns it as the forced travel target.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "The TravelTarget object to which the new destination and path will be assigned."
+    },
+    {
+     "name": "flags",
+     "desc": "A vector of NPCFlags that the target creature must possess for the action to proceed."
+    },
+    {
+     "name": "name",
+     "desc": "An optional string; if provided, the target's Name or SubName must contain this substring."
+    },
+    {
+     "name": "items",
+     "desc": "An optional vector of item IDs (uint32); if provided, the target's vendor list must include at least one of these items."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (potentially triggers travel logic), Global State (modifies bot AI state via target object)",
+   "notes": "Returns false if no destination meets all criteria or if the destination has no valid path points. Relies on external managers for creature templates, faction data, and vendor items.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets a travel target for an NPC bot by filtering destinations based on flags, name, items, and faction reaction.\",\n  \"overview\": \"This function iterates through all available RPG travel destinations to find the nearest one that satisfies specific criteria. It filters candidates by checking if they possess required flags, match a provided name or sub-name, contain requested vendor items, and maintain a neutral or better faction reaction with the bot's current faction. Once a valid destination is found, it calculates the optimal path from the bot's position and assigns it as the forced travel target.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"The TravelTarget object to which the new destination and path will be assigned.\"\n    },\n    {\n      \"name\": \"flags\",\n      \"desc\": \"A vector of NPCFlags that the target creature must possess for the action to proceed.\"\n    },\n    {\n      \"name\": \"name\",\n      \"desc\": \"An optional string; if provided, the target's Name or SubName must contain this substring.\"\n    },\n    {\n      \"name\": \"items\",\n      \"desc\": \"An optional vector of item IDs (uint32); if provided, the target's vendor list must include at least one of these items.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (potentially triggers travel logic), Global State (modifies bot AI state via target object)\",\n  \"notes\": \"Returns false if no destination meets all criteria or if the destination has no valid path points. Relies on external managers for creature templates, faction data, and vendor items.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::getBossTravelDestinations@7a13ece6:qwen3-5-4b": {
+  "hash": "466101a9f7ed",
+  "doc": {
+   "summary": "Retrieves a list of available travel destinations for a boss mob based on activity status, capacity, and distance constraints.",
+   "overview": "This function iterates through all known boss mobs to identify valid travel targets for the specified bot. It filters candidates by checking if they are active (unless ignored), have available space (unless ignored), and fall within the maximum distance threshold. The resulting vector contains pointers to destinations that meet all applicable criteria.",
+   "params": [
+    {
+     "name": "bot",
+     "desc": "The player bot instance for which travel destinations are being calculated."
+    },
+    {
+     "name": "ignoreFull",
+     "desc": "If true, skips destination checks for mobs that are currently full; otherwise, only selects mobs with available space."
+    },
+    {
+     "name": "ignoreInactive",
+     "desc": "If true, skips destination checks for inactive mobs; otherwise, only selects active mobs."
+    },
+    {
+     "name": "maxDistance",
+     "desc": "The maximum allowable distance in units; if set to 0 or negative, no distance filtering is applied."
+    }
+   ],
+   "returns": "std::vector<TravelDestination*>",
+   "side_effects": "None",
+   "notes": "Callers should verify that the bot pointer is valid before invoking. The function relies on global state via `bossMobs`, so it assumes this list is populated and up-to-date.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Retrieves a list of available travel destinations for a boss mob based on activity status, capacity, and distance constraints.\",\n  \"overview\": \"This function iterates through all known boss mobs to identify valid travel targets for the specified bot. It filters candidates by checking if they are active (unless ignored), have available space (unless ignored), and fall within the maximum distance threshold. The resulting vector contains pointers to destinations that meet all applicable criteria.\",\n  \"params\": [\n    {\n      \"name\": \"bot\",\n      \"desc\": \"The player bot instance for which travel destinations are being calculated.\"\n    },\n    {\n      \"name\": \"ignoreFull\",\n      \"desc\": \"If true, skips destination checks for mobs that are currently full; otherwise, only selects mobs with available space.\"\n    },\n    {\n      \"name\": \"ignoreInactive\",\n      \"desc\": \"If true, skips destination checks for inactive mobs; otherwise, only selects active mobs.\"\n    },\n    {\n      \"name\": \"maxDistance\",\n      \"desc\": \"The maximum allowable distance in units; if set to 0 or negative, no distance filtering is applied.\"\n    }\n  ],\n  \"returns\": \"std::vector<TravelDestination*>\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify that the bot pointer is valid before invoking. The function relies on global state via `bossMobs`, so it assumes this list is populated and up-to-date.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::SetNullTarget@40776857:qwen3-5-4b": {
+  "hash": "52c8e29c7464",
+  "doc": {
+   "summary": "Sets the travel target to a null destination and returns true.",
+   "overview": "This function clears any existing travel target by setting it to the predefined null destination within the strategy manager. It is typically used when an entity needs to be disengaged from navigation or when resetting its pathfinding state before initiating a new movement command.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to the TravelTarget object whose destination will be set to null."
+    }
+   ],
+   "returns": "true",
+   "side_effects": "None",
+   "notes": "Callers should ensure the target pointer is valid before invoking this function. This operation does not trigger any network transmission or global state changes.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Sets the travel target to a null destination and returns true.\",\n  \"overview\": \"This function clears any existing travel target by setting it to the predefined null destination within the strategy manager. It is typically used when an entity needs to be disengaged from navigation or when resetting its pathfinding state before initiating a new movement command.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the TravelTarget object whose destination will be set to null.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the target pointer is valid before invoking this function. This operation does not trigger any network transmission or global state changes.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::FindDestination@2b059e4c:qwen3-5-4b": {
+  "hash": "66663535fa34",
+  "doc": {
+   "summary": "Finds the nearest travel destination matching a name from various game categories based on the bot's current position.",
+   "overview": "This function searches for travel destinations within specified categories such as quests, zones, NPCs, mobs, or bosses that match a given string. It iterates through each relevant category using the strategy manager, filtering results by title and collecting matches into a vector. The function then calculates distances from the bot's current world position to all collected destinations and returns the closest one.",
+   "params": [
+    {
+     "name": "bot",
+     "desc": "The player bot instance whose current position is used for distance calculations."
+    },
+    {
+     "name": "name",
+     "desc": "A string to match against the titles of travel destinations; partial matches are supported via strstri."
+    },
+    {
+     "name": "zones",
+     "desc": "Boolean flag indicating whether to include zone-related travel destinations in the search results."
+    },
+    {
+     "name": "npcs",
+     "desc": "Boolean flag indicating whether to include RPG/NPC-related travel destinations in the search results."
+    },
+    {
+     "name": "quests",
+     "desc": "Boolean flag indicating whether to include quest-related travel destinations in the search results."
+    },
+    {
+     "name": "mobs",
+     "desc": "Boolean flag indicating whether to include mob grinding-related travel destinations in the search results."
+    },
+    {
+     "name": "bosses",
+     "desc": "Boolean flag indicating whether to include boss-related travel destinations in the search results."
+    }
+   ],
+   "returns": "TravelDestination*",
+   "side_effects": "None",
+   "notes": "Returns nullptr if no matching destination is found. Relies on global sTravelMgr instance and assumes valid bot position access via WorldPosition.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Finds the nearest travel destination matching a name from various game categories based on the bot's current position.\",\n  \"overview\": \"This function searches for travel destinations within specified categories such as quests, zones, NPCs, mobs, or bosses that match a given string. It iterates through each relevant category using the strategy manager, filtering results by title and collecting matches into a vector. The function then calculates distances from the bot's current world position to all collected destinations and returns the closest one.\",\n  \"params\": [\n    {\n      \"name\": \"bot\",\n      \"desc\": \"The player bot instance whose current position is used for distance calculations.\"\n    },\n    {\n      \"name\": \"name\",\n      \"desc\": \"A string to match against the titles of travel destinations; partial matches are supported via strstri.\"\n    },\n    {\n      \"name\": \"zones\",\n      \"desc\": \"Boolean flag indicating whether to include zone-related travel destinations in the search results.\"\n    },\n    {\n      \"name\": \"npcs\",\n      \"desc\": \"Boolean flag indicating whether to include RPG/NPC-related travel destinations in the search results.\"\n    },\n    {\n      \"name\": \"quests\",\n      \"desc\": \"Boolean flag indicating whether to include quest-related travel destinations in the search results.\"\n    },\n    {\n      \"name\": \"mobs\",\n      \"desc\": \"Boolean flag indicating whether to include mob grinding-related travel destinations in the search results.\"\n    },\n    {\n      \"name\": \"bosses\",\n      \"desc\": \"Boolean flag indicating whether to include boss-related travel destinations in the search results.\"\n    }\n  ],\n  \"returns\": \"TravelDestination*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns nullptr if no matching destination is found. Relies on global sTravelMgr instance and assumes valid bot position access via WorldPosition.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "f21088df1c42",
+  "doc": {
+   "summary": "Determines if a bot should initiate travel by checking activity permissions, target availability, and combat status.",
+   "overview": "This function evaluates whether a bot is permitted to perform the TRAVEL_ACTIVITY based on its AI configuration. It further verifies that neither the selected travel target nor any loot target is currently active or loottable, ensuring the bot does not attempt movement while engaged in combat.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on external state from botAI, context, and the bot object itself; callers should ensure these dependencies are initialized before invocation.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines if a bot should initiate travel by checking activity permissions, target availability, and combat status.\",\n  \"overview\": \"This function evaluates whether a bot is permitted to perform the TRAVEL_ACTIVITY based on its AI configuration. It further verifies that neither the selected travel target nor any loot target is currently active or loottable, ensuring the bot does not attempt movement while engaged in combat.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external state from botAI, context, and the bot object itself; callers should ensure these dependencies are initialized before invocation.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::needForQuest@5f3f8a47:qwen3-5-4b": {
+  "hash": "23ddafa42027",
+  "doc": {
+   "summary": "Determines if a specific unit is the target of an active quest or a completed quest with pending rewards for the bot.",
+   "overview": "This function evaluates whether a given Unit qualifies as a travel target by checking the bot's current quest status against that unit. It iterates through all active quests to verify if the unit is involved in incomplete objectives, represents a required NPC/GO, or provides necessary loot for completed quests lacking rewards.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to the Unit object representing the potential travel target."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function returns true if the unit is directly involved in an incomplete quest, satisfies a specific objective requirement, or provides loot for a completed quest with no reward status. It also performs a level check against incomplete quests.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines if a specific unit is the target of an active quest or a completed quest with pending rewards for the bot.\",\n  \"overview\": \"This function evaluates whether a given Unit qualifies as a travel target by checking the bot's current quest status against that unit. It iterates through all active quests to verify if the unit is involved in incomplete objectives, represents a required NPC/GO, or provides necessary loot for completed quests lacking rewards.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the Unit object representing the potential travel target.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function returns true if the unit is directly involved in an incomplete quest, satisfies a specific objective requirement, or provides loot for a completed quest with no reward status. It also performs a level check against incomplete quests.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.cpp::needItemForQuest@d2f134f1:qwen3-5-4b": {
+  "hash": "745d4048be19",
+  "doc": {
+   "summary": "Determines whether the current inventory lacks a specific item required by a particular quest objective.",
+   "overview": "This function iterates through all objectives of a given quest template to identify if any require the specified item. It compares the available quantity of that item against the required quantity for each matching objective and returns true immediately upon finding a deficit, otherwise it returns false after checking all objectives.",
+   "params": [
+    {
+     "name": "itemId",
+     "desc": "The unique identifier of the item to check for availability."
+    },
+    {
+     "name": "questTemplate",
+     "desc": "A pointer to the quest definition containing the list of required items and their quantities per objective."
+    },
+    {
+     "name": "questStatusData",
+     "desc": "A pointer to the current state of the quest, specifically providing the count of each item currently available."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Returns true if any objective requires more instances of itemId than are currently in inventory; returns false only if all required items are present or no objectives require the item.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines whether the current inventory lacks a specific item required by a particular quest objective.\",\n  \"overview\": \"This function iterates through all objectives of a given quest template to identify if any require the specified item. It compares the available quantity of that item against the required quantity for each matching objective and returns true immediately upon finding a deficit, otherwise it returns false after checking all objectives.\",\n  \"params\": [\n    {\n      \"name\": \"itemId\",\n      \"desc\": \"The unique identifier of the item to check for availability.\"\n    },\n    {\n      \"name\": \"questTemplate\",\n      \"desc\": \"A pointer to the quest definition containing the list of required items and their quantities per objective.\"\n    },\n    {\n      \"name\": \"questStatusData\",\n      \"desc\": \"A pointer to the current state of the quest, specifically providing the count of each item currently available.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns true if any objective requires more instances of itemId than are currently in inventory; returns false only if all required items are present or no objectives require the item.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ChooseTravelTargetAction.h::ChooseTravelTargetAction@6a6da3ab:qwen3-5-4b": {
+  "hash": "134491024819",
+  "doc": {
+   "summary": "ChooseTravelTargetAction is a ShadowAI movement action that selects an optimal travel destination based on active quests, mobs, bosses, or other criteria.",
+   "overview": "This class extends MovementAction to handle the logic of selecting where a bot should travel next. It evaluates various targets such as quest items, NPCs, and enemies to determine the most efficient path. The action relies on helper methods to filter destinations based on specific game conditions like zone restrictions or item requirements.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The public constructor accepts a ShadowAI instance and an optional name string. The static FindDestination method is the primary entry point for target selection, allowing callers to specify which categories of targets (zones, NPCs, quests, mobs, bosses) are relevant.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"ChooseTravelTargetAction is a ShadowAI movement action that selects an optimal travel destination based on active quests, mobs, bosses, or other criteria.\",\n  \"overview\": \"This class extends MovementAction to handle the logic of selecting where a bot should travel next. It evaluates various targets such as quest items, NPCs, and enemies to determine the most efficient path. The action relies on helper methods to filter destinations based on specific game conditions like zone restrictions or item requirements.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The public constructor accepts a ShadowAI instance and an optional name string. The static FindDestination method is the primary entry point for target selection, allowing callers to specify which categories of targets (zones, NPCs, quests, mobs, bosses) are relevant.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CombatActions.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "11f8907d3895",
+  "doc": {
+   "summary": "Executes a combat strategy change action by delegating to the base class implementation.",
+   "overview": "This function serves as a thin wrapper that forwards the provided Event object to the Execute method of ChangeCombatStrategyAction. It does not perform any additional logic or validation itself, relying entirely on the derived class's behavior to handle the specific combat strategy modification requested by the event.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The Event object containing details about the action to be executed."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the event is valid before invoking this function. Edge cases include scenarios where the base class implementation returns false due to missing permissions or invalid state.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a combat strategy change action by delegating to the base class implementation.\",\n  \"overview\": \"This function serves as a thin wrapper that forwards the provided Event object to the Execute method of ChangeCombatStrategyAction. It does not perform any additional logic or validation itself, relying entirely on the derived class's behavior to handle the specific combat strategy modification requested by the event.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The Event object containing details about the action to be executed.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the event is valid before invoking this function. Edge cases include scenarios where the base class implementation returns false due to missing permissions or invalid state.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CombatActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "0860c276e9fe",
+  "doc": {
+   "summary": "Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.",
+   "overview": "This function evaluates if a Hunter bot is in a position to perform close-combat attacks by checking for sufficient ammunition and valid targeting conditions. It first verifies the presence of a current target and whether the bot possesses enough ammo before assessing distance constraints relative to the victim or target. If no specific target exists or ammo is unavailable, it defaults to checking if the bot has the 'close' strategy enabled in combat mode.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on AI_VALUE macros for target and ammo data; distance calculation depends on server facade state.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.\",\n  \"overview\": \"This function evaluates if a Hunter bot is in a position to perform close-combat attacks by checking for sufficient ammunition and valid targeting conditions. It first verifies the presence of a current target and whether the bot possesses enough ammo before assessing distance constraints relative to the victim or target. If no specific target exists or ammo is unavailable, it defaults to checking if the bot has the 'close' strategy enabled in combat mode.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on AI_VALUE macros for target and ammo data; distance calculation depends on server facade state.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CombatActions.h::SwitchToMeleeAction@d91e6fcf:qwen3-5-4b": {
+  "hash": "5e0955a5ae71",
+  "doc": {
+   "summary": "SwitchToMeleeAction is a strategy action that forces the bot to switch its combat focus from ranged attacks to melee attacks.",
+   "overview": "This class extends ChangeCombatStrategyAction to specifically handle the transition to melee combat by applying the modifier '-ranged,+close'. It overrides the base Execute and isUseful methods to determine if the current state warrants a change to melee-based fighting.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the bot has valid melee capabilities before relying on this action; edge cases include situations where the bot is already in melee or lacks weapons for close combat.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"SwitchToMeleeAction is a strategy action that forces the bot to switch its combat focus from ranged attacks to melee attacks.\",\n  \"overview\": \"This class extends ChangeCombatStrategyAction to specifically handle the transition to melee combat by applying the modifier '-ranged,+close'. It overrides the base Execute and isUseful methods to determine if the current state warrants a change to melee-based fighting.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot has valid melee capabilities before relying on this action; edge cases include situations where the bot is already in melee or lacks weapons for close combat.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CombatActions.h::SwitchToRangedAction@8352386e:qwen3-5-4b": {
+  "hash": "3cebf451db08",
+  "doc": {
+   "summary": "SwitchToRangedAction is a strategy action that instructs the bot to switch its combat mode from close-range to ranged attacks.",
+   "overview": "This class extends ChangeCombatStrategyAction to specifically handle the transition to ranged combat by defining the target state as '-close,+ranged'. It inherits the core logic for managing combat strategy changes but overrides execution and utility checks to ensure the bot only switches when appropriate for its current situation.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should verify isUseful() before Execute() to avoid unnecessary state transitions.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"SwitchToRangedAction is a strategy action that instructs the bot to switch its combat mode from close-range to ranged attacks.\",\n  \"overview\": \"This class extends ChangeCombatStrategyAction to specifically handle the transition to ranged combat by defining the target state as '-close,+ranged'. It inherits the core logic for managing combat strategy changes but overrides execution and utility checks to ensure the bot only switches when appropriate for its current situation.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify isUseful() before Execute() to avoid unnecessary state transitions.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CustomStrategyEditAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "7f07ad93649a",
+  "doc": {
+   "summary": "Executes a custom strategy edit command by parsing the event parameters to retrieve the action name and index, then delegates to the Edit function.",
+   "overview": "This function processes user input from an Event object to perform specific edits on game entities. It first extracts the action name and target index from the provided text string, handling cases where only a name is given or no arguments are present. Depending on whether the index is marked with a question mark, it either displays help information or invokes the Edit function to modify the specified entity.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The Event object containing the command text and associated game state."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "I/O, global state",
+   "notes": "PrintHelp() and Print() are likely helper functions that output to the client or server log; Edit() modifies game data. The function relies on string parsing which may fail if input format is incorrect.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a custom strategy edit command by parsing the event parameters to retrieve the action name and index, then delegates to the Edit function.\",\n  \"overview\": \"This function processes user input from an Event object to perform specific edits on game entities. It first extracts the action name and target index from the provided text string, handling cases where only a name is given or no arguments are present. Depending on whether the index is marked with a question mark, it either displays help information or invokes the Edit function to modify the specified entity.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The Event object containing the command text and associated game state.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O, global state\",\n  \"notes\": \"PrintHelp() and Print() are likely helper functions that output to the client or server log; Edit() modifies game data. The function relies on string parsing which may fail if input format is incorrect.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CustomStrategyEditAction.cpp::PrintHelp@337ea396:qwen3-5-4b": {
+  "hash": "f5e04d005b1d",
+  "doc": {
+   "summary": "PrintHelp displays a list of custom strategies owned by the current bot and provides usage instructions to the master.",
+   "overview": "This function queries the Shadows database for custom strategies associated with the bot's owner GUID and iterates through the results to report each strategy name. It concludes by informing the user of the command syntax required to edit these strategies.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Database query, network communication (botAI->TellMaster)",
+   "notes": "Returns false to indicate this is a help action rather than an execution action; relies on botAI and ShadowsDatabase being initialized.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"PrintHelp displays a list of custom strategies owned by the current bot and provides usage instructions to the master.\",\n  \"overview\": \"This function queries the Shadows database for custom strategies associated with the bot's owner GUID and iterates through the results to report each strategy name. It concludes by informing the user of the command syntax required to edit these strategies.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Database query, network communication (botAI->TellMaster)\",\n  \"notes\": \"Returns false to indicate this is a help action rather than an execution action; relies on botAI and ShadowsDatabase being initialized.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CustomStrategyEditAction.cpp::Print@08d69554:qwen3-5-4b": {
+  "hash": "466a5339cc73",
+  "doc": {
+   "summary": "Prints the custom strategy name to the master and retrieves and displays all associated actions for that owner.",
+   "overview": "This function first sends the provided strategy name to the master via the bot AI interface. It then queries the Shadows database for any custom strategies matching the owner's GUID and the given name, iterating through results to print each action line.",
+   "params": [
+    {
+     "name": "name",
+     "desc": "The name of the custom strategy to search for and display."
+    }
+   ],
+   "returns": "true",
+   "side_effects": "Database query, I/O (master communication)",
+   "notes": "Always returns true regardless of whether a matching strategy is found; callers should expect this behavior even if no actions exist.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Prints the custom strategy name to the master and retrieves and displays all associated actions for that owner.\",\n  \"overview\": \"This function first sends the provided strategy name to the master via the bot AI interface. It then queries the Shadows database for any custom strategies matching the owner's GUID and the given name, iterating through results to print each action line.\",\n  \"params\": [\n    {\n      \"name\": \"name\",\n      \"desc\": \"The name of the custom strategy to search for and display.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"Database query, I/O (master communication)\",\n  \"notes\": \"Always returns true regardless of whether a matching strategy is found; callers should expect this behavior even if no actions exist.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CustomStrategyEditAction.cpp::Edit@78db4a8d:qwen3-5-4b": {
+  "hash": "738d54da1ee7",
+  "doc": {
+   "summary": "Edits, deletes, or creates a custom strategy for a specific bot owner based on name and index.",
+   "overview": "This function retrieves an existing custom strategy by the bot's owner GUID, name, and index. If found, it either updates the command if provided or deletes the entry if the command is empty; otherwise, it inserts a new strategy record into the Shadows database. After persisting changes, it logs the action and attempts to reset the corresponding in-memory strategy object.",
+   "params": [
+    {
+     "name": "name",
+     "desc": "The unique identifier name for the custom strategy."
+    },
+    {
+     "name": "idx",
+     "desc": "The index of the custom strategy within the bot's configuration."
+    },
+    {
+     "name": "command",
+     "desc": "The new command string to update; if empty, triggers a deletion."
+    }
+   ],
+   "returns": "true",
+   "side_effects": "Database I/O (Shadows), global state modification (bot AI re-initialization)",
+   "notes": "Calls PrintActionLine for logging; relies on botAI and ShadowsDatabase being initialized. Edge case: if the strategy does not exist in the database, it creates a new one.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Edits, deletes, or creates a custom strategy for a specific bot owner based on name and index.\",\n  \"overview\": \"This function retrieves an existing custom strategy by the bot's owner GUID, name, and index. If found, it either updates the command if provided or deletes the entry if the command is empty; otherwise, it inserts a new strategy record into the Shadows database. After persisting changes, it logs the action and attempts to reset the corresponding in-memory strategy object.\",\n  \"params\": [\n    {\n      \"name\": \"name\",\n      \"desc\": \"The unique identifier name for the custom strategy.\"\n    },\n    {\n      \"name\": \"idx\",\n      \"desc\": \"The index of the custom strategy within the bot's configuration.\"\n    },\n    {\n      \"name\": \"command\",\n      \"desc\": \"The new command string to update; if empty, triggers a deletion.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"Database I/O (Shadows), global state modification (bot AI re-initialization)\",\n  \"notes\": \"Calls PrintActionLine for logging; relies on botAI and ShadowsDatabase being initialized. Edge case: if the strategy does not exist in the database, it creates a new one.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CustomStrategyEditAction.cpp::PrintActionLine@115e09e0:qwen3-5-4b": {
+  "hash": "617b2e0a9d06",
+  "doc": {
+   "summary": "Prints a formatted action line to the master and returns true.",
+   "overview": "This function constructs a string containing an action index and a command, prefixed with a hash symbol, then transmits it to the master via the botAI interface. It is designed for logging or reporting custom strategy actions within the game server's AI system.",
+   "params": [
+    {
+     "name": "idx",
+     "desc": "The unique identifier for the action being printed."
+    },
+    {
+     "name": "command",
+     "desc": "The textual command associated with the action."
+    }
+   ],
+   "returns": "true",
+   "side_effects": "Network (botAI->TellMaster)",
+   "notes": "Callers should ensure idx is valid before invoking; the function always returns true regardless of network success.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Prints a formatted action line to the master and returns true.\",\n  \"overview\": \"This function constructs a string containing an action index and a command, prefixed with a hash symbol, then transmits it to the master via the botAI interface. It is designed for logging or reporting custom strategy actions within the game server's AI system.\",\n  \"params\": [\n    {\n      \"name\": \"idx\",\n      \"desc\": \"The unique identifier for the action being printed.\"\n    },\n    {\n      \"name\": \"command\",\n      \"desc\": \"The textual command associated with the action.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"Network (botAI->TellMaster)\",\n  \"notes\": \"Callers should ensure idx is valid before invoking; the function always returns true regardless of network success.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/CustomStrategyEditAction.h::CustomStrategyEditAction@351f5469:qwen3-5-4b": {
+  "hash": "4033d4c86cfc",
+  "doc": {
+   "summary": "CustomStrategyEditAction is a strategy action class that allows users to modify the commands of specific actions within a ShadowAI bot's custom strategy.",
+   "overview": "This class extends the base Action class to handle operations on custom strategies defined by ShadowAI bots. It accepts a pointer to the bot's AI instance during construction, enabling it to access and manipulate the bot's internal state. The primary functionality is delegated to the Execute method, which likely orchestrates the editing process based on user input or event triggers.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The constructor requires a valid ShadowAI* instance; passing null may lead to undefined behavior. The Execute method is the entry point for all strategy modifications.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"CustomStrategyEditAction is a strategy action class that allows users to modify the commands of specific actions within a ShadowAI bot's custom strategy.\",\n  \"overview\": \"This class extends the base Action class to handle operations on custom strategies defined by ShadowAI bots. It accepts a pointer to the bot's AI instance during construction, enabling it to access and manipulate the bot's internal state. The primary functionality is delegated to the Execute method, which likely orchestrates the editing process based on user input or event triggers.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The constructor requires a valid ShadowAI* instance; passing null may lead to undefined behavior. The Execute method is the entry point for all strategy modifications.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DebugAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "097da8b5174e",
+  "doc": {
+   "summary": "Executes debug commands such as scanning creatures, printing maps, and reporting travel or quest status to the master.",
+   "overview": "This function processes a string command from an event parameter to perform various debugging operations on the game world. It first checks for a 'scan' command to log creature positions and zone data, followed by commands to print map structures or report travel routes. The function also handles queries related to quests, including listing quest details, counting bad quests, and identifying specific problematic quests.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The event object containing the command string in its 'getParam()' field."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "I/O (file logging, network messages to master)",
+   "notes": "Calls GetMaster(), sShadowAIConfig, WorldPosition, sMapMgr, sTravelNodeMap, botAI, sObjectMgr, and sTravelMgr. Edge cases include missing masters, invalid quest IDs, or destinations not found.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes debug commands such as scanning creatures, printing maps, and reporting travel or quest status to the master.\",\n  \"overview\": \"This function processes a string command from an event parameter to perform various debugging operations on the game world. It first checks for a 'scan' command to log creature positions and zone data, followed by commands to print map structures or report travel routes. The function also handles queries related to quests, including listing quest details, counting bad quests, and identifying specific problematic quests.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the command string in its 'getParam()' field.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O (file logging, network messages to master)\",\n  \"notes\": \"Calls GetMaster(), sShadowAIConfig, WorldPosition, sMapMgr, sTravelNodeMap, botAI, sObjectMgr, and sTravelMgr. Edge cases include missing masters, invalid quest IDs, or destinations not found.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DebugAction.cpp::FakeSpell@70ca0ea0:qwen3-5-4b": {
+  "hash": "d4a8abcf1e50",
+  "doc": {
+   "summary": "Simulates the start and completion of a spell cast by sending network packets to the client without executing actual game logic.",
+   "overview": "This function generates two WorldPacket messages (SMSG_SPELL_START and SMSG_SPELL_GO) to mimic a spell being cast, bypassing normal validation and execution steps. It constructs packet data based on provided caster information, target details, and optional trajectory parameters, allowing developers to test client-side spell rendering and animations in isolation.",
+   "params": [
+    {
+     "name": "spellId",
+     "desc": "The unique identifier of the spell to simulate."
+    },
+    {
+     "name": "truecaster",
+     "desc": "Pointer to the actual unit performing the cast (used for GUIDs in packets)."
+    },
+    {
+     "name": "caster",
+     "desc": "Optional pointer to a different unit acting as the caster; if null, truecaster is used."
+    },
+    {
+     "name": "target",
+     "desc": "ObjectGuid of the primary target for the spell."
+    },
+    {
+     "name": "otherTargets",
+     "desc": "Vector containing ObjectGuids of additional targets affected by the spell."
+    },
+    {
+     "name": "missTargets",
+     "desc": "Vector containing ObjectGuids of units that will miss the spell effect."
+    },
+    {
+     "name": "source",
+     "desc": "WorldPosition representing the origin location of the spell trajectory."
+    },
+    {
+     "name": "dest",
+     "desc": "WorldPosition representing the destination location for spells requiring a target point."
+    },
+    {
+     "name": "forceDest",
+     "desc": "Boolean flag; if true, forces the use of dest regardless of spell targeting flags."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "Network (SMSG_SPELL_START, SMSG_SPELL_GO), Global State (sSpellMgr)",
+   "notes": "Used primarily for debugging and testing client-side spell effects; does not trigger actual spell logic or resource consumption.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Simulates the start and completion of a spell cast by sending network packets to the client without executing actual game logic.\",\n  \"overview\": \"This function generates two WorldPacket messages (SMSG_SPELL_START and SMSG_SPELL_GO) to mimic a spell being cast, bypassing normal validation and execution steps. It constructs packet data based on provided caster information, target details, and optional trajectory parameters, allowing developers to test client-side spell rendering and animations in isolation.\",\n  \"params\": [\n    {\n      \"name\": \"spellId\",\n      \"desc\": \"The unique identifier of the spell to simulate.\"\n    },\n    {\n      \"name\": \"truecaster\",\n      \"desc\": \"Pointer to the actual unit performing the cast (used for GUIDs in packets).\"\n    },\n    {\n      \"name\": \"caster\",\n      \"desc\": \"Optional pointer to a different unit acting as the caster; if null, truecaster is used.\"\n    },\n    {\n      \"name\": \"target\",\n      \"desc\": \"ObjectGuid of the primary target for the spell.\"\n    },\n    {\n      \"name\": \"otherTargets\",\n      \"desc\": \"Vector containing ObjectGuids of additional targets affected by the spell.\"\n    },\n    {\n      \"name\": \"missTargets\",\n      \"desc\": \"Vector containing ObjectGuids of units that will miss the spell effect.\"\n    },\n    {\n      \"name\": \"source\",\n      \"desc\": \"WorldPosition representing the origin location of the spell trajectory.\"\n    },\n    {\n      \"name\": \"dest\",\n      \"desc\": \"WorldPosition representing the destination location for spells requiring a target point.\"\n    },\n    {\n      \"name\": \"forceDest\",\n      \"desc\": \"Boolean flag; if true, forces the use of dest regardless of spell targeting flags.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (SMSG_SPELL_START, SMSG_SPELL_GO), Global State (sSpellMgr)\",\n  \"notes\": \"Used primarily for debugging and testing client-side spell effects; does not trigger actual spell logic or resource consumption.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DebugAction.cpp::addAura@17457710:qwen3-5-4b": {
+  "hash": "9be1ef90152b",
+  "doc": {
+   "summary": "Adds a spell aura to a target unit if the target is alive and the spell permits it.",
+   "overview": "This function retrieves spell information for the given spell ID and checks whether the target unit is alive. If the target is dead, the spell is passive, or the spell allows targeting dead units, the function proceeds to apply the aura; otherwise, it returns early without modification.",
+   "params": [
+    {
+     "name": "spellId",
+     "desc": "The unique identifier of the spell to be applied as an aura."
+    },
+    {
+     "name": "target",
+     "desc": "A pointer to the unit object that will receive the aura; must not be null."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Callers should ensure the target is valid before invoking this function. Edge case: if the spell has no attributes allowing dead targets and the target is already dead, the aura will not be added.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Adds a spell aura to a target unit if the target is alive and the spell permits it.\",\n  \"overview\": \"This function retrieves spell information for the given spell ID and checks whether the target unit is alive. If the target is dead, the spell is passive, or the spell allows targeting dead units, the function proceeds to apply the aura; otherwise, it returns early without modification.\",\n  \"params\": [\n    {\n      \"name\": \"spellId\",\n      \"desc\": \"The unique identifier of the spell to be applied as an aura.\"\n    },\n    {\n      \"name\": \"target\",\n      \"desc\": \"A pointer to the unit object that will receive the aura; must not be null.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the target is valid before invoking this function. Edge case: if the spell has no attributes allowing dead targets and the target is already dead, the aura will not be added.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DebugAction.h::DebugAction@61494f0c:qwen3-5-4b": {
+  "hash": "bcbbaf0b27ae",
+  "doc": {
+   "summary": "DebugAction is a C++ class that extends the Action base class to simulate spells and manage auras for ShadowAI bots during debugging.",
+   "overview": "This class serves as a utility mechanism within the game server's strategy system, allowing developers to inject artificial spell effects into bot behavior without triggering actual game logic. It inherits from the standard Action class but overrides execution methods to handle specific simulation scenarios. The primary functionality involves faking spell casts and adding temporary auras to units for testing purposes.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Callers should ensure the botAI is initialized before instantiation; edge cases include potential null pointer dereferences if Unit pointers are invalid during FakeSpell execution.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"DebugAction is a C++ class that extends the Action base class to simulate spells and manage auras for ShadowAI bots during debugging.\",\n  \"overview\": \"This class serves as a utility mechanism within the game server's strategy system, allowing developers to inject artificial spell effects into bot behavior without triggering actual game logic. It inherits from the standard Action class but overrides execution methods to handle specific simulation scenarios. The primary functionality involves faking spell casts and adding temporary auras to units for testing purposes.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI is initialized before instantiation; edge cases include potential null pointer dereferences if Unit pointers are invalid during FakeSpell execution.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DelayAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "8cff9509d7e5",
+  "doc": {
+   "summary": "Executes a passive shadow AI action by calculating a combined delay and setting the next check interval.",
+   "overview": "This function computes a total delay by summing the configured passive delay and global cool-down values from the Shadow AI configuration. It then instructs the bot AI to set this calculated duration as the time until the next state check, effectively pausing further actions for that period.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "botAI->SetNextCheckDelay(delay)",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a passive shadow AI action by calculating a combined delay and setting the next check interval.\",\n  \"overview\": \"This function computes a total delay by summing the configured passive delay and global cool-down values from the Shadow AI configuration. It then instructs the bot AI to set this calculated duration as the time until the next state check, effectively pausing further actions for that period.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"botAI->SetNextCheckDelay(delay)\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DelayAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "5aea058d75ba",
+  "doc": {
+   "summary": "Returns true if the bot AI currently permits all activity types.",
+   "overview": "This function checks whether the bot's artificial intelligence allows any form of action by querying its internal state. It returns a boolean indicating if the current activity mask matches the allowed set, effectively determining if the bot is in an active or idle state. The result is used to decide whether to execute a delay action based on AI constraints.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on the global botAI instance and its AllowActivity method; callers should ensure the bot object is initialized before invoking.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns true if the bot AI currently permits all activity types.\",\n  \"overview\": \"This function checks whether the bot's artificial intelligence allows any form of action by querying its internal state. It returns a boolean indicating if the current activity mask matches the allowed set, effectively determining if the bot is in an active or idle state. The result is used to decide whether to execute a delay action based on AI constraints.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on the global botAI instance and its AllowActivity method; callers should ensure the bot object is initialized before invoking.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DelayAction.h::DelayAction@2cc8ddd6:qwen3-5-4b": {
+  "hash": "8128283a626f",
+  "doc": {
+   "summary": "The DelayAction class implements a strategy action that pauses the execution of a ShadowAI bot for a specified duration.",
+   "overview": "Derived from the base Action class, DelayAction accepts a pointer to the bot's AI instance during construction and identifies itself via the string \"delay\". Its primary functionality is encapsulated in the Execute method, which manages the timing logic required to delay subsequent actions within the game loop. The isUseful method determines if the action should be executed based on current game conditions.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers must ensure the botAI pointer remains valid throughout the execution of this action.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"The DelayAction class implements a strategy action that pauses the execution of a ShadowAI bot for a specified duration.\",\n  \"overview\": \"Derived from the base Action class, DelayAction accepts a pointer to the bot's AI instance during construction and identifies itself via the string \\\"delay\\\". Its primary functionality is encapsulated in the Execute method, which manages the timing logic required to delay subsequent actions within the game loop. The isUseful method determines if the action should be executed based on current game conditions.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI pointer remains valid throughout the execution of this action.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DestroyItemAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "a81421965ab1",
+  "doc": {
+   "summary": "Executes the item destruction action by parsing the event's text parameter and invoking the destroy logic for each specified item ID.",
+   "overview": "This function processes an incoming event to remove one or more items from the game world. It first extracts the item identifiers from the event's text parameter using the chat module, then iterates through them to trigger the destruction of each item via a visitor pattern.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The action event containing the text parameter that specifies which items to destroy."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "I/O, global state",
+   "notes": "Calls chat->parseItems() and FindItemByIdVisitor; assumes valid item IDs in the text parameter.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the item destruction action by parsing the event's text parameter and invoking the destroy logic for each specified item ID.\",\n  \"overview\": \"This function processes an incoming event to remove one or more items from the game world. It first extracts the item identifiers from the event's text parameter using the chat module, then iterates through them to trigger the destruction of each item via a visitor pattern.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The action event containing the text parameter that specifies which items to destroy.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O, global state\",\n  \"notes\": \"Calls chat->parseItems() and FindItemByIdVisitor; assumes valid item IDs in the text parameter.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DestroyItemAction.cpp::DestroyItem@d27af968:qwen3-5-4b": {
+  "hash": "9578feec1a6e",
+  "doc": {
+   "summary": "Executes a destroy action by iterating through items found by the visitor, logging their destruction to chat, and removing them from the game.",
+   "overview": "This function processes a list of items identified by the provided FindItemVisitor instance. It iterates over each item, formats a log message indicating its destruction using the current chat configuration, and sends this message to the master bot AI. Finally, it calls the bot's destroy method on each item to physically remove it from the game state.",
+   "params": [
+    {
+     "name": "visitor",
+     "desc": "A pointer to a FindItemVisitor object that has already identified and collected the items to be destroyed."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "I/O (chat logging), Network (botAI communication), Global State (item removal)",
+   "notes": "Relies on chat->FormatItem() for formatting and botAI->TellMaster() for output; assumes visitor->GetResult() returns a valid vector of Item pointers.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a destroy action by iterating through items found by the visitor, logging their destruction to chat, and removing them from the game.\",\n  \"overview\": \"This function processes a list of items identified by the provided FindItemVisitor instance. It iterates over each item, formats a log message indicating its destruction using the current chat configuration, and sends this message to the master bot AI. Finally, it calls the bot's destroy method on each item to physically remove it from the game state.\",\n  \"params\": [\n    {\n      \"name\": \"visitor\",\n      \"desc\": \"A pointer to a FindItemVisitor object that has already identified and collected the items to be destroyed.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"I/O (chat logging), Network (botAI communication), Global State (item removal)\",\n  \"notes\": \"Relies on chat->FormatItem() for formatting and botAI->TellMaster() for output; assumes visitor->GetResult() returns a valid vector of Item pointers.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DestroyItemAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "ec05f01e9e02",
+  "doc": {
+   "summary": "Returns true if the bot AI has no active player master, indicating the item destruction action is currently useful.",
+   "overview": "This function evaluates whether a DestroyItemAction should be executed by checking the state of the bot's artificial intelligence. It determines utility based on the presence or absence of an active player master within the bot system. The result guides decision-making logic for item disposal in the game environment.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Depends on the availability and state of the botAI object; may return false if a player master is active.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns true if the bot AI has no active player master, indicating the item destruction action is currently useful.\",\n  \"overview\": \"This function evaluates whether a DestroyItemAction should be executed by checking the state of the bot's artificial intelligence. It determines utility based on the presence or absence of an active player master within the bot system. The result guides decision-making logic for item disposal in the game environment.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Depends on the availability and state of the botAI object; may return false if a player master is active.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DestroyItemAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "6c210d0143c0",
+  "doc": {
+   "summary": "Executes item destruction logic based on bag space availability and AI configuration flags.",
+   "overview": "This function attempts to destroy items from the bot's inventory if there is sufficient free bag space (at least 90 units). It first checks for poor quality items in real guild scenarios, then falls back to destroying items with specific usage types like None, Quest, Vendor, AH, Skill, or Use. The process iterates through candidate items and stops early if the bag space requirement is met.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Global state (modifies bot inventory via DestroyItem)",
+   "notes": "Returns true only if an item was successfully destroyed; returns false if no items were destroyed or bag space was insufficient. Early exit occurs when bagSpace reaches 90 during iteration.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes item destruction logic based on bag space availability and AI configuration flags.\",\n  \"overview\": \"This function attempts to destroy items from the bot's inventory if there is sufficient free bag space (at least 90 units). It first checks for poor quality items in real guild scenarios, then falls back to destroying items with specific usage types like None, Quest, Vendor, AH, Skill, or Use. The process iterates through candidate items and stops early if the bag space requirement is met.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Global state (modifies bot inventory via DestroyItem)\",\n  \"notes\": \"Returns true only if an item was successfully destroyed; returns false if no items were destroyed or bag space was insufficient. Early exit occurs when bagSpace reaches 90 during iteration.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DestroyItemAction.h::DestroyItemAction@f420f2ae:qwen3-5-4b": {
+  "hash": "59f533944c7b",
+  "doc": {
+   "summary": "Executes a strategy action to destroy an item by invoking the protected helper method with a FindItemVisitor.",
+   "overview": "The DestroyItemAction class extends InventoryAction to handle specific logic for removing items from inventory. It accepts a ShadowAI instance and an optional name parameter, defaulting to 'destroy', during construction. The primary functionality is encapsulated in the Execute method, which delegates the actual destruction logic to the protected DestroyItem helper.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a strategy action to destroy an item by invoking the protected helper method with a FindItemVisitor.\",\n  \"overview\": \"The DestroyItemAction class extends InventoryAction to handle specific logic for removing items from inventory. It accepts a ShadowAI instance and an optional name parameter, defaulting to 'destroy', during construction. The primary functionality is encapsulated in the Execute method, which delegates the actual destruction logic to the protected DestroyItem helper.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DestroyItemAction.h::SmartDestroyItemAction@a4dbb66f:qwen3-5-4b": {
+  "hash": "2c5e7f18b90b",
+  "doc": {
+   "summary": "SmartDestroyItemAction is a specialized strategy action that executes item destruction with enhanced logic derived from the base DestroyItemAction.",
+   "overview": "This class extends the base DestroyItemAction to provide intelligent decision-making for destroying items within the game environment. It initializes with a reference to the ShadowAI bot instance and applies a 'smart destroy' identifier to its execution context. The implementation relies on inherited functionality while potentially overriding behavior through specific event handling.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the botAI instance is valid before invoking Execute; edge cases include scenarios where the item target is no longer accessible or the game state prevents destruction.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"SmartDestroyItemAction is a specialized strategy action that executes item destruction with enhanced logic derived from the base DestroyItemAction.\",\n  \"overview\": \"This class extends the base DestroyItemAction to provide intelligent decision-making for destroying items within the game environment. It initializes with a reference to the ShadowAI bot instance and applies a 'smart destroy' identifier to its execution context. The implementation relies on inherited functionality while potentially overriding behavior through specific event handling.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI instance is valid before invoking Execute; edge cases include scenarios where the item target is no longer accessible or the game state prevents destruction.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DropQuestAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "9b1bfeffcef4",
+  "doc": {
+   "summary": "Executes the DropQuestAction strategy by iterating through a bot's quest log and removing quests that are significantly lower level than the bot, based on configurable thresholds.",
+   "overview": "This function first validates that an event owner exists and that the drop obsolete quests configuration is enabled before proceeding. It calculates a dynamic 'trivial' level threshold based on the bot's current level to determine which quests should be discarded. The core logic iterates through all quest slots, identifies quests where the level difference exceeds the calculated trivial threshold, and removes them by clearing the slot, taking source items, and resetting the quest status.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The event object containing the context for the action execution."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Quest log modification, item state changes (source items taken), quest status updates, and potential logging or chat messages.",
+   "notes": "Calls GetMaster() if no event owner is detected; relies on sShadowAIConfig->dropObsoleteQuests being true; uses botLevel to determine trivial thresholds which scale between levels 5 and 8.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the DropQuestAction strategy by iterating through a bot's quest log and removing quests that are significantly lower level than the bot, based on configurable thresholds.\",\n  \"overview\": \"This function first validates that an event owner exists and that the drop obsolete quests configuration is enabled before proceeding. It calculates a dynamic 'trivial' level threshold based on the bot's current level to determine which quests should be discarded. The core logic iterates through all quest slots, identifies quests where the level difference exceeds the calculated trivial threshold, and removes them by clearing the slot, taking source items, and resetting the quest status.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the context for the action execution.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Quest log modification, item state changes (source items taken), quest status updates, and potential logging or chat messages.\",\n  \"notes\": \"Calls GetMaster() if no event owner is detected; relies on sShadowAIConfig->dropObsoleteQuests being true; uses botLevel to determine trivial thresholds which scale between levels 5 and 8.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DropQuestAction.cpp::DropQuestType@934ab5b1:qwen3-5-4b": {
+  "hash": "c5f7dbaf67da",
+  "doc": {
+   "summary": "Removes a specified number of active quests from the bot's inventory, applying filters for quest completion status, progress availability, and level-based visibility rules.",
+   "overview": "This function iterates through all available quest slots in the bot's inventory to identify and remove quests based on user-defined criteria. It utilizes a random shuffle algorithm when fewer than 100 quests are targeted to ensure non-deterministic selection order. The removal process checks for class requirements, level differences, and specific flags such as 'green' visibility or completion status before executing the drop.",
+   "params": [
+    {
+     "name": "numQuest",
+     "desc": "Output parameter tracking the count of quests removed; incremented if a quest is found but not dropped, decremented upon successful removal."
+    },
+    {
+     "name": "wantNum",
+     "desc": "Input parameter specifying the target number of quests to remove; if set to 100, all eligible quests are processed sequentially without shuffling."
+    },
+    {
+     "name": "isGreen",
+     "desc": "Input boolean flag indicating whether to enforce level-based visibility rules where lower-level quests are hidden unless the 'green' option is enabled."
+    },
+    {
+     "name": "hasProgress",
+     "desc": "Input boolean flag restricting removal of quests that have already been partially completed by the bot."
+    },
+    {
+     "name": "isComplete",
+     "desc": "Input boolean flag restricting removal of quests that are currently marked as complete."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "Modifies bot inventory state, updates quest status flags, logs debug messages if configured, and notifies the master controller.",
+   "notes": "Caller must ensure numQuest is initialized to zero before invocation. Edge case: If wantNum exceeds the number of available quests, the function will process all eligible quests regardless of the target count.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Removes a specified number of active quests from the bot's inventory, applying filters for quest completion status, progress availability, and level-based visibility rules.\",\n  \"overview\": \"This function iterates through all available quest slots in the bot's inventory to identify and remove quests based on user-defined criteria. It utilizes a random shuffle algorithm when fewer than 100 quests are targeted to ensure non-deterministic selection order. The removal process checks for class requirements, level differences, and specific flags such as 'green' visibility or completion status before executing the drop.\",\n  \"params\": [\n    {\n      \"name\": \"numQuest\",\n      \"desc\": \"Output parameter tracking the count of quests removed; incremented if a quest is found but not dropped, decremented upon successful removal.\"\n    },\n    {\n      \"name\": \"wantNum\",\n      \"desc\": \"Input parameter specifying the target number of quests to remove; if set to 100, all eligible quests are processed sequentially without shuffling.\"\n    },\n    {\n      \"name\": \"isGreen\",\n      \"desc\": \"Input boolean flag indicating whether to enforce level-based visibility rules where lower-level quests are hidden unless the 'green' option is enabled.\"\n    },\n    {\n      \"name\": \"hasProgress\",\n      \"desc\": \"Input boolean flag restricting removal of quests that have already been partially completed by the bot.\"\n    },\n    {\n      \"name\": \"isComplete\",\n      \"desc\": \"Input boolean flag restricting removal of quests that are currently marked as complete.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Modifies bot inventory state, updates quest status flags, logs debug messages if configured, and notifies the master controller.\",\n  \"notes\": \"Caller must ensure numQuest is initialized to zero before invocation. Edge case: If wantNum exceeds the number of available quests, the function will process all eligible quests regardless of the target count.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DropQuestAction.cpp::HasProgress@b1faeee8:qwen3-5-4b": {
+  "hash": "41da58dc9fcf",
+  "doc": {
+   "summary": "Returns true if the bot has completed the quest or has made progress on any of its objectives.",
+   "overview": "This function checks whether a specific player bot has finished a quest or has achieved sufficient progress to be considered active. It first verifies if the quest is already marked as complete, and if so, immediately returns true. Otherwise, it iterates through all defined objectives to determine if any required item, creature, or go has been collected in an amount greater than zero.",
+   "params": [
+    {
+     "name": "bot",
+     "desc": "Pointer to the player bot instance whose quest status is being evaluated."
+    },
+    {
+     "name": "quest",
+     "desc": "Pointer to the Quest object containing the objective definitions and requirements."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function relies on internal quest status maps which may be updated asynchronously; callers should ensure the bot's state is current before invoking this check.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns true if the bot has completed the quest or has made progress on any of its objectives.\",\n  \"overview\": \"This function checks whether a specific player bot has finished a quest or has achieved sufficient progress to be considered active. It first verifies if the quest is already marked as complete, and if so, immediately returns true. Otherwise, it iterates through all defined objectives to determine if any required item, creature, or go has been collected in an amount greater than zero.\",\n  \"params\": [\n    {\n      \"name\": \"bot\",\n      \"desc\": \"Pointer to the player bot instance whose quest status is being evaluated.\"\n    },\n    {\n      \"name\": \"quest\",\n      \"desc\": \"Pointer to the Quest object containing the objective definitions and requirements.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on internal quest status maps which may be updated asynchronously; callers should ensure the bot's state is current before invoking this check.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DropQuestAction.h::DropQuestAction@7b23d734:qwen3-5-4b": {
+  "hash": "a2462329d6ad",
+  "doc": {
+   "summary": "Executes the action of dropping a quest item for the specified ShadowAI bot.",
+   "overview": "The DropQuestAction class extends the base Action class to handle specific logic related to quest item drops within the game server. It initializes with a reference to the ShadowAI bot and defines an event handler that processes the drop operation when triggered by an in-game event.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the action of dropping a quest item for the specified ShadowAI bot.\",\n  \"overview\": \"The DropQuestAction class extends the base Action class to handle specific logic related to quest item drops within the game server. It initializes with a reference to the ShadowAI bot and defines an event handler that processes the drop operation when triggered by an in-game event.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/DropQuestAction.h::CleanQuestLogAction@3e3b237f:qwen3-5-4b": {
+  "hash": "b0496eea3f8d",
+  "doc": {
+   "summary": "CleanQuestLogAction is a ShadowAI strategy action that executes a specific drop logic for quests based on player state.",
+   "overview": "This class extends the base Action class to handle the cleaning of a bot's quest log. It primarily utilizes the DropQuestType method to manage the number and type of quests dropped, with optional flags for color, progress status, and completion state. The Execute method triggers this logic during game events, while HasProgress provides a utility check for specific player-quest combinations.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The DropQuestType method accepts parameters for the number of quests to drop (default 100), quest color, progress indication, and completion status. The HasProgress static method requires a Player pointer and Quest pointer to determine if progress exists.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"CleanQuestLogAction is a ShadowAI strategy action that executes a specific drop logic for quests based on player state.\",\n  \"overview\": \"This class extends the base Action class to handle the cleaning of a bot's quest log. It primarily utilizes the DropQuestType method to manage the number and type of quests dropped, with optional flags for color, progress status, and completion state. The Execute method triggers this logic during game events, while HasProgress provides a utility check for specific player-quest combinations.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The DropQuestType method accepts parameters for the number of quests to drop (default 100), quest color, progress indication, and completion status. The HasProgress static method requires a Player pointer and Quest pointer to determine if progress exists.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::Action@ede17f62:qwen3-5-4b": {
+  "hash": "4aec354a99a3",
+  "doc": {
+   "summary": "The EmoteActionBase constructor initializes the emote list by calling InitEmotes() if it is currently empty.",
+   "overview": "This constructor sets up the internal state of an EmoteAction instance by delegating to the base Action class and then checking for an empty emote collection. If no emotes have been loaded yet, it triggers the initialization routine to populate the list before the action becomes usable.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"The EmoteActionBase constructor initializes the emote list by calling InitEmotes() if it is currently empty.\",\n  \"overview\": \"This constructor sets up the internal state of an EmoteAction instance by delegating to the base Action class and then checking for an empty emote collection. If no emotes have been loaded yet, it triggers the initialization routine to populate the list before the action becomes usable.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::Qualified@f23e6652:qwen3-5-4b": {
+  "hash": "2da4563d0c5e",
+  "doc": {
+   "summary": "Constructs an EmoteAction instance by initializing the base class with a reference to the ShadowAI bot and the action name 'emote'.",
+   "overview": "This constructor initializes the EmoteAction object by delegating to the EmoteActionBase constructor, passing the owning botAI pointer and the specific action identifier. It also invokes the Qualified() initializer list to set up any necessary qualification flags for the action's execution context.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs an EmoteAction instance by initializing the base class with a reference to the ShadowAI bot and the action name 'emote'.\",\n  \"overview\": \"This constructor initializes the EmoteAction object by delegating to the EmoteActionBase constructor, passing the owning botAI pointer and the specific action identifier. It also invokes the Qualified() initializer list to set up any necessary qualification flags for the action's execution context.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::InitEmotes@da692290:qwen3-5-4b": {
+  "hash": "e0dcb5ba4f11",
+  "doc": {
+   "summary": "Initializes the global emote lookup tables by populating them with predefined string-to-enum and string-to-int mappings.",
+   "overview": "This function serves as a static initializer that defines the complete set of available emotes for the game server. It creates two distinct data structures: 'emotes', which maps action names to their corresponding enum types (distinguishing between one-shot actions and state-based actions), and 'textEmotes', which maps names to either string literals or integer IDs used for text chat commands.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "Global state modification via initialization of static variables",
+   "notes": "Called automatically at program startup; ensures all emote definitions are available before any client requests them.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Initializes the global emote lookup tables by populating them with predefined string-to-enum and string-to-int mappings.\",\n  \"overview\": \"This function serves as a static initializer that defines the complete set of available emotes for the game server. It creates two distinct data structures: 'emotes', which maps action names to their corresponding enum types (distinguishing between one-shot actions and state-based actions), and 'textEmotes', which maps names to either string literals or integer IDs used for text chat commands.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Global state modification via initialization of static variables\",\n  \"notes\": \"Called automatically at program startup; ensures all emote definitions are available before any client requests them.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::Emote@b04875eb:qwen3-5-4b": {
+  "hash": "11b8d44f7269",
+  "doc": {
+   "summary": "Executes a specific emote on a target unit or the bot itself, handling targeting logic and sending network packets for text-based emotes.",
+   "overview": "This function first ensures the bot faces its target if one exists within line of sight, then sets the selection to that target. It checks if the target is a player to potentially adjust their facing towards the bot based on shadow AI configuration. Finally, it sends the emote via network packet if textEmote is true, otherwise handles the command locally, and restores the previous target selection.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "Pointer to the unit object intended to receive the emote; if null, the bot performs the action."
+    },
+    {
+     "name": "type",
+     "desc": "The identifier for the specific emote to be executed."
+    },
+    {
+     "name": "textEmote",
+     "desc": "Boolean flag indicating whether to send a network packet (SMSG_TEXT_EMOTE) instead of handling the command locally."
+    }
+   ],
+   "returns": "true",
+   "side_effects": "Network I/O (if textEmote is true), target selection changes, and potential facing adjustments for bot or player.",
+   "notes": "Relies on global shadow AI configuration; callers should ensure the target is valid before passing it to avoid unnecessary logic execution.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a specific emote on a target unit or the bot itself, handling targeting logic and sending network packets for text-based emotes.\",\n  \"overview\": \"This function first ensures the bot faces its target if one exists within line of sight, then sets the selection to that target. It checks if the target is a player to potentially adjust their facing towards the bot based on shadow AI configuration. Finally, it sends the emote via network packet if textEmote is true, otherwise handles the command locally, and restores the previous target selection.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the unit object intended to receive the emote; if null, the bot performs the action.\"\n    },\n    {\n      \"name\": \"type\",\n      \"desc\": \"The identifier for the specific emote to be executed.\"\n    },\n    {\n      \"name\": \"textEmote\",\n      \"desc\": \"Boolean flag indicating whether to send a network packet (SMSG_TEXT_EMOTE) instead of handling the command locally.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"Network I/O (if textEmote is true), target selection changes, and potential facing adjustments for bot or player.\",\n  \"notes\": \"Relies on global shadow AI configuration; callers should ensure the target is valid before passing it to avoid unnecessary logic execution.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::GetTarget@a3946ab1:qwen3-5-4b": {
+  "hash": "cde843434104",
+  "doc": {
+   "summary": "Selects a random friendly unit within a specific distance threshold to execute an emote action.",
+   "overview": "This function retrieves the list of nearest friendly players from the game context and filters them based on proximity to the executing bot. It then selects one unit randomly from this filtered list to serve as the target for the current action.",
+   "params": [],
+   "returns": "Unit*",
+   "side_effects": "None",
+   "notes": "Returns nullptr if no friendly units are found within the configured distance threshold.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Selects a random friendly unit within a specific distance threshold to execute an emote action.\",\n  \"overview\": \"This function retrieves the list of nearest friendly players from the game context and filters them based on proximity to the executing bot. It then selects one unit randomly from this filtered list to serve as the target for the current action.\",\n  \"params\": [],\n  \"returns\": \"Unit*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns nullptr if no friendly units are found within the configured distance threshold.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::ReceiveEmote@747b6cbe:qwen3-5-4b": {
+  "hash": "b995c43bb5f9",
+  "doc": {
+   "summary": "Maps a received emote ID and verbal flag to specific internal action IDs, text strings, and optional yell messages for bot AI behavior.",
+   "overview": "This function translates an incoming emote identifier into the corresponding internal game state actions and associated dialogue. It handles various predefined cases, including special logic for master-bot interactions and a wide range of textual expressions like greetings, emotions, and physical actions. The function returns true upon successful processing or false if no matching case is found.",
+   "params": [
+    {
+     "name": "source",
+     "desc": "Pointer to the Player object who initiated the emote."
+    },
+    {
+     "name": "emote",
+     "desc": "The identifier of the emote being received, which determines the specific action and text output."
+    },
+    {
+     "name": "verbal",
+     "desc": "A boolean flag indicating whether the emote should include a verbal component."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function contains extensive switch-case logic mapping specific emote IDs to internal action IDs (e.g., EMOTE_ONESHOT_CRY) and text strings. It includes conditional checks for bot AI master relationships in specific cases.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Maps a received emote ID and verbal flag to specific internal action IDs, text strings, and optional yell messages for bot AI behavior.\",\n  \"overview\": \"This function translates an incoming emote identifier into the corresponding internal game state actions and associated dialogue. It handles various predefined cases, including special logic for master-bot interactions and a wide range of textual expressions like greetings, emotions, and physical actions. The function returns true upon successful processing or false if no matching case is found.\",\n  \"params\": [\n    {\n      \"name\": \"source\",\n      \"desc\": \"Pointer to the Player object who initiated the emote.\"\n    },\n    {\n      \"name\": \"emote\",\n      \"desc\": \"The identifier of the emote being received, which determines the specific action and text output.\"\n    },\n    {\n      \"name\": \"verbal\",\n      \"desc\": \"A boolean flag indicating whether the emote should include a verbal component.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function contains extensive switch-case logic mapping specific emote IDs to internal action IDs (e.g., EMOTE_ONESHOT_CRY) and text strings. It includes conditional checks for bot AI master relationships in specific cases.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "004f8d188e95",
+  "doc": {
+   "summary": "Executes a bot emote action by parsing the event packet, determining if the bot should react to another player's emote, and then performing the appropriate emote logic or sound playback.",
+   "overview": "This function processes incoming emote events from the game server, first checking for reactive conditions where the bot responds to other players' actions based on proximity or name matching. It handles two distinct packet types (SMSG_TEXT_EMOTE and SMSG_EMOTE) with different logic for identifying the source player and selecting an appropriate emote ID from available stores. If no reactive condition is met, it falls back to executing a predefined emote list or playing a sound based on the event's parameters.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The Event object containing the game packet data and parameters that triggered this action."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (handles text emote opcodes), Global State (updates last emote time via botAI context)",
+   "notes": "Relies on external configuration objects like sShadowAIConfig and sEmotesTextStore; performs random selection logic for emote variety; handles special cases for one-shot emotes and text-based commands.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a bot emote action by parsing the event packet, determining if the bot should react to another player's emote, and then performing the appropriate emote logic or sound playback.\",\n  \"overview\": \"This function processes incoming emote events from the game server, first checking for reactive conditions where the bot responds to other players' actions based on proximity or name matching. It handles two distinct packet types (SMSG_TEXT_EMOTE and SMSG_EMOTE) with different logic for identifying the source player and selecting an appropriate emote ID from available stores. If no reactive condition is met, it falls back to executing a predefined emote list or playing a sound based on the event's parameters.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The Event object containing the game packet data and parameters that triggered this action.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (handles text emote opcodes), Global State (updates last emote time via botAI context)\",\n  \"notes\": \"Relies on external configuration objects like sShadowAIConfig and sEmotesTextStore; performs random selection logic for emote variety; handles special cases for one-shot emotes and text-based commands.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "23f6b5877323",
+  "doc": {
+   "summary": "Checks whether the bot is permitted to perform an emote action based on current activity restrictions and cooldown timing.",
+   "overview": "This function evaluates if a bot should be allowed to execute an emote by first verifying that general activity is permitted via the bot AI system. It then retrieves the timestamp of the last performed emote using the qualifier's stored value and compares it against the current time to ensure the action has not been recently executed.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on external state from botAI and AI_VALUE2; returns false if activity is blocked or the emote cooldown has not expired.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Checks whether the bot is permitted to perform an emote action based on current activity restrictions and cooldown timing.\",\n  \"overview\": \"This function evaluates if a bot should be allowed to execute an emote by first verifying that general activity is permitted via the bot AI system. It then retrieves the timestamp of the last performed emote using the qualifier's stored value and compares it against the current time to ensure the action has not been recently executed.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external state from botAI and AI_VALUE2; returns false if activity is blocked or the emote cooldown has not expired.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "4ba7c54770ca",
+  "doc": {
+   "summary": "Executes a random emote action on a selected target with a 10% chance to abort and clear the talk target context.",
+   "overview": "This function attempts to retrieve a target unit from bot AI configuration or the current target, then randomly decides whether to proceed with an emote. If the random check fails (10% probability), it clears the stored talk target GUID and returns success without performing any action. Otherwise, it updates the context with the target's GUID and executes the emote on that unit.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Context modification, network I/O (emote execution)",
+   "notes": "Caller must ensure botAI is initialized; edge case occurs when no valid target exists after retrieval attempts.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a random emote action on a selected target with a 10% chance to abort and clear the talk target context.\",\n  \"overview\": \"This function attempts to retrieve a target unit from bot AI configuration or the current target, then randomly decides whether to proceed with an emote. If the random check fails (10% probability), it clears the stored talk target GUID and returns success without performing any action. Otherwise, it updates the context with the target's GUID and executes the emote on that unit.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Context modification, network I/O (emote execution)\",\n  \"notes\": \"Caller must ensure botAI is initialized; edge case occurs when no valid target exists after retrieval attempts.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::GetRandomEmote@de87b160:qwen3-5-4b": {
+  "hash": "fdb60240f57c",
+  "doc": {
+   "summary": "Selects a random emote type for a unit based on whether the output should be text or visual, with special handling for trainers and quest givers.",
+   "overview": "This function determines an appropriate emote to perform by first checking if the requested format is text-based or visual. It utilizes a weighted random selection mechanism where specific emotes have a higher probability of being chosen based on the `textEmote` flag. The logic includes conditional checks for unit flags to include salutation emotes when the target is a trainer or quest giver.",
+   "params": [
+    {
+     "name": "unit",
+     "desc": "Pointer to the unit performing the action; used to check for specific NPC flags like TRAINER or QUESTGIVER."
+    },
+    {
+     "name": "textEmote",
+     "desc": "Boolean flag indicating whether the function should return a text emote ID (true) or a visual/one-shot emote ID (false)."
+    }
+   ],
+   "returns": "uint32",
+   "side_effects": "None",
+   "notes": "The function relies on `urand()` for random selection and assumes valid input where the `types` vector is never empty. Callers should ensure the unit pointer is valid before invoking this function to avoid potential crashes during flag checks.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Selects a random emote type for a unit based on whether the output should be text or visual, with special handling for trainers and quest givers.\",\n  \"overview\": \"This function determines an appropriate emote to perform by first checking if the requested format is text-based or visual. It utilizes a weighted random selection mechanism where specific emotes have a higher probability of being chosen based on the `textEmote` flag. The logic includes conditional checks for unit flags to include salutation emotes when the target is a trainer or quest giver.\",\n  \"params\": [\n    {\n      \"name\": \"unit\",\n      \"desc\": \"Pointer to the unit performing the action; used to check for specific NPC flags like TRAINER or QUESTGIVER.\"\n    },\n    {\n      \"name\": \"textEmote\",\n      \"desc\": \"Boolean flag indicating whether the function should return a text emote ID (true) or a visual/one-shot emote ID (false).\"\n    }\n  ],\n  \"returns\": \"uint32\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on `urand()` for random selection and assumes valid input where the `types` vector is never empty. Callers should ensure the unit pointer is valid before invoking this function to avoid potential crashes during flag checks.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.cpp::GetNumberOfEmoteVariants@501ea2c0:qwen3-5-4b": {
+  "hash": "9d8bb6e92649",
+  "doc": {
+   "summary": "Determines the number of available emote variants for a specific character based on their selected emote ID, race, and gender.",
+   "overview": "This function acts as a lookup utility that returns an integer count representing how many distinct visual or audio variations exist for a given emote. It utilizes a series of conditional checks to map the input emote identifier against the character's race and gender to calculate the appropriate variant count, ensuring different races and genders receive tailored options.",
+   "params": [
+    {
+     "name": "emote",
+     "desc": "The specific emote identifier (e.g., 304, TEXT_EMOTE_HELLO) for which the variant count is being calculated."
+    },
+    {
+     "name": "Race",
+     "desc": "The character's race enum value used to determine gender-specific and race-specific emote availability."
+    },
+    {
+     "name": "Gender",
+     "desc": "The character's gender enum value (MALE/FEMALE) which influences the return count for most emotes."
+    }
+   ],
+   "returns": "uint32",
+   "side_effects": "None",
+   "notes": "Callers should ensure the emote ID is valid before invoking this function to avoid undefined behavior. Edge cases include races not explicitly listed in the switch statements, which will fall through and likely return a default or zero value depending on implementation details.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines the number of available emote variants for a specific character based on their selected emote ID, race, and gender.\",\n  \"overview\": \"This function acts as a lookup utility that returns an integer count representing how many distinct visual or audio variations exist for a given emote. It utilizes a series of conditional checks to map the input emote identifier against the character's race and gender to calculate the appropriate variant count, ensuring different races and genders receive tailored options.\",\n  \"params\": [\n    {\n      \"name\": \"emote\",\n      \"desc\": \"The specific emote identifier (e.g., 304, TEXT_EMOTE_HELLO) for which the variant count is being calculated.\"\n    },\n    {\n      \"name\": \"Race\",\n      \"desc\": \"The character's race enum value used to determine gender-specific and race-specific emote availability.\"\n    },\n    {\n      \"name\": \"Gender\",\n      \"desc\": \"The character's gender enum value (MALE/FEMALE) which influences the return count for most emotes.\"\n    }\n  ],\n  \"returns\": \"uint32\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the emote ID is valid before invoking this function to avoid undefined behavior. Edge cases include races not explicitly listed in the switch statements, which will fall through and likely return a default or zero value depending on implementation details.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.h::EmoteActionBase@6f4ee598:qwen3-5-4b": {
+  "hash": "f01a6860ccbf",
+  "doc": {
+   "summary": "A base class for emote actions in ShadowAI that handles the logic for executing and receiving character emotes.",
+   "overview": "The EmoteActionBase class serves as the foundational structure for all emote-related actions within the ShadowAI framework. It encapsulates both the execution of emotes on targets and the reception of emotes from players, providing a unified interface for these interactions. The class manages internal state through static maps to store emote definitions and supports initialization routines to populate this data.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Callers should ensure the botAI instance is valid before invoking protected methods. Edge cases include handling missing emote definitions in the static maps.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"A base class for emote actions in ShadowAI that handles the logic for executing and receiving character emotes.\",\n  \"overview\": \"The EmoteActionBase class serves as the foundational structure for all emote-related actions within the ShadowAI framework. It encapsulates both the execution of emotes on targets and the reception of emotes from players, providing a unified interface for these interactions. The class manages internal state through static maps to store emote definitions and supports initialization routines to populate this data.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI instance is valid before invoking protected methods. Edge cases include handling missing emote definitions in the static maps.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.h::EmoteAction@0c4af461:qwen3-5-4b": {
+  "hash": "8870b859db85",
+  "doc": {
+   "summary": "EmoteAction is a strategy action class that executes emotes for Shadow AI bots by overriding base functionality.",
+   "overview": "This class extends EmoteActionBase and Qualified to handle specific emote logic within the game's strategy system. It accepts a reference to the bot's AI instance during construction, allowing it to access necessary state for execution. The primary function Execute processes incoming events to trigger the appropriate emote animation or behavior.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"EmoteAction is a strategy action class that executes emotes for Shadow AI bots by overriding base functionality.\",\n  \"overview\": \"This class extends EmoteActionBase and Qualified to handle specific emote logic within the game's strategy system. It accepts a reference to the bot's AI instance during construction, allowing it to access necessary state for execution. The primary function Execute processes incoming events to trigger the appropriate emote animation or behavior.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EmoteAction.h::TalkAction@ed422753:qwen3-5-4b": {
+  "hash": "837be5da8c69",
+  "doc": {
+   "summary": "TalkAction is a C++ class that extends EmoteActionBase to handle specific talk-related emotes for ShadowAI bots.",
+   "overview": "This class serves as a specialized action handler within the ShadowAI framework, allowing bots to perform text-based or non-text emotes. It inherits from EmoteActionBase and initializes with a reference to the bot's AI instance, delegating execution logic to the Execute method while providing a static utility for random emote selection.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The constructor requires a valid ShadowAI* pointer; callers should ensure the bot is active before instantiation.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"TalkAction is a C++ class that extends EmoteActionBase to handle specific talk-related emotes for ShadowAI bots.\",\n  \"overview\": \"This class serves as a specialized action handler within the ShadowAI framework, allowing bots to perform text-based or non-text emotes. It inherits from EmoteActionBase and initializes with a reference to the bot's AI instance, delegating execution logic to the Execute method while providing a static utility for random emote selection.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The constructor requires a valid ShadowAI* pointer; callers should ensure the bot is active before instantiation.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "505d557f4d12",
+  "doc": {
+   "summary": "Executes the auto-equip strategy for Shadow AI bots by collecting and equipping items from the player's inventory when specific conditions are met.",
+   "overview": "This function is invoked during a trade status event to automatically equip loot for Shadow AI bots that have the auto-equip upgrade enabled. It first validates that the bot is not a random bot and that the configuration allows automatic looting, then checks if the trade status is accepted before proceeding. The core logic iterates through all items in the player's bags, identifies those with specific usage requirements (equip, replace, or bad equip), and passes their IDs to the EquipItems function for processing.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The WorldPacket event object containing the trade status information."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (processes WorldPacket), Global State (modifies bot inventory/equipment via EquipItems)",
+   "notes": "Called by the Shadow AI strategy system; returns false if the trade is not accepted or auto-equip is disabled.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the auto-equip strategy for Shadow AI bots by collecting and equipping items from the player's inventory when specific conditions are met.\",\n  \"overview\": \"This function is invoked during a trade status event to automatically equip loot for Shadow AI bots that have the auto-equip upgrade enabled. It first validates that the bot is not a random bot and that the configuration allows automatic looting, then checks if the trade status is accepted before proceeding. The core logic iterates through all items in the player's bags, identifies those with specific usage requirements (equip, replace, or bad equip), and passes their IDs to the EquipItems function for processing.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The WorldPacket event object containing the trade status information.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (processes WorldPacket), Global State (modifies bot inventory/equipment via EquipItems)\",\n  \"notes\": \"Called by the Shadow AI strategy system; returns false if the trade is not accepted or auto-equip is disabled.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.cpp::EquipItems@62d0205f:qwen3-5-4b": {
+  "hash": "6e84eb74fd23",
+  "doc": {
+   "summary": "EquipItems equips all items specified in the provided ItemIds array.",
+   "overview": "This function iterates through each item ID in the input list and attempts to equip it using FindItemByIdVisitor. It is designed to handle multiple items simultaneously, ensuring that each one is processed sequentially within the same action context.",
+   "params": [
+    {
+     "name": "ids",
+     "desc": "A collection of item identifiers representing the items to be equipped."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Callers should ensure all referenced items exist in the game world before invoking this function to avoid potential errors during iteration.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"EquipItems equips all items specified in the provided ItemIds array.\",\n  \"overview\": \"This function iterates through each item ID in the input list and attempts to equip it using FindItemByIdVisitor. It is designed to handle multiple items simultaneously, ensuring that each one is processed sequentially within the same action context.\",\n  \"params\": [\n    {\n      \"name\": \"ids\",\n      \"desc\": \"A collection of item identifiers representing the items to be equipped.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure all referenced items exist in the game world before invoking this function to avoid potential errors during iteration.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.cpp::GetSmallestBagSlot@644d2d25:qwen3-5-4b": {
+  "hash": "74f14672df41",
+  "doc": {
+   "summary": "Returns the index of the first inventory bag that has available space.",
+   "overview": "This function iterates through all inventory bags to identify the first one with free slots. It prioritizes bags that are not currently full, returning the bag index immediately if an empty or partially filled bag is found during the traversal.",
+   "params": [],
+   "returns": "uint8",
+   "side_effects": "None",
+   "notes": "The function assumes valid bot state and returns the first bag encountered with capacity; callers should ensure the returned index corresponds to a usable slot.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns the index of the first inventory bag that has available space.\",\n  \"overview\": \"This function iterates through all inventory bags to identify the first one with free slots. It prioritizes bags that are not currently full, returning the bag index immediately if an empty or partially filled bag is found during the traversal.\",\n  \"params\": [],\n  \"returns\": \"uint8\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function assumes valid bot state and returns the first bag encountered with capacity; callers should ensure the returned index corresponds to a usable slot.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.cpp::EquipItem@d2bcb9c5:qwen3-5-4b": {
+  "hash": "98383461e316",
+  "doc": {
+   "summary": "EquipItem locates a specific item using a FindItemVisitor and equips the first matching result.",
+   "overview": "This function accepts a visitor object to identify target items within the game world. It retrieves the list of found items from the visitor, checks if any were discovered, and proceeds to equip the first item in the resulting vector if the list is not empty.",
+   "params": [
+    {
+     "name": "visitor",
+     "desc": "A FindItemVisitor instance used to search for and identify items within the game world."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "I/O (equips an item)",
+   "notes": "If no items are found by the visitor, this function performs no action. The specific item equipped is determined solely by the first result returned by the visitor.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"EquipItem locates a specific item using a FindItemVisitor and equips the first matching result.\",\n  \"overview\": \"This function accepts a visitor object to identify target items within the game world. It retrieves the list of found items from the visitor, checks if any were discovered, and proceeds to equip the first item in the resulting vector if the list is not empty.\",\n  \"params\": [\n    {\n      \"name\": \"visitor\",\n      \"desc\": \"A FindItemVisitor instance used to search for and identify items within the game world.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"I/O (equips an item)\",\n  \"notes\": \"If no items are found by the visitor, this function performs no action. The specific item equipped is determined solely by the first result returned by the visitor.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.cpp::EquipItem@39754f91:qwen3-5-4b": {
+  "hash": "e4ccf48f1517",
+  "doc": {
+   "summary": "Automatically equips an item to a bot's inventory by handling ammo, containers, ranged weapons, and complex two-handed weapon logic including Titan Grip compatibility.",
+   "overview": "This function retrieves the item's bag slot, template, and inventory type to determine the appropriate equipping strategy. It first checks if the item is ammo or a container, logging actions and swapping items as necessary before proceeding to standard equipment slots. For ranged weapons, it sends a specific network packet to auto-equip the item in the ranged slot, while other items undergo a detailed calculation involving stats weights and current equipped items to decide between main hand, off hand, or two-handed slots.",
+   "params": [
+    {
+     "name": "item",
+     "desc": "Pointer to the Item object that needs to be equipped."
+    }
+   ],
+   "returns": "void",
+   "side_effects": "Network (CMSG_AUTOEQUIP_ITEM_SLOT, WorldPackets::Item::AutoEquipItemSlot), Global State (bot->SetAmmo, botAI->TellMaster)",
+   "notes": "The function contains incomplete logic at the end of the provided definition; callers should ensure the item is valid and not null. Edge cases include items that cannot be equipped due to inventory constraints or Titan Grip incompatibility.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Automatically equips an item to a bot's inventory by handling ammo, containers, ranged weapons, and complex two-handed weapon logic including Titan Grip compatibility.\",\n  \"overview\": \"This function retrieves the item's bag slot, template, and inventory type to determine the appropriate equipping strategy. It first checks if the item is ammo or a container, logging actions and swapping items as necessary before proceeding to standard equipment slots. For ranged weapons, it sends a specific network packet to auto-equip the item in the ranged slot, while other items undergo a detailed calculation involving stats weights and current equipped items to decide between main hand, off hand, or two-handed slots.\",\n  \"params\": [\n    {\n      \"name\": \"item\",\n      \"desc\": \"Pointer to the Item object that needs to be equipped.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (CMSG_AUTOEQUIP_ITEM_SLOT, WorldPackets::Item::AutoEquipItemSlot), Global State (bot->SetAmmo, botAI->TellMaster)\",\n  \"notes\": \"The function contains incomplete logic at the end of the provided definition; callers should ensure the item is valid and not null. Edge cases include items that cannot be equipped due to inventory constraints or Titan Grip incompatibility.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "43e8836b7cd4",
+  "doc": {
+   "summary": "Executes the equip action by collecting item IDs from player bags and invoking the global EquipItems function.",
+   "overview": "This function iterates through all items currently in the player's inventory bags, extracting their template IDs and optional random properties to determine usage parameters. It filters for items intended for equipping or replacing, aggregates them into a list, and delegates the actual equipment logic to the global EquipItems function before returning success.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Global state (modifies player inventory/equipment status via EquipItems)",
+   "notes": "Called by action handlers; assumes valid Event object. Edge case: empty bag results in immediate return without side effects.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the equip action by collecting item IDs from player bags and invoking the global EquipItems function.\",\n  \"overview\": \"This function iterates through all items currently in the player's inventory bags, extracting their template IDs and optional random properties to determine usage parameters. It filters for items intended for equipping or replacing, aggregates them into a list, and delegates the actual equipment logic to the global EquipItems function before returning success.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Global state (modifies player inventory/equipment status via EquipItems)\",\n  \"notes\": \"Called by action handlers; assumes valid Event object. Edge case: empty bag results in immediate return without side effects.\"\n}",
+  "model": "qwen3.5:4b"
  }
 }
