@@ -26640,14 +26640,14 @@
   "hash": "0860c276e9fe",
   "doc": {
    "summary": "Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.",
-   "overview": "This function evaluates if a Hunter bot is in a position to perform close-combat attacks by checking for sufficient ammunition and valid targeting conditions. It first verifies the presence of a current target and whether the bot possesses enough ammo before assessing distance constraints relative to the victim or target. If no specific target exists or ammo is unavailable, it defaults to checking if the bot has the 'close' strategy enabled in combat mode.",
+   "overview": "This function evaluates if a Hunter bot is in a position to perform close-combat attacks by checking for sufficient ammunition and valid targeting conditions. It first verifies the presence of a current target and adequate ammo; if both are met, it assesses whether the target is within or outside an 8.0 unit radius while ensuring the bot is engaged in combat with that specific victim. If these conditions are not satisfied, the function falls back to checking if the bot simply needs to enter combat.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on AI_VALUE macros for target and ammo data; distance calculation depends on server facade state.",
+   "notes": "Relies on AI_VALUE macros for target and ammo data; assumes valid botAI and sServerFacade objects are initialized.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.\",\n  \"overview\": \"This function evaluates if a Hunter bot is in a position to perform close-combat attacks by checking for sufficient ammunition and valid targeting conditions. It first verifies the presence of a current target and whether the bot possesses enough ammo before assessing distance constraints relative to the victim or target. If no specific target exists or ammo is unavailable, it defaults to checking if the bot has the 'close' strategy enabled in combat mode.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on AI_VALUE macros for target and ammo data; distance calculation depends on server facade state.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.\",\n  \"overview\": \"This function evaluates if a Hunter bot is in a position to perform close-combat attacks by checking for sufficient ammunition and valid targeting conditions. It first verifies the presence of a current target and adequate ammo; if both are met, it assesses whether the target is within or outside an 8.0 unit radius while ensuring the bot is engaged in combat with that specific victim. If these conditions are not satisfied, the function falls back to checking if the bot simply needs to enter combat.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on AI_VALUE macros for target and ammo data; assumes valid botAI and sServerFacade objects are initialized.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/CombatActions.h::SwitchToMeleeAction@d91e6fcf:qwen3-5-4b": {
@@ -27040,20 +27040,20 @@
  "src/strategy/actions/DropQuestAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
   "hash": "9b1bfeffcef4",
   "doc": {
-   "summary": "Executes the DropQuestAction strategy by iterating through a bot's quest log and removing quests that are significantly lower level than the bot, based on configurable thresholds.",
-   "overview": "This function first validates that an event owner exists and that the drop obsolete quests configuration is enabled before proceeding. It calculates a dynamic 'trivial' level threshold based on the bot's current level to determine which quests should be discarded. The core logic iterates through all quest slots, identifies quests where the level difference exceeds the calculated trivial threshold, and removes them by clearing the slot, taking source items, and resetting the quest status.",
+   "summary": "Executes a strategy action to remove low-level or trivial quests from a bot's inventory based on configurable thresholds.",
+   "overview": "This function processes an event to identify and discard quests that are significantly lower in level than the bot, defined as 'trivial' by dynamic thresholds. It first validates that an event owner exists and checks if the drop obsolete quests configuration is enabled before iterating through the quest log. For each valid quest, it compares the bot's level against the quest's level to determine if removal should occur.",
    "params": [
     {
      "name": "event",
-     "desc": "The event object containing the context for the action execution."
+     "desc": "The event object containing the owner of the action; used to retrieve the requester player or master."
     }
    ],
    "returns": "bool",
-   "side_effects": "Quest log modification, item state changes (source items taken), quest status updates, and potential logging or chat messages.",
-   "notes": "Calls GetMaster() if no event owner is detected; relies on sShadowAIConfig->dropObsoleteQuests being true; uses botLevel to determine trivial thresholds which scale between levels 5 and 8.",
+   "side_effects": "I/O, global state",
+   "notes": "Modifies bot quest inventory by setting slots to zero and removing rewarded items; logs removals via INFO level if debug strategy is active.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the DropQuestAction strategy by iterating through a bot's quest log and removing quests that are significantly lower level than the bot, based on configurable thresholds.\",\n  \"overview\": \"This function first validates that an event owner exists and that the drop obsolete quests configuration is enabled before proceeding. It calculates a dynamic 'trivial' level threshold based on the bot's current level to determine which quests should be discarded. The core logic iterates through all quest slots, identifies quests where the level difference exceeds the calculated trivial threshold, and removes them by clearing the slot, taking source items, and resetting the quest status.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the context for the action execution.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Quest log modification, item state changes (source items taken), quest status updates, and potential logging or chat messages.\",\n  \"notes\": \"Calls GetMaster() if no event owner is detected; relies on sShadowAIConfig->dropObsoleteQuests being true; uses botLevel to determine trivial thresholds which scale between levels 5 and 8.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a strategy action to remove low-level or trivial quests from a bot's inventory based on configurable thresholds.\",\n  \"overview\": \"This function processes an event to identify and discard quests that are significantly lower in level than the bot, defined as 'trivial' by dynamic thresholds. It first validates that an event owner exists and checks if the drop obsolete quests configuration is enabled before iterating through the quest log. For each valid quest, it compares the bot's level against the quest's level to determine if removal should occur.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the owner of the action; used to retrieve the requester player or master.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O, global state\",\n  \"notes\": \"Modifies bot quest inventory by setting slots to zero and removing rewarded items; logs removals via INFO level if debug strategy is active.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/DropQuestAction.cpp::DropQuestType@934ab5b1:qwen3-5-4b": {
@@ -27395,19 +27395,19 @@
   "hash": "505d557f4d12",
   "doc": {
    "summary": "Executes the auto-equip strategy for Shadow AI bots by collecting and equipping items from the player's inventory when specific conditions are met.",
-   "overview": "This function is invoked during a trade status event to automatically equip loot for Shadow AI bots that have the auto-equip upgrade enabled. It first validates that the bot is not a random bot and that the configuration allows automatic looting, then checks if the trade status is accepted before proceeding. The core logic iterates through all items in the player's bags, identifies those with specific usage requirements (equip, replace, or bad equip), and passes their IDs to the EquipItems function for processing.",
+   "overview": "This function is invoked during a trade status event to automatically equip loot for Shadow AI bots that have the auto-equip upgrade enabled. It first validates that the bot is not in random mode and the configuration allows automatic looting, then checks if the trade status is accepted before proceeding. The core logic iterates through all items in the player's bags, identifies those with specific usage requirements (equip, replace, or bad equip), and passes their IDs to the EquipItems function for processing.",
    "params": [
     {
      "name": "event",
-     "desc": "The WorldPacket event object containing the trade status information."
+     "desc": "The WorldEvent object representing the trade status event that triggered this action."
     }
    ],
    "returns": "bool",
-   "side_effects": "Network (processes WorldPacket), Global State (modifies bot inventory/equipment via EquipItems)",
-   "notes": "Called by the Shadow AI strategy system; returns false if the trade is not accepted or auto-equip is disabled.",
+   "side_effects": "Network (WorldPacket manipulation), Global State (modifies bot inventory/equipment via EquipItems)",
+   "notes": "Called by the Shadow AI strategy system; returns false if the trade status is not ACCEPT or if auto-equip is disabled.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the auto-equip strategy for Shadow AI bots by collecting and equipping items from the player's inventory when specific conditions are met.\",\n  \"overview\": \"This function is invoked during a trade status event to automatically equip loot for Shadow AI bots that have the auto-equip upgrade enabled. It first validates that the bot is not a random bot and that the configuration allows automatic looting, then checks if the trade status is accepted before proceeding. The core logic iterates through all items in the player's bags, identifies those with specific usage requirements (equip, replace, or bad equip), and passes their IDs to the EquipItems function for processing.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The WorldPacket event object containing the trade status information.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (processes WorldPacket), Global State (modifies bot inventory/equipment via EquipItems)\",\n  \"notes\": \"Called by the Shadow AI strategy system; returns false if the trade is not accepted or auto-equip is disabled.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the auto-equip strategy for Shadow AI bots by collecting and equipping items from the player's inventory when specific conditions are met.\",\n  \"overview\": \"This function is invoked during a trade status event to automatically equip loot for Shadow AI bots that have the auto-equip upgrade enabled. It first validates that the bot is not in random mode and the configuration allows automatic looting, then checks if the trade status is accepted before proceeding. The core logic iterates through all items in the player's bags, identifies those with specific usage requirements (equip, replace, or bad equip), and passes their IDs to the EquipItems function for processing.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The WorldEvent object representing the trade status event that triggered this action.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (WorldPacket manipulation), Global State (modifies bot inventory/equipment via EquipItems)\",\n  \"notes\": \"Called by the Shadow AI strategy system; returns false if the trade status is not ACCEPT or if auto-equip is disabled.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/EquipAction.cpp::EquipItems@62d0205f:qwen3-5-4b": {
@@ -27493,6 +27493,621 @@
    "ai": true
   },
   "raw": "{\n  \"summary\": \"Executes the equip action by collecting item IDs from player bags and invoking the global EquipItems function.\",\n  \"overview\": \"This function iterates through all items currently in the player's inventory bags, extracting their template IDs and optional random properties to determine usage parameters. It filters for items intended for equipping or replacing, aggregates them into a list, and delegates the actual equipment logic to the global EquipItems function before returning success.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Global state (modifies player inventory/equipment status via EquipItems)\",\n  \"notes\": \"Called by action handlers; assumes valid Event object. Edge case: empty bag results in immediate return without side effects.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.h::EquipAction@eaa6ad8c:qwen3-5-4b": {
+  "hash": "645176e4ad6d",
+  "doc": {
+   "summary": "EquipAction is a strategy action that equips items into a bot's inventory by utilizing the InventoryAction base class.",
+   "overview": "This class extends InventoryAction to handle specific logic for equipping items, accepting a ShadowAI instance and an optional name during construction. It provides public methods to execute the action on events and manage item lists, while private helper functions handle individual item processing and slot selection.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"EquipAction is a strategy action that equips items into a bot's inventory by utilizing the InventoryAction base class.\",\n  \"overview\": \"This class extends InventoryAction to handle specific logic for equipping items, accepting a ShadowAI instance and an optional name during construction. It provides public methods to execute the action on events and manage item lists, while private helper functions handle individual item processing and slot selection.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.h::EquipUpgradesAction@77f76d78:qwen3-5-4b": {
+  "hash": "b7d4d5d01ee0",
+  "doc": {
+   "summary": "EquipUpgradesAction is a specialized action class that handles the logic for equipping upgrades on a bot's character.",
+   "overview": "This class extends the base EquipAction to manage specific upgrade equipmenting routines within the ShadowAI framework. It accepts a reference to the bot's AI instance and an optional name identifier during construction, delegating further execution details to its parent class while implementing custom behavior in the Execute method.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the botAI is valid before invoking this action; edge cases include scenarios where no upgrades are available or the character lacks the necessary slots.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"EquipUpgradesAction is a specialized action class that handles the logic for equipping upgrades on a bot's character.\",\n  \"overview\": \"This class extends the base EquipAction to manage specific upgrade equipmenting routines within the ShadowAI framework. It accepts a reference to the bot's AI instance and an optional name identifier during construction, delegating further execution details to its parent class while implementing custom behavior in the Execute method.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI is valid before invoking this action; edge cases include scenarios where no upgrades are available or the character lacks the necessary slots.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipAction.h::EquipUpgradeAction@8c9afa7c:qwen3-5-4b": {
+  "hash": "593d1e9c051d",
+  "doc": {
+   "summary": "EquipUpgradeAction is a specialized action class that extends EquipAction to handle equipment upgrades for Shadow AI bots.",
+   "overview": "This class inherits from EquipAction and provides a constructor that initializes the bot AI and action name. It overrides the Execute method to process upgrade events, allowing the bot to perform specific equipment enhancement tasks within the game logic.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the bot has sufficient resources before execution; edge cases include insufficient funds or unavailable items.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"EquipUpgradeAction is a specialized action class that extends EquipAction to handle equipment upgrades for Shadow AI bots.\",\n  \"overview\": \"This class inherits from EquipAction and provides a constructor that initializes the bot AI and action name. It overrides the Execute method to process upgrade events, allowing the bot to perform specific equipment enhancement tasks within the game logic.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot has sufficient resources before execution; edge cases include insufficient funds or unavailable items.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipGlyphsAction.cpp::BuildGlyphCache@cebea450:qwen3-5-4b": {
+  "hash": "e149595e836a",
+  "doc": {
+   "summary": "BuildGlyphCache() initializes a static cache of glyph properties by iterating through item templates and spell effects.",
+   "overview": "This function checks if the global glyph cache is already populated; if so, it returns immediately to avoid redundant processing. It then iterates through all item templates in the object manager, filtering for items that contain spells with glyph application effects. For each valid glyph effect found, the function retrieves the corresponding spell and glyph properties to populate the cache.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "Global state: populates s_GlyphCache",
+   "notes": "Called by action systems requiring glyph data; assumes sObjectMgr and sSpellMgr are initialized",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"BuildGlyphCache() initializes a static cache of glyph properties by iterating through item templates and spell effects.\",\n  \"overview\": \"This function checks if the global glyph cache is already populated; if so, it returns immediately to avoid redundant processing. It then iterates through all item templates in the object manager, filtering for items that contain spells with glyph application effects. For each valid glyph effect found, the function retrieves the corresponding spell and glyph properties to populate the cache.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Global state: populates s_GlyphCache\",\n  \"notes\": \"Called by action systems requiring glyph data; assumes sObjectMgr and sSpellMgr are initialized\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipGlyphsAction.cpp::GetGlyphInfo@2e6d5072:qwen3-5-4b": {
+  "hash": "6258cc153554",
+  "doc": {
+   "summary": "Retrieves a pointer to glyph information for a specific item ID from the global cache, returning null if the item is not found.",
+   "overview": "This function acts as a lookup utility that accesses the static GlyphCache map to provide quick access to glyph data associated with an item. It first ensures the cache is populated by calling BuildGlyphCache(), then searches for the provided itemId. If the item exists in the cache, it returns a pointer to its GlyphInfo structure; otherwise, it returns nullptr.",
+   "params": [
+    {
+     "name": "itemId",
+     "desc": "The unique identifier of the glyph to look up."
+    }
+   ],
+   "returns": "GlyphInfo const*",
+   "side_effects": "None",
+   "notes": "Callers must check for nullptr before dereferencing. The function relies on the global s_GlyphCache being maintained by BuildGlyphCache().",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Retrieves a pointer to glyph information for a specific item ID from the global cache, returning null if the item is not found.\",\n  \"overview\": \"This function acts as a lookup utility that accesses the static GlyphCache map to provide quick access to glyph data associated with an item. It first ensures the cache is populated by calling BuildGlyphCache(), then searches for the provided itemId. If the item exists in the cache, it returns a pointer to its GlyphInfo structure; otherwise, it returns nullptr.\",\n  \"params\": [\n    {\n      \"name\": \"itemId\",\n      \"desc\": \"The unique identifier of the glyph to look up.\"\n    }\n  ],\n  \"returns\": \"GlyphInfo const*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must check for nullptr before dereferencing. The function relies on the global s_GlyphCache being maintained by BuildGlyphCache().\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipGlyphsAction.cpp::CollectGlyphs@ab350f34:qwen3-5-4b": {
+  "hash": "7c93cc24edb7",
+  "doc": {
+   "summary": "Collects valid glyph information for a specific set of item IDs, filtering by class allowance and uniqueness.",
+   "overview": "This function iterates through a list of item IDs to gather glyph data, ensuring each item is unique and the player's class permits its use. It validates that every requested item corresponds to an actual glyph and checks compatibility with the bot's current class mask before adding it to the output vector. The operation concludes by verifying that the resulting collection contains at least one but no more than six glyphs.",
+   "params": [
+    {
+     "name": "itemIds",
+     "desc": "A read-only list of item IDs representing potential glyph sources."
+    },
+    {
+     "name": "out",
+     "desc": "A reference to a vector that will be populated with pointers to valid GlyphInfo objects."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Returns false if duplicate item IDs are provided, if any item ID lacks corresponding glyph info, or if the resulting glyph count exceeds six. Returns true only if at least one valid glyph was collected.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Collects valid glyph information for a specific set of item IDs, filtering by class allowance and uniqueness.\",\n  \"overview\": \"This function iterates through a list of item IDs to gather glyph data, ensuring each item is unique and the player's class permits its use. It validates that every requested item corresponds to an actual glyph and checks compatibility with the bot's current class mask before adding it to the output vector. The operation concludes by verifying that the resulting collection contains at least one but no more than six glyphs.\",\n  \"params\": [\n    {\n      \"name\": \"itemIds\",\n      \"desc\": \"A read-only list of item IDs representing potential glyph sources.\"\n    },\n    {\n      \"name\": \"out\",\n      \"desc\": \"A reference to a vector that will be populated with pointers to valid GlyphInfo objects.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns false if duplicate item IDs are provided, if any item ID lacks corresponding glyph info, or if the resulting glyph count exceeds six. Returns true only if at least one valid glyph was collected.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipGlyphsAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "3c9a38e8aa64",
+  "doc": {
+   "summary": "Executes the equip action for a bot by parsing glyph item IDs, validating their properties, and casting spells to place glyphs into available slots.",
+   "overview": "This function parses an event containing a list of item IDs representing glyph items. It attempts to collect information about these glyphs and validates that there are exactly six valid entries (three major and three minor). If the collection fails or insufficient empty sockets exist, it reports usage errors via botAI and returns false; otherwise, it iterates through each glyph to find a compatible slot, removes any existing aura from the old glyph if present, casts the new spell, and updates the glyph state before setting a custom flag.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The event object containing the parameter string with space-separated item IDs to equip."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (botAI->TellMaster), I/O (LOG_INFO), Global State (custom_glyphs flag)",
+   "notes": "Requires exactly six valid glyph items; fails if collection fails or fewer than six empty compatible sockets are found.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the equip action for a bot by parsing glyph item IDs, validating their properties, and casting spells to place glyphs into available slots.\",\n  \"overview\": \"This function parses an event containing a list of item IDs representing glyph items. It attempts to collect information about these glyphs and validates that there are exactly six valid entries (three major and three minor). If the collection fails or insufficient empty sockets exist, it reports usage errors via botAI and returns false; otherwise, it iterates through each glyph to find a compatible slot, removes any existing aura from the old glyph if present, casts the new spell, and updates the glyph state before setting a custom flag.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the parameter string with space-separated item IDs to equip.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (botAI->TellMaster), I/O (LOG_INFO), Global State (custom_glyphs flag)\",\n  \"notes\": \"Requires exactly six valid glyph items; fails if collection fails or fewer than six empty compatible sockets are found.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/EquipGlyphsAction.h::EquipGlyphsAction@a1c4d039:qwen3-5-4b": {
+  "hash": "bd2d88944acd",
+  "doc": {
+   "summary": "Executes the logic for equipping glyphs on a player by validating glyph properties and applying them to the character's inventory.",
+   "overview": "The EquipGlyphsAction class handles the specific mechanics of equipping glyphs within the ShadowAI strategy module. It relies on internal caching mechanisms to retrieve glyph properties efficiently during gameplay events. The action processes input item IDs, validates their associated glyph data, and updates the player's equipped state accordingly.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Inventory modification, global glyph cache updates",
+   "notes": "Requires a valid ShadowAI instance; callers must ensure the target character has sufficient slots for the glyphs.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the logic for equipping glyphs on a player by validating glyph properties and applying them to the character's inventory.\",\n  \"overview\": \"The EquipGlyphsAction class handles the specific mechanics of equipping glyphs within the ShadowAI strategy module. It relies on internal caching mechanisms to retrieve glyph properties efficiently during gameplay events. The action processes input item IDs, validates their associated glyph data, and updates the player's equipped state accordingly.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Inventory modification, global glyph cache updates\",\n  \"notes\": \"Requires a valid ShadowAI instance; callers must ensure the target character has sufficient slots for the glyphs.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FlagAction.cpp::TellUsage@489059e1:qwen3-5-4b": {
+  "hash": "c0043ed18232",
+  "doc": {
+   "summary": "Returns false and logs an error message explaining the required usage format for the FlagAction command.",
+   "overview": "This function serves as a utility method to display usage instructions when the FlagAction is invoked without valid arguments. It triggers an error notification via the botAI system, directing users on how to properly specify flags such as cloak, helm, pvp, along with their associated states like on, set, off, clear, or toggle.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "I/O",
+   "notes": "Always returns false; intended for error handling scenarios where argument validation has already failed.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns false and logs an error message explaining the required usage format for the FlagAction command.\",\n  \"overview\": \"This function serves as a utility method to display usage instructions when the FlagAction is invoked without valid arguments. It triggers an error notification via the botAI system, directing users on how to properly specify flags such as cloak, helm, pvp, along with their associated states like on, set, off, clear, or toggle.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O\",\n  \"notes\": \"Always returns false; intended for error handling scenarios where argument validation has already failed.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FlagAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
+  "hash": "080a031c2637",
+  "doc": {
+   "summary": "Executes PvP or player flag commands (set/clear/toggle) for the bot by parsing an Event object.",
+   "overview": "This function parses a command string from the provided Event to determine whether to modify the bot's PvP status or toggle specific player flags like cloak or helm. It validates the command structure, performs the requested action on the bot instance, and reports the result back to the master via botAI.",
+   "params": [
+    {
+     "name": "event",
+     "desc": "The Event object containing the command string to be executed."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (botAI->TellMaster), Global State (bot's PvP status or player flags)",
+   "notes": "Returns false only if the command format is invalid; otherwise always returns true. Requires access to bot, chat, and botAI objects.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes PvP or player flag commands (set/clear/toggle) for the bot by parsing an Event object.\",\n  \"overview\": \"This function parses a command string from the provided Event to determine whether to modify the bot's PvP status or toggle specific player flags like cloak or helm. It validates the command structure, performs the requested action on the bot instance, and reports the result back to the master via botAI.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The Event object containing the command string to be executed.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (botAI->TellMaster), Global State (bot's PvP status or player flags)\",\n  \"notes\": \"Returns false only if the command format is invalid; otherwise always returns true. Requires access to bot, chat, and botAI objects.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FlagAction.h::FlagAction@f2e9a952:qwen3-5-4b": {
+  "hash": "8ab19c91ee34",
+  "doc": {
+   "summary": "FlagAction is a C++ class representing the action of flagging an enemy in Shadow AI.",
+   "overview": "This class extends the base Action class to handle specific logic for flagging targets within the game. It initializes with a reference to the bot's AI and defines the execution method that processes events related to flagging. The implementation includes a private helper function to manage usage information.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"FlagAction is a C++ class representing the action of flagging an enemy in Shadow AI.\",\n  \"overview\": \"This class extends the base Action class to handle specific logic for flagging targets within the game. It initializes with a reference to the bot's AI and defines the execution method that processes events related to flagging. The implementation includes a private helper function to manage usage information.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FollowActions.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "949bea924475",
+  "doc": {
+   "summary": "Executes a follow action by checking if the master target is reachable and communicating travel status to the AI master.",
+   "overview": "This function first verifies if the bot can follow its assigned master target using the Follow logic. If the target cannot be followed, it immediately returns false. Otherwise, it calculates the distance between the bot and the target, then uses random chance checks to send specific status messages to the master indicating proximity or travel progress.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Network (botAI->TellMaster), Global State (botAI->SetNextCheckDelay)",
+   "notes": "Relies on external AI_VALUE for target assignment and global configuration sShadowAIConfig. Uses urand for randomized messaging logic.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a follow action by checking if the master target is reachable and communicating travel status to the AI master.\",\n  \"overview\": \"This function first verifies if the bot can follow its assigned master target using the Follow logic. If the target cannot be followed, it immediately returns false. Otherwise, it calculates the distance between the bot and the target, then uses random chance checks to send specific status messages to the master indicating proximity or travel progress.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (botAI->TellMaster), Global State (botAI->SetNextCheckDelay)\",\n  \"notes\": \"Relies on external AI_VALUE for target assignment and global configuration sShadowAIConfig. Uses urand for randomized messaging logic.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FollowActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "1a257ecb5f97",
+  "doc": {
+   "summary": "Determines whether a bot should execute the follow action based on group master status, target alignment, and strategy configuration.",
+   "overview": "This function evaluates if a bot is currently in a state where it can perform the follow action by checking for group master relationships and target consistency. It verifies that the bot has the necessary 'follow' strategy enabled in non-combat conditions and ensures the master's target is valid for dead-follow mechanics before returning true.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on external AI_VALUE macros to retrieve current targets; returns false if the bot is its own group master or if the master's target cannot be followed.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines whether a bot should execute the follow action based on group master status, target alignment, and strategy configuration.\",\n  \"overview\": \"This function evaluates if a bot is currently in a state where it can perform the follow action by checking for group master relationships and target consistency. It verifies that the bot has the necessary 'follow' strategy enabled in non-combat conditions and ensures the master's target is valid for dead-follow mechanics before returning true.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external AI_VALUE macros to retrieve current targets; returns false if the bot is its own group master or if the master's target cannot be followed.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FollowActions.cpp::CanDeadFollow@414ffdb0:qwen3-5-4b": {
+  "hash": "5136702af791",
+  "doc": {
+   "summary": "Returns true if the bot can perform a dead follow action on the specified target unit.",
+   "overview": "This function determines whether a bot is eligible to execute a 'dead follow' maneuver, which typically involves moving while in a non-combat or stealth state. It first verifies that the bot is within a battleground and alive; if either condition fails, it returns false. Additionally, it ensures the target is either dead or marked as a ghost entity, rejecting any living targets that do not meet this criteria.",
+   "params": [
+    {
+     "name": "target",
+     "desc": "The unit the bot intends to follow; must be alive or flagged as a ghost."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the target pointer is valid before invoking this function. Edge case: if the target is alive but not a ghost, the action is disallowed regardless of the bot's state.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns true if the bot can perform a dead follow action on the specified target unit.\",\n  \"overview\": \"This function determines whether a bot is eligible to execute a 'dead follow' maneuver, which typically involves moving while in a non-combat or stealth state. It first verifies that the bot is within a battleground and alive; if either condition fails, it returns false. Additionally, it ensures the target is either dead or marked as a ghost entity, rejecting any living targets that do not meet this criteria.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"The unit the bot intends to follow; must be alive or flagged as a ghost.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the target pointer is valid before invoking this function. Edge case: if the target is alive but not a ghost, the action is disallowed regardless of the bot's state.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FollowActions.h::FollowAction@73593c88:qwen3-5-4b": {
+  "hash": "b976e4e182a4",
+  "doc": {
+   "summary": "The FollowAction class defines a movement strategy that causes an AI bot to track and follow a specific unit.",
+   "overview": "Inheriting from MovementAction, this class encapsulates the logic for a bot to maintain proximity to a target unit. It provides methods to execute the follow behavior in response to game events, evaluate its current utility, and determine if dead-following is permissible.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the target unit exists before invoking Execute; CanDeadFollow returns false if the target is already in a state that prevents following.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"The FollowAction class defines a movement strategy that causes an AI bot to track and follow a specific unit.\",\n  \"overview\": \"Inheriting from MovementAction, this class encapsulates the logic for a bot to maintain proximity to a target unit. It provides methods to execute the follow behavior in response to game events, evaluate its current utility, and determine if dead-following is permissible.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the target unit exists before invoking Execute; CanDeadFollow returns false if the target is already in a state that prevents following.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/FollowActions.h::FleeToMasterAction@4b741bdd:qwen3-5-4b": {
+  "hash": "ffc9fa9df7a5",
+  "doc": {
+   "summary": "Executes a flee-to-master strategy by moving the bot away from its current location toward the master's position.",
+   "overview": "The FleeToMasterAction class extends the FollowAction base class to implement a specific behavioral pattern where the bot prioritizes distance from the master. It initializes with a reference to the ShadowAI instance and executes logic that calculates movement vectors based on the relative positions of the bot and the master entity.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Network (potentially), Global state (bot position)",
+   "notes": "Callers should ensure the master entity is alive before execution; edge case occurs if the bot and master are at identical coordinates.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a flee-to-master strategy by moving the bot away from its current location toward the master's position.\",\n  \"overview\": \"The FleeToMasterAction class extends the FollowAction base class to implement a specific behavioral pattern where the bot prioritizes distance from the master. It initializes with a reference to the ShadowAI instance and executes logic that calculates movement vectors based on the relative positions of the bot and the master entity.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (potentially), Global state (bot position)\",\n  \"notes\": \"Callers should ensure the master entity is alive before execution; edge case occurs if the bot and master are at identical coordinates.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "36abad441153",
+  "doc": {
+   "summary": "Returns true unless the bot AI is currently inside a vehicle.",
+   "overview": "This function checks whether a bot AI entity is occupying a vehicle to determine if a specific action should be executed. It first verifies if the bot is in a vehicle, and if so, performs an additional check to confirm the vehicle state before returning false; otherwise, it returns true.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the bot AI object is valid before invoking this function. The internal logic relies on the `IsInVehicle` method with specific boolean flags to determine vehicle occupancy status.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns true unless the bot AI is currently inside a vehicle.\",\n  \"overview\": \"This function checks whether a bot AI entity is occupying a vehicle to determine if a specific action should be executed. It first verifies if the bot is in a vehicle, and if so, performs an additional check to confirm the vehicle state before returning false; otherwise, it returns true.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot AI object is valid before invoking this function. The internal logic relies on the `IsInVehicle` method with specific boolean flags to determine vehicle occupancy status.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "e9b4e718ef41",
+  "doc": {
+   "summary": "Executes a command attack for the bot's guardian pet against its current target, overriding existing AI states to force an immediate attack.",
+   "overview": "This function initiates an attack by the bot's guardian pet only if the pet exists, is not in a passive state, and has a valid target. It clears all previous unit states related to following or staying, sets the specific target, and forces the pet to begin attacking immediately via its AI system.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Network (AI commands), Global state (pet's internal attack state)",
+   "notes": "Requires a valid guardian pet and a current target; returns false if either is missing or the pet is passive.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a command attack for the bot's guardian pet against its current target, overriding existing AI states to force an immediate attack.\",\n  \"overview\": \"This function initiates an attack by the bot's guardian pet only if the pet exists, is not in a passive state, and has a valid target. It clears all previous unit states related to following or staying, sets the specific target, and forces the pet to begin attacking immediately via its AI system.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (AI commands), Global state (pet's internal attack state)\",\n  \"notes\": \"Requires a valid guardian pet and a current target; returns false if either is missing or the pet is passive.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.cpp::Execute@aa855b55:qwen3-5-4b": {
+  "hash": "cd5aa5a431b8",
+  "doc": {
+   "summary": "Executes a defensive, passive, or aggressive stance on the bot's pet and all other controlled creatures based on configuration settings.",
+   "overview": "This function retrieves the list of targets consisting of the bot's pet (if present) and any other controlled creatures, excluding the pet from its own target list. It determines the appropriate reaction state by reading a default pet stance from the Shadow AI configuration, falling back to defensive if an invalid value is encountered. The determined stance is then applied to all identified targets via their SetReactState method.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "I/O",
+   "notes": "Calls TellError and TellMaster on the botAI; relies on sShadowAIConfig for stance selection.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a defensive, passive, or aggressive stance on the bot's pet and all other controlled creatures based on configuration settings.\",\n  \"overview\": \"This function retrieves the list of targets consisting of the bot's pet (if present) and any other controlled creatures, excluding the pet from its own target list. It determines the appropriate reaction state by reading a default pet stance from the Shadow AI configuration, falling back to defensive if an invalid value is encountered. The determined stance is then applied to all identified targets via their SetReactState method.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O\",\n  \"notes\": \"Calls TellError and TellMaster on the botAI; relies on sShadowAIConfig for stance selection.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.h::MeleeAction@08b9aef6:qwen3-5-4b": {
+  "hash": "4bc386acd740",
+  "doc": {
+   "summary": "MeleeAction is a specialized attack action class for Shadow AI bots that executes melee attacks against the current target.",
+   "overview": "This class extends AttackAction to provide specific logic for melee combat within the Shadow AI framework. It initializes with a reference to the bot's AI instance and identifies its target as the current one. The implementation includes an override method to determine if the action is beneficial based on game state conditions.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Callers should ensure a valid current target exists before invoking this action.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"MeleeAction is a specialized attack action class for Shadow AI bots that executes melee attacks against the current target.\",\n  \"overview\": \"This class extends AttackAction to provide specific logic for melee combat within the Shadow AI framework. It initializes with a reference to the bot's AI instance and identifies its target as the current one. The implementation includes an override method to determine if the action is beneficial based on game state conditions.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure a valid current target exists before invoking this action.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.h::TogglePetSpellAutoCastAction@06ebded9:qwen3-5-4b": {
+  "hash": "1cc82f4ea412",
+  "doc": {
+   "summary": "Executes a toggle action for the pet's spell auto-cast feature within ShadowAI.",
+   "overview": "This action class extends the base Action framework to manage the state of a pet's spell auto-casting. It is initialized with a reference to the ShadowAI instance and implements the Execute method to handle the logic required to switch the auto-cast status on or off based on the current event context.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a toggle action for the pet's spell auto-cast feature within ShadowAI.\",\n  \"overview\": \"This action class extends the base Action framework to manage the state of a pet's spell auto-casting. It is initialized with a reference to the ShadowAI instance and implements the Execute method to handle the logic required to switch the auto-cast status on or off based on the current event context.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.h::PetAttackAction@e8145af3:qwen3-5-4b": {
+  "hash": "d9483a1bf3e8",
+  "doc": {
+   "summary": "Executes a pet attack action by targeting the player's pet with a ranged or melee attack.",
+   "overview": "The PetAttackAction class extends the base Action class to handle specific combat logic involving the player's pet. It initializes with a reference to the ShadowAI instance and defines the core execution method that determines whether the pet should perform an attack based on the current event state.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers must ensure the player has a valid pet before invoking this action. Edge cases include situations where the pet is stunned, dead, or out of range.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a pet attack action by targeting the player's pet with a ranged or melee attack.\",\n  \"overview\": \"The PetAttackAction class extends the base Action class to handle specific combat logic involving the player's pet. It initializes with a reference to the ShadowAI instance and defines the core execution method that determines whether the pet should perform an attack based on the current event state.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the player has a valid pet before invoking this action. Edge cases include situations where the pet is stunned, dead, or out of range.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericActions.h::SetPetStanceAction@c03105e2:qwen3-5-4b": {
+  "hash": "48e2bf0d1e96",
+  "doc": {
+   "summary": "Executes a command to set the current pet's combat stance based on the provided event.",
+   "overview": "The SetPetStanceAction class is a specialized action handler within the ShadowAI framework designed to modify a pet's fighting attitude. It inherits from the base Action class and utilizes the botAI instance to determine the appropriate stance logic during gameplay events. The Execute method processes incoming events to trigger the necessary state changes in the pet controller.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a command to set the current pet's combat stance based on the provided event.\",\n  \"overview\": \"The SetPetStanceAction class is a specialized action handler within the ShadowAI framework designed to modify a pet's fighting attitude. It inherits from the base Action class and utilizes the botAI instance to determine the appropriate stance logic during gameplay events. The Execute method processes incoming events to trigger the necessary state changes in the pet controller.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::range@fb4bd385:qwen3-5-4b": {
+  "hash": "415d8c82be70",
+  "doc": {
+   "summary": "Constructs a new CastSpellAction instance that initializes the action with the provided bot AI and spell name while calculating the spell's range.",
+   "overview": "This constructor creates an instance of CastSpellAction, which is a specific type of Action designed to execute magic spells. It inherits from the base Action class, passing the bot AI and spell identifier for further processing. During initialization, it also computes the effective range of the spell by querying the bot AI.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "The spell range is dynamically calculated based on the bot AI configuration at construction time.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a new CastSpellAction instance that initializes the action with the provided bot AI and spell name while calculating the spell's range.\",\n  \"overview\": \"This constructor creates an instance of CastSpellAction, which is a specific type of Action designed to execute magic spells. It inherits from the base Action class, passing the bot AI and spell identifier for further processing. During initialization, it also computes the effective range of the spell by querying the bot AI.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The spell range is dynamically calculated based on the bot AI configuration at construction time.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "77cec84d6cba",
+  "doc": {
+   "summary": "Executes available trinkets in the specified inventory slots if present.",
+   "overview": "This function attempts to use a trinket from either the first or second equipment slot within the bag inventory. It retrieves items at specific positions, checks if they are valid trinkets, and uses them via the UseTrinket helper function before returning the result of that action.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes available trinkets in the specified inventory slots if present.\",\n  \"overview\": \"This function attempts to use a trinket from either the first or second equipment slot within the bag inventory. It retrieves items at specific positions, checks if they are valid trinkets, and uses them via the UseTrinket helper function before returning the result of that action.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::isPossible@033f8826:qwen3-5-4b": {
+  "hash": "b71f0830bee1",
+  "doc": {
+   "summary": "Determines if a vehicle spell can be cast by the current bot AI on the specified target.",
+   "overview": "This function checks whether the bot's artificial intelligence is capable of casting a specific vehicle spell. It retrieves the spell ID from the provided spell object and delegates the validation logic to the botAI system, which verifies both the spell's validity and the target's eligibility for that spell.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function relies on GetTarget() returning a valid entity; if the target is null or invalid, botAI->CanCastVehicleSpell will likely return false.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines if a vehicle spell can be cast by the current bot AI on the specified target.\",\n  \"overview\": \"This function checks whether the bot's artificial intelligence is capable of casting a specific vehicle spell. It retrieves the spell ID from the provided spell object and delegates the validation logic to the botAI system, which verifies both the spell's validity and the target's eligibility for that spell.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on GetTarget() returning a valid entity; if the target is null or invalid, botAI->CanCastVehicleSpell will likely return false.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
+  "hash": "ca356497051c",
+  "doc": {
+   "summary": "Determines if a spell action is viable by verifying the target's existence and health relative to estimated damage output.",
+   "overview": "This function evaluates whether executing a specific spell action on a given unit is beneficial. It first validates that the target exists, is alive, and remains within the game world before proceeding with calculations. The core logic compares the target's current health against an estimated duration of life based on group damage per second to decide if the action should be performed.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Relies on GetTarget() and CastAuraSpellAction::isUseful(); requires valid AI_VALUE configuration for estimated group dps.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines if a spell action is viable by verifying the target's existence and health relative to estimated damage output.\",\n  \"overview\": \"This function evaluates whether executing a specific spell action on a given unit is beneficial. It first validates that the target exists, is alive, and remains within the game world before proceeding with calculations. The core logic compares the target's current health against an estimated duration of life based on group damage per second to decide if the action should be performed.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on GetTarget() and CastAuraSpellAction::isUseful(); requires valid AI_VALUE configuration for estimated group dps.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::CastSpellAction@d7c0525b:qwen3-5-4b": {
+  "hash": "6deafc1253d3",
+  "doc": {
+   "summary": "Constructs a melee spell action by initializing the base cast action and setting the attack range to ATTACK_DISTANCE.",
+   "overview": "This constructor initializes a CastMeleeSpellAction by delegating to the parent CastSpellAction with the provided bot AI and spell string. It then explicitly sets the action's range to the constant ATTACK_DISTANCE, ensuring the spell is treated as a melee interaction rather than a ranged one.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a melee spell action by initializing the base cast action and setting the attack range to ATTACK_DISTANCE.\",\n  \"overview\": \"This constructor initializes a CastMeleeSpellAction by delegating to the parent CastSpellAction with the provided bot AI and spell string. It then explicitly sets the action's range to the constant ATTACK_DISTANCE, ensuring the spell is treated as a melee interaction rather than a ranged one.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::CastDebuffSpellAction@c1a307e5:qwen3-5-4b": {
+  "hash": "370df5349350",
+  "doc": {
+   "summary": "Constructs a melee debuff spell action for the Shadow AI bot with a fixed attack distance.",
+   "overview": "This constructor initializes a specific type of spell action designed to apply debuffs within melee range. It sets the action's effective range to ATTACK_DISTANCE and delegates further initialization to the parent CastDebuffSpellAction class, passing along the bot AI, spell identifier, ownership flag, and required life time.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a melee debuff spell action for the Shadow AI bot with a fixed attack distance.\",\n  \"overview\": \"This constructor initializes a specific type of spell action designed to apply debuffs within melee range. It sets the action's effective range to ATTACK_DISTANCE and delegates further initialization to the parent CastDebuffSpellAction class, passing along the bot AI, spell identifier, ownership flag, and required life time.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::CastSpellAction@64f2657b:qwen3-5-4b": {
+  "hash": "1f58c0101533",
+  "doc": {
+   "summary": "Constructs a specialized action to cast an enchantment spell by initializing the base spell casting logic and setting the target range.",
+   "overview": "This constructor initializes a CastEnchantItemAction, which extends the generic CastSpellAction class. It sets the spell's range dynamically based on the provided ShadowAI bot instance, ensuring the spell can only be cast within valid distances. This action is typically used when a bot needs to perform specific enchantment tasks.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "The range is derived from the botAI instance; ensure the bot has appropriate permissions for the spell.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a specialized action to cast an enchantment spell by initializing the base spell casting logic and setting the target range.\",\n  \"overview\": \"This constructor initializes a CastEnchantItemAction, which extends the generic CastSpellAction class. It sets the spell's range dynamically based on the provided ShadowAI bot instance, ensuring the spell can only be cast within valid distances. This action is typically used when a bot needs to perform specific enchantment tasks.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The range is derived from the botAI instance; ensure the bot has appropriate permissions for the spell.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::estAmount@c4720261:qwen3-5-4b": {
+  "hash": "cfb048d6d657",
+  "doc": {
+   "summary": "Constructs a healing spell action for the Shadow AI bot by initializing the base CastAuraSpellAction and storing estimated amount, mana efficiency, and target range.",
+   "overview": "This constructor initializes the CastHealingSpellAction class by delegating to the parent CastAuraSpellAction with the provided bot AI, spell name, and ownership flag. It additionally stores the estimated healing amount and mana efficiency values as member variables for later use during execution. Finally, it calculates the effective range of the spell by querying the bot AI's configuration.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a healing spell action for the Shadow AI bot by initializing the base CastAuraSpellAction and storing estimated amount, mana efficiency, and target range.\",\n  \"overview\": \"This constructor initializes the CastHealingSpellAction class by delegating to the parent CastAuraSpellAction with the provided bot AI, spell name, and ownership flag. It additionally stores the estimated healing amount and mana efficiency values as member variables for later use during execution. Finally, it calculates the effective range of the spell by querying the bot AI's configuration.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::CastSpellAction@c3ca7a2e:qwen3-5-4b": {
+  "hash": "67e4f7f2555a",
+  "doc": {
+   "summary": "Constructs a Cure Spell action by initializing the base CastSpellAction and setting the healing range based on the provided ShadowAI instance.",
+   "overview": "This constructor initializes a specific type of spell action designed to cure spells, delegating the core casting logic to the parent CastSpellAction class. It immediately determines the effective range for the healing effect by querying the associated bot AI object for its configured 'heal' range value. This setup ensures that the subsequent execution of the spell respects the tactical limitations defined within the game's artificial intelligence framework.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Relies on botAI being a valid ShadowAI instance with a configured 'heal' range; callers should ensure the AI object is properly initialized before invoking this constructor.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a Cure Spell action by initializing the base CastSpellAction and setting the healing range based on the provided ShadowAI instance.\",\n  \"overview\": \"This constructor initializes a specific type of spell action designed to cure spells, delegating the core casting logic to the parent CastSpellAction class. It immediately determines the effective range for the healing effect by querying the associated bot AI object for its configured 'heal' range value. This setup ensures that the subsequent execution of the spell respects the tactical limitations defined within the game's artificial intelligence framework.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on botAI being a valid ShadowAI instance with a configured 'heal' range; callers should ensure the AI object is properly initialized before invoking this constructor.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::GetTargetValue@9e14af89:qwen3-5-4b": {
+  "hash": "294254dd46f9",
+  "doc": {
+   "summary": "Retrieves the value of the 'main tank' unit for a given spell from the game context.",
+   "overview": "This function acts as a utility within the GenericSpellActions module to identify the primary target for a spell by querying the game context. It specifically looks for a unit tagged with the string 'main tank' and returns its value if found, or null otherwise. The implementation relies entirely on the existing GetValue mechanism provided by the context object.",
+   "params": [],
+   "returns": "Value<Unit*>",
+   "side_effects": "None",
+   "notes": "Callers should handle potential null returns to avoid dereferencing errors; edge cases include scenarios where no unit matches the 'main tank' tag.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Retrieves the value of the 'main tank' unit for a given spell from the game context.\",\n  \"overview\": \"This function acts as a utility within the GenericSpellActions module to identify the primary target for a spell by querying the game context. It specifically looks for a unit tagged with the string 'main tank' and returns its value if found, or null otherwise. The implementation relies entirely on the existing GetValue mechanism provided by the context object.\",\n  \"params\": [],\n  \"returns\": \"Value<Unit*>\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should handle potential null returns to avoid dereferencing errors; edge cases include scenarios where no unit matches the 'main tank' tag.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::CastSpellAction@67a9ad44:qwen3-5-4b": {
+  "hash": "895ea094ad47",
+  "doc": {
+   "summary": "Constructs a CastShootAction by initializing the spell name based on the equipped ranged weapon in the player's inventory.",
+   "overview": "This constructor initializes the spell identifier for a ranged attack action by checking the equipment slot of the bot. It specifically looks for an item in the bag at the primary inventory location and determines the specific spell string (e.g., 'shoot', 'gun', 'bow') based on the weapon's subclass template.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "Relies on bot->GetItemByPos to retrieve equipment; if no ranged weapon is found, the spell remains unset.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a CastShootAction by initializing the spell name based on the equipped ranged weapon in the player's inventory.\",\n  \"overview\": \"This constructor initializes the spell identifier for a ranged attack action by checking the equipment slot of the bot. It specifically looks for an item in the bag at the primary inventory location and determines the specific spell string (e.g., 'shoot', 'gun', 'bow') based on the weapon's subclass template.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on bot->GetItemByPos to retrieve equipment; if no ranged weapon is found, the spell remains unset.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::getPrerequisites@9aa34811:qwen3-5-4b": {
+  "hash": "372476b20291",
+  "doc": {
+   "summary": "Returns a null pointer indicating no prerequisites are required for the action.",
+   "overview": "The getPrerequisites function is designed to identify any conditions or requirements that must be met before an action can be executed. In this specific implementation, it returns nullptr, signifying that the action has no dependencies and can be performed immediately without additional checks.",
+   "params": [],
+   "returns": "NextAction*",
+   "side_effects": "None",
+   "notes": "Callers should check for a null return value to determine if prerequisites exist; in this case, the absence of a return value indicates immediate eligibility.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns a null pointer indicating no prerequisites are required for the action.\",\n  \"overview\": \"The getPrerequisites function is designed to identify any conditions or requirements that must be met before an action can be executed. In this specific implementation, it returns nullptr, signifying that the action has no dependencies and can be performed immediately without additional checks.\",\n  \"params\": [],\n  \"returns\": \"NextAction*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should check for a null return value to determine if prerequisites exist; in this case, the absence of a return value indicates immediate eligibility.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::CastAuraSpellAction@94e3c1e1:qwen3-5-4b": {
+  "hash": "53ef7a8f2e0b",
+  "doc": {
+   "summary": "Constructs a Shadow AI action to cast a buff spell with a specified duration and owner verification.",
+   "overview": "This constructor initializes a CastBuffSpellAction by delegating to the parent CastAuraSpellAction class while explicitly setting the target range based on the bot's capabilities. It prepares the action for execution, ensuring that the spell is only applied if the caster owns the target when checkIsOwner is true.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs a Shadow AI action to cast a buff spell with a specified duration and owner verification.\",\n  \"overview\": \"This constructor initializes a CastBuffSpellAction by delegating to the parent CastAuraSpellAction class while explicitly setting the target range based on the bot's capabilities. It prepares the action for execution, ensuring that the spell is only applied if the caster owns the target when checkIsOwner is true.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::GetTargetName@1a854f04:qwen3-5-4b": {
+  "hash": "0abe5426a729",
+  "doc": {
+   "summary": "Returns the name of the party member designated for protection.",
+   "overview": "This function retrieves the identifier for the specific ally currently selected as the target of a protective action. It is typically invoked by spell logic or UI systems to determine which entity should be affected by defensive maneuvers.",
+   "params": [],
+   "returns": "std::string const",
+   "side_effects": "None",
+   "notes": "The caller must ensure the current party member selection is valid before relying on this return value.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Returns the name of the party member designated for protection.\",\n  \"overview\": \"This function retrieves the identifier for the specific ally currently selected as the target of a protective action. It is typically invoked by spell logic or UI systems to determine which entity should be affected by defensive maneuvers.\",\n  \"params\": [],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The caller must ensure the current party member selection is valid before relying on this return value.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.cpp::UseTrinket@36311e3d:qwen3-5-4b": {
+  "hash": "c22e3c34024b",
+  "doc": {
+   "summary": "Executes a trinket spell by validating item eligibility, checking for aura effects, and sending the appropriate network packet to cast the spell.",
+   "overview": "This function attempts to use an equipped or held item as a spell source by first verifying that the bot can equip it and that no melee spell is currently being cast. It iterates through the item's template spells to locate one triggered on use, ensuring the spell exists, is positive, applies an aura effect, and has no proc flags before proceeding. If all checks pass, the function constructs a CMSG_USE_ITEM packet containing relevant item and spell data and sends it via the bot's session.",
+   "params": [
+    {
+     "name": "item",
+     "desc": "Pointer to the Item object representing the trinket or other usable item."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "Network (CMSG_USE_ITEM packet sent)",
+   "notes": "Callers should ensure the item is valid and owned by the bot; returns false if the spell lacks aura effects, has proc flags, or cannot be cast.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a trinket spell by validating item eligibility, checking for aura effects, and sending the appropriate network packet to cast the spell.\",\n  \"overview\": \"This function attempts to use an equipped or held item as a spell source by first verifying that the bot can equip it and that no melee spell is currently being cast. It iterates through the item's template spells to locate one triggered on use, ensuring the spell exists, is positive, applies an aura effect, and has no proc flags before proceeding. If all checks pass, the function constructs a CMSG_USE_ITEM packet containing relevant item and spell data and sends it via the bot's session.\",\n  \"params\": [\n    {\n      \"name\": \"item\",\n      \"desc\": \"Pointer to the Item object representing the trinket or other usable item.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (CMSG_USE_ITEM packet sent)\",\n  \"notes\": \"Callers should ensure the item is valid and owned by the bot; returns false if the spell lacks aura effects, has proc flags, or cannot be cast.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.h::CastSpellAction@9e116bfb:qwen3-5-4b": {
+  "hash": "01754be49eed",
+  "doc": {
+   "summary": "CastSpellAction is a ShadowAI action class that executes a specific spell on the current target.",
+   "overview": "This class extends the base Action class to handle the logic for casting spells within the ShadowAI framework. It stores the spell identifier and range, allowing it to determine if the spell can be cast based on target proximity and other game conditions. The action evaluates its feasibility through isPossible() and utility via isUseful(), ensuring optimal decision-making during gameplay.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The Execute method relies on the current target being set; if no target exists, the action will likely fail. The spell string must correspond to a valid spell ID in the game's database.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"CastSpellAction is a ShadowAI action class that executes a specific spell on the current target.\",\n  \"overview\": \"This class extends the base Action class to handle the logic for casting spells within the ShadowAI framework. It stores the spell identifier and range, allowing it to determine if the spell can be cast based on target proximity and other game conditions. The action evaluates its feasibility through isPossible() and utility via isUseful(), ensuring optimal decision-making during gameplay.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The Execute method relies on the current target being set; if no target exists, the action will likely fail. The spell string must correspond to a valid spell ID in the game's database.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GenericSpellActions.h::CastAuraSpellAction@0f1915f9:qwen3-5-4b": {
+  "hash": "73185288c9e1",
+  "doc": {
+   "summary": "CastAuraSpellAction is a specialized action class for ShadowAI that executes aura spells with custom duration and ownership logic.",
+   "overview": "This class extends CastSpellAction to handle specific requirements for aura spells, such as tracking whether the spell is owned by the caster or checking if the spell has already expired. It initializes internal flags for owner status and duration checks during construction, allowing the ShadowAI bot to make informed decisions about spell utility based on these conditions.",
+   "params": [
+    {
+     "name": "botAI",
+     "desc": "Pointer to the ShadowAI instance managing this action."
+    },
+    {
+     "name": "spell",
+     "desc": "The identifier or name of the aura spell to be cast."
+    },
+    {
+     "name": "isOwner",
+     "desc": "Flag indicating whether the caster owns the spell (default: false)."
+    },
+    {
+     "name": "checkDuration",
+     "desc": "Flag indicating whether to check if the spell duration has expired before casting (default: false)."
+    },
+    {
+     "name": "beforeDuration",
+     "desc": "The duration threshold in units to check against when checkDuration is enabled."
+    }
+   ],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "Callers should ensure the spell ID corresponds to a valid aura spell before invoking this action. Edge cases include scenarios where the spell duration is zero or negative, which may affect the checkDuration logic.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"CastAuraSpellAction is a specialized action class for ShadowAI that executes aura spells with custom duration and ownership logic.\",\n  \"overview\": \"This class extends CastSpellAction to handle specific requirements for aura spells, such as tracking whether the spell is owned by the caster or checking if the spell has already expired. It initializes internal flags for owner status and duration checks during construction, allowing the ShadowAI bot to make informed decisions about spell utility based on these conditions.\",\n  \"params\": [\n    {\n      \"name\": \"botAI\",\n      \"desc\": \"Pointer to the ShadowAI instance managing this action.\"\n    },\n    {\n      \"name\": \"spell\",\n      \"desc\": \"The identifier or name of the aura spell to be cast.\"\n    },\n    {\n      \"name\": \"isOwner\",\n      \"desc\": \"Flag indicating whether the caster owns the spell (default: false).\"\n    },\n    {\n      \"name\": \"checkDuration\",\n      \"desc\": \"Flag indicating whether to check if the spell duration has expired before casting (default: false).\"\n    },\n    {\n      \"name\": \"beforeDuration\",\n      \"desc\": \"The duration threshold in units to check against when checkDuration is enabled.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the spell ID corresponds to a valid aura spell before invoking this action. Edge cases include scenarios where the spell duration is zero or negative, which may affect the checkDuration logic.\"\n}",
   "model": "qwen3.5:4b"
  }
 }
