@@ -29296,10 +29296,10 @@
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank.",
+   "notes": "Caller must ensure 'member' is not null before invoking; returns false if ranks are equal or if guilds differ.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.\",\n  \"overview\": \"This function checks two conditions: whether the provided player is a member of the same guild as the bot, and whether their rank is strictly lower than the bot's rank. It returns true only if both conditions are satisfied, ensuring that actions requiring higher authority can be restricted to specific guild members with appropriate hierarchy.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose validity is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank.\"\n}",
+  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.\",\n  \"overview\": \"This function checks two conditions: whether the provided player is a member of the same guild as the bot, and whether their rank is strictly lower than the bot's rank. It returns true only if both conditions are satisfied, ensuring that actions requiring higher authority can be restricted to specific guild members with appropriate hierarchy.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose validity is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking; returns false if ranks are equal or if guilds differ.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::GetRankId@a8ae41b2:qwen3-5-4b": {
@@ -29408,6 +29408,48 @@
    "ai": true
   },
   "raw": "{\n  \"summary\": \"Represents an action to promote a player to guild leader within the ShadowAI framework.\",\n  \"overview\": \"The GuildPromoteAction class extends GuidManageAction to handle the specific logic for promoting a player to a guild's leader. It encapsulates the packet construction and validation required to execute this server-side command, ensuring only valid players can be promoted through the bot's automated actions.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (sends GuildPromote packet), Global state (modifies player role)\",\n  \"notes\": \"Callers must ensure the target player is not already a leader and that promotion rules are met before invoking this action.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GuildManagementActions.h::GuildDemoteAction@0e35be6f:qwen3-5-4b": {
+  "hash": "85140f2a93dc",
+  "doc": {
+   "summary": "GuildDemoteAction constructs a C++ action object to demote a player within a guild by invoking the parent GuidManageAction logic.",
+   "overview": "This class extends GuildManageAction to handle specific guild demotion requests, initializing with a bot AI instance and optional default parameters for name and opcode. It overrides standard methods to validate player eligibility and construct the necessary network packet for execution. The action relies on the base class for core management functionality while providing specialized logic for demotion scenarios.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"GuildDemoteAction constructs a C++ action object to demote a player within a guild by invoking the parent GuidManageAction logic.\",\n  \"overview\": \"This class extends GuildManageAction to handle specific guild demotion requests, initializing with a bot AI instance and optional default parameters for name and opcode. It overrides standard methods to validate player eligibility and construct the necessary network packet for execution. The action relies on the base class for core management functionality while providing specialized logic for demotion scenarios.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GuildManagementActions.h::GuildRemoveAction@b0080815:qwen3-5-4b": {
+  "hash": "4ffd2726e38b",
+  "doc": {
+   "summary": "GuildRemoveAction is a C++ class that executes the guild removal command in ShadowAI by sending the appropriate network packet.",
+   "overview": "This class extends GuidManageAction to handle specific logic for removing a guild from a server. It initializes with a bot AI instance, a descriptive name, and a specific opcode, then overrides methods to validate players and construct the necessary WorldPacket data before transmission.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "Network (sends CMSG_GUILD_REMOVE packet)",
+   "notes": "Callers should ensure the guild exists and the bot has sufficient permissions before invoking this action.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"GuildRemoveAction is a C++ class that executes the guild removal command in ShadowAI by sending the appropriate network packet.\",\n  \"overview\": \"This class extends GuidManageAction to handle specific logic for removing a guild from a server. It initializes with a bot AI instance, a descriptive name, and a specific opcode, then overrides methods to validate players and construct the necessary WorldPacket data before transmission.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (sends CMSG_GUILD_REMOVE packet)\",\n  \"notes\": \"Callers should ensure the guild exists and the bot has sufficient permissions before invoking this action.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/GuildManagementActions.h::GuildManageNearbyAction@11751081:qwen3-5-4b": {
+  "hash": "44ab9f82a10b",
+  "doc": {
+   "summary": "Executes a strategy action to manage guild members within the specified radius.",
+   "overview": "The GuildManageNearbyAction class extends the base Action class to handle specific logic for managing nearby guild members. It initializes with a reference to the ShadowAI bot instance and defines its unique identifier as 'guild manage nearby'. The class provides an Execute method to perform the action when triggered by an event and an isUseful method to determine if the action should be executed based on current conditions.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a strategy action to manage guild members within the specified radius.\",\n  \"overview\": \"The GuildManageNearbyAction class extends the base Action class to handle specific logic for managing nearby guild members. It initializes with a reference to the ShadowAI bot instance and defines its unique identifier as 'guild manage nearby'. The class provides an Execute method to perform the action when triggered by an event and an isUseful method to determine if the action should be executed based on current conditions.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  }
 }
