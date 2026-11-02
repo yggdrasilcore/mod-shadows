@@ -7023,26 +7023,26 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::UpdateAI@c00ee10d:qwen3-5-4b": {
-  "hash": "daf9c134dbdc",
+  "hash": "5ed9e0538fc4",
   "doc": {
-   "summary": "Updates the Shadow AI state by applying cheats, managing spell interruptions based on target health and casting conditions, handling transport switching, and delegating core logic to the base class.",
-   "overview": "This function serves as the primary entry point for the Shadow AI bot's update cycle, utilizing the elapsed time since the last check to manage internal timers. It first applies active cheats to restore health or mana if permitted by configuration, then evaluates whether the bot should interrupt its current spell based on target status, healing mechanics, or facing requirements. Finally, it handles transport synchronization and delegates remaining AI logic to the base class.",
+   "summary": "Updates the Shadow AI state by applying cheats, managing spell interruptions based on target conditions, handling transport switching, and delegating core logic to the base class.",
+   "overview": "This function acts as a wrapper for the bot's AI update cycle, first accounting for elapsed time to manage internal delays. It then checks for active cheats to restore health or mana if applicable before allowing general activity. The core logic evaluates the current spell state to interrupt casting under specific conditions such as dead targets, full health status, or incorrect facing direction, yielding the thread after each decision point.",
    "params": [
     {
      "name": "elapsed",
-     "desc": "The time in milliseconds elapsed since the last call to this function."
+     "desc": "The amount of time that has passed since the last call to this function."
     },
     {
      "name": "minimal",
-     "desc": "A boolean flag indicating whether minimal processing is required (currently unused within this function)."
+     "desc": "A flag indicating whether minimal processing is required (passed through to UpdateAIInternal)."
     }
    ],
    "returns": "void",
    "side_effects": "Network, Global State",
-   "notes": "Calls UpdateAIInternal which may perform I/O; modifies global cheat masks and bot state via SetFullHealth/SetPower; relies on server-side spell info and transport data.",
+   "notes": "Calls AllowActivity(), InterruptSpell(), and YieldThread(); modifies global cheat masks and bot state; relies on sServerFacade for facing updates.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Updates the Shadow AI state by applying cheats, managing spell interruptions based on target health and casting conditions, handling transport switching, and delegating core logic to the base class.\",\n  \"overview\": \"This function serves as the primary entry point for the Shadow AI bot's update cycle, utilizing the elapsed time since the last check to manage internal timers. It first applies active cheats to restore health or mana if permitted by configuration, then evaluates whether the bot should interrupt its current spell based on target status, healing mechanics, or facing requirements. Finally, it handles transport synchronization and delegates remaining AI logic to the base class.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The time in milliseconds elapsed since the last call to this function.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A boolean flag indicating whether minimal processing is required (currently unused within this function).\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network, Global State\",\n  \"notes\": \"Calls UpdateAIInternal which may perform I/O; modifies global cheat masks and bot state via SetFullHealth/SetPower; relies on server-side spell info and transport data.\"\n}",
+  "raw": "{\n  \"summary\": \"Updates the Shadow AI state by applying cheats, managing spell interruptions based on target conditions, handling transport switching, and delegating core logic to the base class.\",\n  \"overview\": \"This function acts as a wrapper for the bot's AI update cycle, first accounting for elapsed time to manage internal delays. It then checks for active cheats to restore health or mana if applicable before allowing general activity. The core logic evaluates the current spell state to interrupt casting under specific conditions such as dead targets, full health status, or incorrect facing direction, yielding the thread after each decision point.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The amount of time that has passed since the last call to this function.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A flag indicating whether minimal processing is required (passed through to UpdateAIInternal).\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network, Global State\",\n  \"notes\": \"Calls AllowActivity(), InterruptSpell(), and YieldThread(); modifies global cheat masks and bot state; relies on sServerFacade for facing updates.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::IsFlyingMounted@f31025b0:qwen3-5-4b": {
@@ -29534,6 +29534,39 @@
    "ai": true
   },
   "raw": "{\n  \"summary\": \"Outputs a list of supported strategy commands to the bot AI's error channel.\",\n  \"overview\": \"This function generates a formatted string listing all currently supported strategies (co, nc, dead) and sends it as an error message via the bot AI. It is primarily used for debugging or informational purposes rather than executing game logic.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network\",\n  \"notes\": \"Relies on CombineSupported() to aggregate supported strategies from the bot AI's context.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HelpAction.cpp::CombineSupported@436194e0:qwen3-5-4b": {
+  "hash": "3a6b379efa53",
+  "doc": {
+   "summary": "Concatenates a set of command strings into a single comma-separated string.",
+   "overview": "This function takes a set of command identifiers and formats them into a readable list separated by commas. It iterates through the provided set, appending each command to an output stream with appropriate spacing, ensuring that trailing separators are avoided. The resulting formatted string is then returned as a const reference to std::string.",
+   "params": [
+    {
+     "name": "commands",
+     "desc": "A set of strings containing the commands to be combined."
+    }
+   ],
+   "returns": "std::string const",
+   "side_effects": "None",
+   "notes": "The function assumes the input set is non-empty; if empty, it returns an empty string. It does not modify any global state or perform I/O operations.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Concatenates a set of command strings into a single comma-separated string.\",\n  \"overview\": \"This function takes a set of command identifiers and formats them into a readable list separated by commas. It iterates through the provided set, appending each command to an output stream with appropriate spacing, ensuring that trailing separators are avoided. The resulting formatted string is then returned as a const reference to std::string.\",\n  \"params\": [\n    {\n      \"name\": \"commands\",\n      \"desc\": \"A set of strings containing the commands to be combined.\"\n    }\n  ],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function assumes the input set is non-empty; if empty, it returns an empty string. It does not modify any global state or perform I/O operations.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HelpAction.h::HelpAction@b8a9a346:qwen3-5-4b": {
+  "hash": "b2e4c5db0b0d",
+  "doc": {
+   "summary": "HelpAction is a strategy action that notifies the player of available chat commands and supported strategies.",
+   "overview": "This class extends the base Action class to handle specific help-related logic within the ShadowAI framework. Upon execution, it triggers internal methods to broadcast information about chat capabilities and strategic options to the user interface. The implementation relies on a NamedObjectContext to manage the context of available actions during this notification process.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "Network (broadcasts help information to the client)",
+   "notes": "Callers should ensure the botAI is initialized before invoking Execute. Edge cases include scenarios where the chat context is missing, which may result in incomplete command listings.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"HelpAction is a strategy action that notifies the player of available chat commands and supported strategies.\",\n  \"overview\": \"This class extends the base Action class to handle specific help-related logic within the ShadowAI framework. Upon execution, it triggers internal methods to broadcast information about chat capabilities and strategic options to the user interface. The implementation relies on a NamedObjectContext to manage the context of available actions during this notification process.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (broadcasts help information to the client)\",\n  \"notes\": \"Callers should ensure the botAI is initialized before invoking Execute. Edge cases include scenarios where the chat context is missing, which may result in incomplete command listings.\"\n}",
   "model": "qwen3.5:4b"
  }
 }
