@@ -351,8 +351,8 @@ void ShadowAI::UpdateAI(uint32 elapsed, bool minimal)
         {
             LOG_DEBUG("shadows", "Bot {} is on a transport", bot->GetName());
 
-            if (bot->GetTransport())
-                bot->GetTransport()->RemovePassenger(bot, true);
+            if (Transport* oldTransport = bot->GetTransport())
+                oldTransport->RemovePassenger(bot, true);
 
             if (newTransport)
                 newTransport->AddPassenger(bot, true);
