@@ -29493,5 +29493,47 @@
   },
   "raw": "{\n  \"summary\": \"The destructor for HelpAction deletes the internal chatContext pointer.\",\n  \"overview\": \"This function serves as the cleanup routine for the HelpAction class, ensuring that dynamically allocated resources are properly released. It specifically targets the chatContext member variable to prevent memory leaks when the action object is destroyed. By invoking a delete operation on this pointer, it guarantees that the associated chat data is freed before the object's lifecycle ends.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Memory deallocation\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HelpAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "9395c343bcca",
+  "doc": {
+   "summary": "Executes the HelpAction by broadcasting chat commands and available strategies to connected clients.",
+   "overview": "This function serves as the primary entry point for handling help requests within the game server. It triggers two internal methods to disseminate information: TellChatCommands sends a list of available chat actions, while TellStrategies provides details on current gameplay strategies. Upon successful execution of these broadcasts, the function returns true to indicate completion.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Network (broadcasts messages to clients)",
+   "notes": "The 'event' parameter is marked [[maybe_unused]] and does not influence the logic; callers should ensure this action is triggered when a player requests assistance.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the HelpAction by broadcasting chat commands and available strategies to connected clients.\",\n  \"overview\": \"This function serves as the primary entry point for handling help requests within the game server. It triggers two internal methods to disseminate information: TellChatCommands sends a list of available chat actions, while TellStrategies provides details on current gameplay strategies. Upon successful execution of these broadcasts, the function returns true to indicate completion.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (broadcasts messages to clients)\",\n  \"notes\": \"The 'event' parameter is marked [[maybe_unused]] and does not influence the logic; callers should ensure this action is triggered when a player requests assistance.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HelpAction.cpp::TellChatCommands@666312b8:qwen3-5-4b": {
+  "hash": "bf198e8fe12c",
+  "doc": {
+   "summary": "Outputs a formatted error message to the chat system listing available whisper commands and syntax examples.",
+   "overview": "This function constructs a string containing instructions for players on how to use the whisper feature, including supported command types and link syntax. It then passes this message to the bot AI's error reporting mechanism via TellError, ensuring it appears in the chat log rather than as a system notification.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "I/O",
+   "notes": "Relies on chatContext->supports() and botAI->TellError(); intended for use by action handlers that need to inform players of command availability.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Outputs a formatted error message to the chat system listing available whisper commands and syntax examples.\",\n  \"overview\": \"This function constructs a string containing instructions for players on how to use the whisper feature, including supported command types and link syntax. It then passes this message to the bot AI's error reporting mechanism via TellError, ensuring it appears in the chat log rather than as a system notification.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"I/O\",\n  \"notes\": \"Relies on chatContext->supports() and botAI->TellError(); intended for use by action handlers that need to inform players of command availability.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HelpAction.cpp::TellStrategies@04f554b3:qwen3-5-4b": {
+  "hash": "d2f6de8b1037",
+  "doc": {
+   "summary": "Outputs a list of supported strategy commands to the bot AI's error channel.",
+   "overview": "This function generates a formatted string listing all currently supported strategies (co, nc, dead) and sends it as an error message via the bot AI. It is primarily used for debugging or informational purposes rather than executing game logic.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "Network",
+   "notes": "Relies on CombineSupported() to aggregate supported strategies from the bot AI's context.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Outputs a list of supported strategy commands to the bot AI's error channel.\",\n  \"overview\": \"This function generates a formatted string listing all currently supported strategies (co, nc, dead) and sends it as an error message via the bot AI. It is primarily used for debugging or informational purposes rather than executing game logic.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network\",\n  \"notes\": \"Relies on CombineSupported() to aggregate supported strategies from the bot AI's context.\"\n}",
+  "model": "qwen3.5:4b"
  }
 }
