@@ -29265,22 +29265,22 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::Execute@9b55cef5:qwen3-5-4b": {
-  "hash": "82f0012d89e1",
+  "hash": "b63fd808dd92",
   "doc": {
-   "summary": "Executes a guild management action by validating the player, sending their name via network packet, and returning success.",
-   "overview": "This function retrieves the player associated with the provided event and performs basic validity checks to ensure the player exists, is not invalid, and is not a bot. Upon validation, it constructs a WorldPacket containing the player's name and transmits it over the network before returning true.",
+   "summary": "Executes a guild leave action for the event owner after verifying shadow security permissions.",
+   "overview": "This function processes a guild departure request by first validating that the event owner possesses the required Shadow Security level. If the permission check fails, it notifies the user via an error message and returns false; otherwise, it constructs a GuildLeave packet and sends the leave command to the server session before returning true.",
    "params": [
     {
      "name": "event",
-     "desc": "The event object containing context information, specifically used to retrieve the associated Player pointer."
+     "desc": "The event object containing the player who initiated the guild leave action."
     }
    ],
    "returns": "bool",
-   "side_effects": "network",
-   "notes": "Caller must ensure the event contains valid player data; returns false if the player is invalid or a bot.",
+   "side_effects": "Network (sends GuildLeave opcode), Global state (checks shadow security level)",
+   "notes": "Caller must ensure the event represents a valid guild leave context. Edge case: If the owner is null or lacks Shadow Security INVITE permission, the action is aborted.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a guild management action by validating the player, sending their name via network packet, and returning success.\",\n  \"overview\": \"This function retrieves the player associated with the provided event and performs basic validity checks to ensure the player exists, is not invalid, and is not a bot. Upon validation, it constructs a WorldPacket containing the player's name and transmits it over the network before returning true.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing context information, specifically used to retrieve the associated Player pointer.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network\",\n  \"notes\": \"Caller must ensure the event contains valid player data; returns false if the player is invalid or a bot.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a guild leave action for the event owner after verifying shadow security permissions.\",\n  \"overview\": \"This function processes a guild departure request by first validating that the event owner possesses the required Shadow Security level. If the permission check fails, it notifies the user via an error message and returns false; otherwise, it constructs a GuildLeave packet and sends the leave command to the server session before returning true.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the player who initiated the guild leave action.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (sends GuildLeave opcode), Global state (checks shadow security level)\",\n  \"notes\": \"Caller must ensure the event represents a valid guild leave context. Edge case: If the owner is null or lacks Shadow Security INVITE permission, the action is aborted.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::PlayerIsValid@0f0e2c00:qwen3-5-4b": {
@@ -29322,17 +29322,17 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
-  "hash": "fcb42fac5664",
+  "hash": "cd7b8d8f966f",
   "doc": {
-   "summary": "Checks if a bot has the necessary rights to perform promotion, demotion, or invite actions within its guild.",
-   "overview": "This function verifies whether a specific bot possesses the required permissions to modify guild membership or structure. It first ensures the bot belongs to a guild and then retrieves the bot's rank rights from the guild manager to determine if any of the specified rights (demote, promote, or invite) are granted.",
+   "summary": "Returns true if the guild ID is set on the bot, indicating the guild management action should be executed.",
+   "overview": "This function checks whether a guild has been assigned to the current bot instance by retrieving its unique identifier. It serves as a guard condition for guild-specific actions, ensuring that operations are only performed when a valid target guild exists. The implementation relies on the bot object's internal state to determine the presence of a guild.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Returns false if the bot has no guild or lacks the specific rank rights.",
+   "notes": "Callers should verify this return value before invoking any guild-related logic to prevent errors when no guild is configured.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Checks if a bot has the necessary rights to perform promotion, demotion, or invite actions within its guild.\",\n  \"overview\": \"This function verifies whether a specific bot possesses the required permissions to modify guild membership or structure. It first ensures the bot belongs to a guild and then retrieves the bot's rank rights from the guild manager to determine if any of the specified rights (demote, promote, or invite) are granted.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns false if the bot has no guild or lacks the specific rank rights.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns true if the guild ID is set on the bot, indicating the guild management action should be executed.\",\n  \"overview\": \"This function checks whether a guild has been assigned to the current bot instance by retrieving its unique identifier. It serves as a guard condition for guild-specific actions, ensuring that operations are only performed when a valid target guild exists. The implementation relies on the bot object's internal state to determine the presence of a guild.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify this return value before invoking any guild-related logic to prevent errors when no guild is configured.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::SendPacket@d96affb9:qwen3-5-4b": {
@@ -29623,6 +29623,62 @@
    "ai": true
   },
   "raw": "{\n  \"summary\": \"Determines the highest valid height above a given horizontal position by querying both the VMap and phase mask for object hit positions.\",\n  \"overview\": \"This function calculates the maximum altitude reachable at specific x and y coordinates without colliding with game objects. It performs two separate queries: one against the global VMap manager and another against the bot's current phase mask, comparing results to find the highest valid height within a defined search range starting from slightly above the bot's current position.\",\n  \"params\": [\n    {\n      \"name\": \"x\",\n      \"desc\": \"Horizontal coordinate for the vertical search.\"\n    },\n    {\n      \"name\": \"y\",\n      \"desc\": \"Horizontal coordinate for the vertical search.\"\n    }\n  ],\n  \"returns\": \"float\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on VMap::VMapFactory and bot state access; returns INVALID_HEIGHT if no objects are found in the search range.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HireAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "219cfc2a5341",
+  "doc": {
+   "summary": "Executes the hiring logic for a random shadow bot by validating master ownership, character count limits, level restrictions, and trade discount requirements before permanently adding the bot to the master's account.",
+   "overview": "This function first verifies that the calling entity is a valid master and that the target bot is a recognized random bot. It then queries the database to ensure the master does not already possess ten characters and confirms the bot's level does not exceed the master's. Finally, it calculates the required hiring fee based on the bot's level and applies any existing trade discount before deducting funds and updating the character record.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "Database query, database update, money deduction from bot, global state modification via sRandomShadowMgr",
+   "notes": "The function relies on external managers like GetMaster() and sRandomShadowMgr; callers must ensure the master is active. Edge cases include scenarios where the master has exactly ten characters or where the trade discount is insufficient to cover the calculated fee.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes the hiring logic for a random shadow bot by validating master ownership, character count limits, level restrictions, and trade discount requirements before permanently adding the bot to the master's account.\",\n  \"overview\": \"This function first verifies that the calling entity is a valid master and that the target bot is a recognized random bot. It then queries the database to ensure the master does not already possess ten characters and confirms the bot's level does not exceed the master's. Finally, it calculates the required hiring fee based on the bot's level and applies any existing trade discount before deducting funds and updating the character record.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Database query, database update, money deduction from bot, global state modification via sRandomShadowMgr\",\n  \"notes\": \"The function relies on external managers like GetMaster() and sRandomShadowMgr; callers must ensure the master is active. Edge cases include scenarios where the master has exactly ten characters or where the trade discount is insufficient to cover the calculated fee.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/HireAction.h::HireAction@0e06936e:qwen3-5-4b": {
+  "hash": "4867a12d806d",
+  "doc": {
+   "summary": "The HireAction class represents a strategy action that allows a ShadowAI bot to hire new units.",
+   "overview": "This class extends the base Action class with a specific identifier 'hire' and is initialized by passing a reference to the bot's AI instance. It encapsulates the logic required for hiring operations within the game's event-driven architecture, ensuring that all hiring attempts are tied to a specific bot context.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"The HireAction class represents a strategy action that allows a ShadowAI bot to hire new units.\",\n  \"overview\": \"This class extends the base Action class with a specific identifier 'hire' and is initialized by passing a reference to the bot's AI instance. It encapsulates the logic required for hiring operations within the game's event-driven architecture, ensuring that all hiring attempts are tied to a specific bot context.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ImbueAction.cpp::Action@defb6a1b:qwen3-5-4b": {
+  "hash": "6306aa2f99a2",
+  "doc": {
+   "summary": "Constructs an action that applies a poison effect to the target.",
+   "overview": "The ImbueWithPoisonAction constructor initializes an action instance within the Shadow AI framework by accepting a reference to the botAI object. It sets the internal action name to 'apply poison' and prepares the state required for executing the poisoning logic during gameplay. This constructor serves as the entry point for creating instances of this specific action type.",
+   "params": [],
+   "returns": "void",
+   "side_effects": "None",
+   "notes": "",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Constructs an action that applies a poison effect to the target.\",\n  \"overview\": \"The ImbueWithPoisonAction constructor initializes an action instance within the Shadow AI framework by accepting a reference to the botAI object. It sets the internal action name to 'apply poison' and prepares the state required for executing the poisoning logic during gameplay. This constructor serves as the entry point for creating instances of this specific action type.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/strategy/actions/ImbueAction.cpp::Execute@99556895:qwen3-5-4b": {
+  "hash": "e89bd81fbb33",
+  "doc": {
+   "summary": "Executes a stealth and poison imbuing strategy for the bot by removing existing stealth auras, ensuring a standing state, and applying prioritized poisons to main and off-hand weapons.",
+   "overview": "This function first checks if the bot is already in combat or has an active stealth aura, returning false if either condition is met. It then attempts to imbue poisons onto the bot's main hand and off-hand weapons, prioritizing deadly poisons over instant poisons when both are available. The logic iterates through predefined lists of poison IDs to find consumable items before applying them via the bot AI.",
+   "params": [],
+   "returns": "bool",
+   "side_effects": "None",
+   "notes": "The function relies on global bot state and inventory checks; callers should ensure the bot is not in combat before invoking. Edge cases include scenarios where no poisons are available or weapons are already enchanted.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Executes a stealth and poison imbuing strategy for the bot by removing existing stealth auras, ensuring a standing state, and applying prioritized poisons to main and off-hand weapons.\",\n  \"overview\": \"This function first checks if the bot is already in combat or has an active stealth aura, returning false if either condition is met. It then attempts to imbue poisons onto the bot's main hand and off-hand weapons, prioritizing deadly poisons over instant poisons when both are available. The logic iterates through predefined lists of poison IDs to find consumable items before applying them via the bot AI.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on global bot state and inventory checks; callers should ensure the bot is not in combat before invoking. Edge cases include scenarios where no poisons are available or weapons are already enchanted.\"\n}",
   "model": "qwen3.5:4b"
  }
 }
