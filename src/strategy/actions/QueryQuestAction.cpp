@@ -59,12 +59,12 @@ bool QueryQuestAction::Execute(Event event)
 
         if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
         {
-            out << "|c0000FF00completed|r ---";
+            out << "|c0000ff00completed|r ---";
             botAI->TellMaster(out);
         }
         else
         {
-            out << "|c00FF0000not completed|r ---";
+            out << "|c00ff0000not completed|r ---";
             botAI->TellMaster(out);
             TellObjectives(questId);
         }

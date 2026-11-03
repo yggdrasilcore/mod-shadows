@@ -66,13 +66,13 @@ std::string const SaveManaAction::Format(double value)
     std::ostringstream out;
 
     if (value <= 1.0)
-        out << "|cFF808080";
+        out << "|cff808080";
     else if (value <= 5.0)
-        out << "|cFF00FF00";
+        out << "|cff00ff00";
     else if (value <= 7.0)
-        out << "|cFFFFFF00";
+        out << "|cffffff00";
     else
-        out << "|cFFFF0000";
+        out << "|cffff0000";
 
     out << value << "|cffffffff";
     return out.str();

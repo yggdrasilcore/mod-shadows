@@ -68,8 +68,8 @@ bool LootStrategyAction::Execute(Event event)
                 if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid))
                 {
                     std::ostringstream out;
-                    out << (StoreLootAction::IsLootAllowed(itemid, botAI) ? "|cFF000000Will loot "
-                                                                          : "|c00FF0000Won't loot ")
+                    out << (StoreLootAction::IsLootAllowed(itemid, botAI) ? "|cff000000Will loot "
+                                                                          : "|c00ff0000Won't loot ")
                         << ChatHelper::FormatItem(proto);
                     botAI->TellMaster(out.str());
                 }

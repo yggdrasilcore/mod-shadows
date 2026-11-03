@@ -365,14 +365,14 @@ std::string const ChatHelper::FormatQuest(Quest const* quest)
     if (questTitle.empty())
         questTitle = quest->GetTitle();
 
-    out << "|cFFFFFF00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << questTitle << "]|h|r";
+    out << "|cffffff00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << questTitle << "]|h|r";
     return out.str();
 }
 
 std::string const ChatHelper::FormatGameobject(GameObject* go)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":"
+    out << "|cffffff00|Hfound:" << go->GetGUID().GetRawValue() << ":" << go->GetEntry() << ":"
         << "|h[" << go->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()) << "]|h|r";
     return out.str();
 }
@@ -380,7 +380,7 @@ std::string const ChatHelper::FormatGameobject(GameObject* go)
 std::string const ChatHelper::FormatWorldobject(WorldObject* wo)
 {
     std::ostringstream out;
-    out << "|cFFFFFF00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":"
+    out << "|cffffff00|Hfound:" << wo->GetGUID().GetRawValue() << ":" << wo->GetEntry() << ":"
         << "|h[";
     out << (wo->ToGameObject() ? ((GameObject*)wo)->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale())
                                : wo->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()))
@@ -399,7 +399,7 @@ std::string const ChatHelper::FormatWorldEntry(int32 entry)
         gInfo = sObjectMgr->GetGameObjectTemplate(entry * -1);
 
     std::ostringstream out;
-    out << "|cFFFFFF00|Hentry:" << abs(entry) << ":"
+    out << "|cffffff00|Hentry:" << abs(entry) << ":"
         << "|h[";
 
     if (entry < 0 && gInfo)
@@ -499,8 +499,8 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
 {
     GuidVector gos;
     //    Link format
-    //    |cFFFFFF00|Hfound:" << guid << ':'  << entry << ':'  <<  "|h[" << gInfo->name << "]|h|r";
-    //    |cFFFFFF00|Hfound:9582:1731|h[Copper Vein]|h|r
+    //    |cffffff00|Hfound:" << guid << ':'  << entry << ':'  <<  "|h[" << gInfo->name << "]|h|r";
+    //    |cffffff00|Hfound:9582:1731|h[Copper Vein]|h|r
 
     uint8 pos = 0;
     while (true)
@@ -540,7 +540,7 @@ GuidVector ChatHelper::parseGameobjects(std::string const text)
 std::string const ChatHelper::FormatQuestObjective(std::string const name, uint32 available, uint32 required)
 {
     std::ostringstream out;
-    out << "|cFFFFFFFF" << name << (available >= required ? "|c0000FF00: " : "|c00FF0000: ") << available << "/"
+    out << "|cffffffff" << name << (available >= required ? "|c0000ff00: " : "|c00ff0000: ") << available << "/"
         << required << "|r";
 
     return out.str();
