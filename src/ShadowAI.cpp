@@ -3724,7 +3724,7 @@ bool ShadowAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
                 pet->ToggleAutocast(spellInfo, !autocast);
                 std::ostringstream out;
-                out << (autocast ? "|cffff0000|Disabling" : "|cFF00ff00|Enabling") << " pet auto-cast for ";
+                out << (autocast ? "|cffff0000|Disabling" : "|cff00ff00|Enabling") << " pet auto-cast for ";
                 out << chatHelper.FormatSpell(spellInfo);
                 TellMaster(out);
                 return true;
@@ -3976,7 +3976,7 @@ bool ShadowAI::CastSpell(uint32 spellId, float x, float y, float z, Item* itemTa
 
         pet->ToggleAutocast(spellInfo, !autocast);
         std::ostringstream out;
-        out << (autocast ? "|cffff0000|Disabling" : "|cFF00ff00|Enabling") << " pet auto-cast for ";
+        out << (autocast ? "|cffff0000|Disabling" : "|cff00ff00|Enabling") << " pet auto-cast for ";
         out << chatHelper.FormatSpell(spellInfo);
         TellMaster(out);
         return true;
