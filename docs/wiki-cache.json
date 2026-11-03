@@ -7135,26 +7135,26 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::GetFallJumpSpeed@40c8ee8d:qwen3-5-4b": {
-  "hash": "29ee614be5a0",
+  "hash": "ee9e3c59a530",
   "doc": {
    "summary": "Calculates the fall jump speed for a bot based on the vertical distance between two Z coordinates.",
-   "overview": "This function determines the speed at which a bot can jump while falling by analyzing the difference in altitude between a starting and target Z position. It first checks if the bot is currently marked as 'falling slow', returning a fixed low speed if true, otherwise it computes a dynamic speed based on the vertical distance traveled.",
+   "overview": "This function determines the speed at which a bot will perform a fall jump by analyzing the vertical displacement between a starting and ending Z coordinate. It first checks if the bot is currently in a 'falling slow' state, returning a fixed speed of 7.0f if true; otherwise, it computes the absolute difference between the coordinates, ensuring a minimum distance of 1.0f before capping the result at 70.0f.",
    "params": [
     {
      "name": "fromZ",
-     "desc": "The starting Z coordinate (altitude) of the fall."
+     "desc": "The starting Z coordinate (float)."
     },
     {
      "name": "toZ",
-     "desc": "The target Z coordinate (altitude) for the jump calculation."
+     "desc": "The target Z coordinate (float)."
     }
    ],
    "returns": "float",
    "side_effects": "None",
-   "notes": "Caller should ensure bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) is updated before calling; returns a minimum of 1.0f and maximum of 70.0f.",
+   "notes": "Callers should ensure the bot's movement state is up to date before invoking this function, as it relies on the MOVEMENTFLAG_FALLING_SLOW flag.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Calculates the fall jump speed for a bot based on the vertical distance between two Z coordinates.\",\n  \"overview\": \"This function determines the speed at which a bot can jump while falling by analyzing the difference in altitude between a starting and target Z position. It first checks if the bot is currently marked as 'falling slow', returning a fixed low speed if true, otherwise it computes a dynamic speed based on the vertical distance traveled.\",\n  \"params\": [\n    {\n      \"name\": \"fromZ\",\n      \"desc\": \"The starting Z coordinate (altitude) of the fall.\"\n    },\n    {\n      \"name\": \"toZ\",\n      \"desc\": \"The target Z coordinate (altitude) for the jump calculation.\"\n    }\n  ],\n  \"returns\": \"float\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller should ensure bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) is updated before calling; returns a minimum of 1.0f and maximum of 70.0f.\"\n}",
+  "raw": "{\n  \"summary\": \"Calculates the fall jump speed for a bot based on the vertical distance between two Z coordinates.\",\n  \"overview\": \"This function determines the speed at which a bot will perform a fall jump by analyzing the vertical displacement between a starting and ending Z coordinate. It first checks if the bot is currently in a 'falling slow' state, returning a fixed speed of 7.0f if true; otherwise, it computes the absolute difference between the coordinates, ensuring a minimum distance of 1.0f before capping the result at 70.0f.\",\n  \"params\": [\n    {\n      \"name\": \"fromZ\",\n      \"desc\": \"The starting Z coordinate (float).\"\n    },\n    {\n      \"name\": \"toZ\",\n      \"desc\": \"The target Z coordinate (float).\"\n    }\n  ],\n  \"returns\": \"float\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot's movement state is up to date before invoking this function, as it relies on the MOVEMENTFLAG_FALLING_SLOW flag.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::PredictFallDamage@4b1c96cb:qwen3-5-4b": {
@@ -7259,26 +7259,26 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::UpdateAIInternal@b655a7e0:qwen3-5-4b": {
-  "hash": "a90826751106",
+  "hash": "008b3cd02a03",
   "doc": {
-   "summary": "Updates the internal AI logic for Shadow bots by processing chat replies, handling commands, managing logout states, and executing fall jump mechanics.",
-   "overview": "This function serves as the core update loop for Shadow AI entities, first verifying the bot's presence in the world before initializing performance tracking. It iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers to maintain network synchronization. The logic then evaluates specific conditions regarding player logout status and master availability to determine if the bot should terminate its session.",
+   "summary": "Updates the internal AI logic for a Shadow bot by processing chat replies, handling commands, managing logout states, and executing fall jump animations.",
+   "overview": "This function first validates that the bot is not being teleported or outside the world before proceeding. It then iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers for both the bot and its master. The logic checks specific conditions regarding the bot's session state, including logging out status, security levels, and resting flags, triggering a logout sequence if necessary.",
    "params": [
     {
      "name": "elapsed",
-     "desc": "The elapsed time since the last update, currently unused."
+     "desc": "The elapsed time since the last update; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic."
     },
     {
      "name": "minimal",
-     "desc": "A flag indicating minimal processing mode, currently unused."
+     "desc": "A boolean flag indicating whether minimal processing mode is active; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic."
     }
    ],
    "returns": "void",
-   "side_effects": "Network packet handling, chat reply execution, potential bot logout via Shadow Manager, fall jump initiation, and environmental damage calculation.",
-   "notes": "The function relies on global performance monitoring and shadow manager instances; callers must ensure the bot is alive and not teleported before invocation. Edge cases include handling bots in flight or swimming states which bypass certain ground-based logic branches.",
+   "side_effects": "Network (packet handling), I/O (chat reply execution), Global State (performance monitoring, logout state updates, shadow manager interactions)",
+   "notes": "The function performs complex fall jump calculations based on the bot's position relative to ground and surfaces. It relies on external handlers for chat processing and packet management, and modifies global AI state regarding the bot's movement and session status.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Updates the internal AI logic for Shadow bots by processing chat replies, handling commands, managing logout states, and executing fall jump mechanics.\",\n  \"overview\": \"This function serves as the core update loop for Shadow AI entities, first verifying the bot's presence in the world before initializing performance tracking. It iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers to maintain network synchronization. The logic then evaluates specific conditions regarding player logout status and master availability to determine if the bot should terminate its session.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The elapsed time since the last update, currently unused.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A flag indicating minimal processing mode, currently unused.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network packet handling, chat reply execution, potential bot logout via Shadow Manager, fall jump initiation, and environmental damage calculation.\",\n  \"notes\": \"The function relies on global performance monitoring and shadow manager instances; callers must ensure the bot is alive and not teleported before invocation. Edge cases include handling bots in flight or swimming states which bypass certain ground-based logic branches.\"\n}",
+  "raw": "{\n  \"summary\": \"Updates the internal AI logic for a Shadow bot by processing chat replies, handling commands, managing logout states, and executing fall jump animations.\",\n  \"overview\": \"This function first validates that the bot is not being teleported or outside the world before proceeding. It then iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers for both the bot and its master. The logic checks specific conditions regarding the bot's session state, including logging out status, security levels, and resting flags, triggering a logout sequence if necessary.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The elapsed time since the last update; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A boolean flag indicating whether minimal processing mode is active; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (packet handling), I/O (chat reply execution), Global State (performance monitoring, logout state updates, shadow manager interactions)\",\n  \"notes\": \"The function performs complex fall jump calculations based on the bot's position relative to ground and surfaces. It relies on external handlers for chat processing and packet management, and modifies global AI state regarding the bot's movement and session status.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::HandleCommands@16e6b583:qwen3-5-4b": {
@@ -7562,22 +7562,22 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::DoNextAction@f26bf85b:qwen3-5-4b": {
-  "hash": "b349dc7e66be",
+  "hash": "aa37b0116b74",
   "doc": {
-   "summary": "Executes the next action for a Shadow AI bot, optionally enforcing minimal activity constraints based on the 'min' parameter.",
-   "overview": "This function determines the appropriate state transition and behavior for a bot by checking its current engine state, combat status, and movement flags. It handles edge cases such as falling, swimming, or being charmed before delegating the core logic to the specific action engine, which may then perform tasks like eating, moving, or engaging in combat.",
+   "summary": "Executes the next action for a Shadow AI bot, handling state transitions based on combat status and movement flags.",
+   "overview": "This function first validates that both the bot and its master are present and not being teleported before proceeding. It manages critical state changes such as transitioning to or from dead states, adjusting death counts, and clearing targets when appropriate. The core logic evaluates movement conditions like falling or swimming to determine if a fall jump is necessary, ultimately delegating the primary action execution to the current engine with a flag indicating whether minimal activity is required.",
    "params": [
     {
      "name": "min",
-     "desc": "A boolean flag indicating whether the bot should operate in minimal activity mode."
+     "desc": "A boolean flag indicating whether the bot should perform only minimal actions."
     }
    ],
    "returns": "void",
-   "side_effects": "State changes (engine transitions, AFK toggling), global state updates (death count, context variables), and potential network I/O via motion master commands.",
-   "notes": "The function relies on the bot being alive and not teleported; it may toggle the bot's AFK status depending on group dynamics and player presence.",
+   "side_effects": "State changes (bot state, death count), movement flags, target clearing, and potential network updates via DoFallJump.",
+   "notes": "The function relies on global configuration for cooldowns and heavily depends on the bot's current engine state. It performs complex height calculations to determine if a fall jump is needed based on map geometry and movement status.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the next action for a Shadow AI bot, optionally enforcing minimal activity constraints based on the 'min' parameter.\",\n  \"overview\": \"This function determines the appropriate state transition and behavior for a bot by checking its current engine state, combat status, and movement flags. It handles edge cases such as falling, swimming, or being charmed before delegating the core logic to the specific action engine, which may then perform tasks like eating, moving, or engaging in combat.\",\n  \"params\": [\n    {\n      \"name\": \"min\",\n      \"desc\": \"A boolean flag indicating whether the bot should operate in minimal activity mode.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"State changes (engine transitions, AFK toggling), global state updates (death count, context variables), and potential network I/O via motion master commands.\",\n  \"notes\": \"The function relies on the bot being alive and not teleported; it may toggle the bot's AFK status depending on group dynamics and player presence.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the next action for a Shadow AI bot, handling state transitions based on combat status and movement flags.\",\n  \"overview\": \"This function first validates that both the bot and its master are present and not being teleported before proceeding. It manages critical state changes such as transitioning to or from dead states, adjusting death counts, and clearing targets when appropriate. The core logic evaluates movement conditions like falling or swimming to determine if a fall jump is necessary, ultimately delegating the primary action execution to the current engine with a flag indicating whether minimal activity is required.\",\n  \"params\": [\n    {\n      \"name\": \"min\",\n      \"desc\": \"A boolean flag indicating whether the bot should perform only minimal actions.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"State changes (bot state, death count), movement flags, target clearing, and potential network updates via DoFallJump.\",\n  \"notes\": \"The function relies on global configuration for cooldowns and heavily depends on the bot's current engine state. It performs complex height calculations to determine if a fall jump is needed based on map geometry and movement status.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::ReInitCurrentEngine@3b6bc18f:qwen3-5-4b": {
@@ -10855,17 +10855,17 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.h::ShadowAI@862a100e:qwen3-5-4b": {
-  "hash": "d13152650096",
+  "hash": "ad5962437ab7",
   "doc": {
-   "summary": "The ShadowAI class defines the core logic and state management for a bot player, handling AI updates, strategy selection, group interactions, and communication with the game server.",
-   "overview": "This class extends ShadowAIBase to provide specialized functionality for managing a bot's behavior within a game instance. It encapsulates critical operations such as updating AI states based on elapsed time, executing specific actions like jumping or spell interruption, and evaluating strategies for different combat roles. The class also handles communication protocols by processing incoming packets from the master server and queuing chat responses.",
+   "summary": "The ShadowAI class defines the core logic and state management for a bot player, handling AI updates, command processing, strategy evaluation, and interaction with the game world.",
+   "overview": "This class extends ShadowAIBase to provide specialized functionality for managing bot behavior, including updating AI states based on elapsed time and executing specific actions. It handles incoming and outgoing network packets, processes remote commands, and manages strategies and engine states for combat and non-combat scenarios. The class also includes utility methods for detecting player roles, predicting damage, and interacting with the game environment.",
    "params": [],
    "returns": "void",
-   "side_effects": "Network (handles remote commands and packets), I/O (chat responses, sounds, emotes), Global state (modifies bot state and strategies)",
-   "notes": "Callers should ensure thread safety when accessing currentState; edge cases include handling minimal vs full AI updates depending on game phase.",
+   "side_effects": "Network (packet handling), Game State (AI updates, strategy changes, spell interrupts)",
+   "notes": "Callers should ensure thread safety when updating AI states; edge cases include handling minimal vs full AI modes and managing bot disbanding or teleportation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The ShadowAI class defines the core logic and state management for a bot player, handling AI updates, strategy selection, group interactions, and communication with the game server.\",\n  \"overview\": \"This class extends ShadowAIBase to provide specialized functionality for managing a bot's behavior within a game instance. It encapsulates critical operations such as updating AI states based on elapsed time, executing specific actions like jumping or spell interruption, and evaluating strategies for different combat roles. The class also handles communication protocols by processing incoming packets from the master server and queuing chat responses.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (handles remote commands and packets), I/O (chat responses, sounds, emotes), Global state (modifies bot state and strategies)\",\n  \"notes\": \"Callers should ensure thread safety when accessing currentState; edge cases include handling minimal vs full AI updates depending on game phase.\"\n}",
+  "raw": "{\n  \"summary\": \"The ShadowAI class defines the core logic and state management for a bot player, handling AI updates, command processing, strategy evaluation, and interaction with the game world.\",\n  \"overview\": \"This class extends ShadowAIBase to provide specialized functionality for managing bot behavior, including updating AI states based on elapsed time and executing specific actions. It handles incoming and outgoing network packets, processes remote commands, and manages strategies and engine states for combat and non-combat scenarios. The class also includes utility methods for detecting player roles, predicting damage, and interacting with the game environment.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (packet handling), Game State (AI updates, strategy changes, spell interrupts)\",\n  \"notes\": \"Callers should ensure thread safety when updating AI states; edge cases include handling minimal vs full AI modes and managing bot disbanding or teleportation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAIAware.h::ShadowAIAware@52896381:qwen3-5-4b": {
@@ -29296,10 +29296,10 @@
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Caller must ensure 'member' is not null before invoking; returns false if ranks are equal or if guilds differ.",
+   "notes": "Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.\",\n  \"overview\": \"This function checks two conditions: whether the provided player is a member of the same guild as the bot, and whether their rank is strictly lower than the bot's rank. It returns true only if both conditions are satisfied, ensuring that actions requiring higher authority can be restricted to specific guild members with appropriate hierarchy.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose validity is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking; returns false if ranks are equal or if guilds differ.\"\n}",
+  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.\",\n  \"overview\": \"This function checks two conditions: whether the provided player is a member of the same guild as the bot, and whether their rank is strictly lower than the bot's rank. It returns true only if both conditions are satisfied, ensuring that actions requiring higher authority can be restricted to specific guild members with appropriate hierarchy.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose validity is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::GetRankId@a8ae41b2:qwen3-5-4b": {
@@ -29322,36 +29322,36 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
-  "hash": "2f8c269de6c1",
+  "hash": "fcb42fac5664",
   "doc": {
-   "summary": "Checks if the bot has the authority to remove a guild member.",
-   "overview": "This function verifies whether a specific bot possesses the 'Remove' rank right within its current guild. It first confirms that the bot is assigned to a guild and then queries the guild manager to validate the presence of the required permission for that bot's role.",
+   "summary": "Checks if a bot has the necessary rights to perform promotion, demotion, or invite actions within its guild.",
+   "overview": "This function verifies whether a specific bot possesses the required permissions to modify guild membership or structure. It first ensures the bot belongs to a guild and then retrieves the bot's rank rights from the guild manager to determine if any of the specified rights (demote, promote, or invite) are granted.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on external state from bot->GetGuildId() and sGuildMgr->GetGuildById(); returns false if the bot lacks a guild or does not hold GR_RIGHT_REMOVE.",
+   "notes": "Returns false if the bot has no guild or lacks the specific rank rights.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Checks if the bot has the authority to remove a guild member.\",\n  \"overview\": \"This function verifies whether a specific bot possesses the 'Remove' rank right within its current guild. It first confirms that the bot is assigned to a guild and then queries the guild manager to validate the presence of the required permission for that bot's role.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external state from bot->GetGuildId() and sGuildMgr->GetGuildById(); returns false if the bot lacks a guild or does not hold GR_RIGHT_REMOVE.\"\n}",
+  "raw": "{\n  \"summary\": \"Checks if a bot has the necessary rights to perform promotion, demotion, or invite actions within its guild.\",\n  \"overview\": \"This function verifies whether a specific bot possesses the required permissions to modify guild membership or structure. It first ensures the bot belongs to a guild and then retrieves the bot's rank rights from the guild manager to determine if any of the specified rights (demote, promote, or invite) are granted.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns false if the bot has no guild or lacks the specific rank rights.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::SendPacket@d96affb9:qwen3-5-4b": {
-  "hash": "61d6dbd7c9de",
+  "hash": "e0b8b9ce284a",
   "doc": {
-   "summary": "Executes a guild demotion action by parsing the provided packet and routing it to the session handler.",
-   "overview": "This function takes a WorldPacket containing GuildDemoteMember data, deserializes it into a structured object, and forwards the command to the bot's session for processing. It serves as a bridge between raw network packets and the game logic that manages guild member ranks.",
+   "summary": "Executes the guild officer remove member opcode by parsing the packet and invoking the session handler.",
+   "overview": "This function processes a GuildOfficerRemoveMember packet to trigger the removal of a guild member. It first deserializes the packet data into a specific struct, then delegates the actual handling logic to the bot's session manager.",
    "params": [
     {
      "name": "packet",
-     "desc": "A WorldPacket containing the GuildDemoteMember opcode and associated data."
+     "desc": "The WorldPacket containing the GuildOfficerRemoveMember opcode and associated data."
     }
    ],
    "returns": "void",
-   "side_effects": "Network (handles packet), Global state (modifies bot session state)",
-   "notes": "Callers should ensure the packet contains valid GuildDemoteMember data before invoking this function to prevent runtime errors.",
+   "side_effects": "Network (handles opcode via session), Global state (modifies guild member list)",
+   "notes": "Caller must ensure the packet contains valid GuildOfficerRemoveMember data; edge case occurs if the bot session is unavailable or the user lacks removal permissions.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a guild demotion action by parsing the provided packet and routing it to the session handler.\",\n  \"overview\": \"This function takes a WorldPacket containing GuildDemoteMember data, deserializes it into a structured object, and forwards the command to the bot's session for processing. It serves as a bridge between raw network packets and the game logic that manages guild member ranks.\",\n  \"params\": [\n    {\n      \"name\": \"packet\",\n      \"desc\": \"A WorldPacket containing the GuildDemoteMember opcode and associated data.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (handles packet), Global state (modifies bot session state)\",\n  \"notes\": \"Callers should ensure the packet contains valid GuildDemoteMember data before invoking this function to prevent runtime errors.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the guild officer remove member opcode by parsing the packet and invoking the session handler.\",\n  \"overview\": \"This function processes a GuildOfficerRemoveMember packet to trigger the removal of a guild member. It first deserializes the packet data into a specific struct, then delegates the actual handling logic to the bot's session manager.\",\n  \"params\": [\n    {\n      \"name\": \"packet\",\n      \"desc\": \"The WorldPacket containing the GuildOfficerRemoveMember opcode and associated data.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (handles opcode via session), Global state (modifies guild member list)\",\n  \"notes\": \"Caller must ensure the packet contains valid GuildOfficerRemoveMember data; edge case occurs if the bot session is unavailable or the user lacks removal permissions.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::Execute@99556895:qwen3-5-4b": {
@@ -29567,6 +29567,62 @@
    "ai": true
   },
   "raw": "{\n  \"summary\": \"HelpAction is a strategy action that notifies the player of available chat commands and supported strategies.\",\n  \"overview\": \"This class extends the base Action class to handle specific help-related logic within the ShadowAI framework. Upon execution, it triggers internal methods to broadcast information about chat capabilities and strategic options to the user interface. The implementation relies on a NamedObjectContext to manage the context of available actions during this notification process.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (broadcasts help information to the client)\",\n  \"notes\": \"Callers should ensure the botAI is initialized before invoking Execute. Edge cases include scenarios where the chat context is missing, which may result in incomplete command listings.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "__overview__@fcba95a2aa34:qwen3-5-4b": {
+  "hash": "fcba95a2aa34",
+  "doc": {
+   "summary": "The mod-shadows C++ module enhances server bots with intelligent AI behavior, dynamic spec detection, and comprehensive chat broadcasting capabilities.",
+   "body": "# mod-shadows Module Wiki\n\n## Overview\n\nThe **mod-shadows** module is a high-performance C++ extension for World of Warcraft game servers. It equips bot players with advanced artificial intelligence that adapts to class-specific roles (Tank, Healer, DPS) and spec tabs. Additionally, it provides a robust broadcasting system allowing bots to communicate guild messages, quest updates, loot notifications, and social suggestions directly into the chat channels.\n\n## How It Works\n\nThe module operates through a modular architecture centered around the `AiFactory` class, which manages the lifecycle of bot intelligence. The flow is as follows:\n\n1.  **Context Creation**: When a bot is instantiated, `AiFactory::createAiObjectContext` determines the player's class and creates a specific object context (e.g., `PriestAiObjectContext`, `WarriorAiObjectContext`).\n2.  **Role & Spec Detection**: The factory analyzes the bot's talent map and active spec mask to determine their role (`BOT_ROLE_TANK`, `BOT_ROLE_HEALER`, etc.) and preferred spec tab.\n3.  **Engine Initialization**: Depending on the game state (Combat, Non-Combat, Dead), the factory creates a dedicated `Engine` instance using `createCombatEngine`, `createNonCombatEngine`, or `createDeadEngine`. These engines load specific strategies relevant to the bot's current situation.\n4.  **Broadcasting**: The `BroadcastHelper` class intercepts events (kills, quests, level-ups) and, if configured, generates localized chat messages with dynamic placeholders.\n\n### Key Functions and Classes\n\n| Component | Function/Class | Description |\n| :--- | :--- | :--- |\n| **Factory** | `AiFactory::createAiObjectContext` | Initializes the bot's AI context based on class (Priest, Mage, Warlock, etc.). |\n| **Factory** | `AiFactory::GetPlayerSpecTab` | Identifies the active spec tab by analyzing the talent map and level requirements. |\n| **Factory** | `AiFactory::IsFeralTank` | Checks if a Druid bot is currently acting as a Feral Tank based on form or auras. |\n| **Factory** | `AiFactory::GetPlayerRoles` | Maps class/spec combinations to specific bot roles (e.g., Paladin Tab 1 = Tank). |\n| **Factory** | `AiFactory::AddDefaultCombatStrategies` | Loads combat strategies like \"avoid aoe\", \"formation\", and racials for active players. |\n| **Factory** | `AiFactory::createCombatEngine` | Constructs the primary combat engine initialized with default strategies. |\n| **Broadcast** | `BroadcastHelper::BroadcastToChannelWithGlobalChance` | Handles probabilistic broadcasting to guilds or channels based on configured chances. |\n| **Broadcast** | `BroadcastHelper::BroadcastLootingItem` | Formats and broadcasts item loot messages with dynamic item links. |\n\n## Configuration for Operators\n\nServer operators can customize bot behavior through configuration keys found in the module's config file. Below are the primary options available:\n\n| Option Name | Default Value | Description |\n| :--- | :--- | :--- |\n| `enableBroadcasts` | `true` | Enables or disables all chat broadcasting features globally. |\n| `broadcastChanceMaxValue` | `100` | The maximum value for random chance rolls used in broadcast logic. |\n| `broadcastToGuildGlobalChance` | `50` | Chance (percentage) to broadcast a message to the guild channel. |\n| `broadcastChanceQuestAccepted` | `20` | Chance to broadcast when a bot accepts a quest. |\n| `broadcastChanceQuestUpdateComplete` | `15` | Chance to broadcast upon completing a quest update. |\n| `broadcastChanceGuildManagement` | `10` | Chance to broadcast guild member promotions or demotions. |\n\n## Usage Example\n\nTo implement the module, configure the options in your server's configuration file and ensure the injected content files match the expected format.\n\n### Configuration Options\n\n```ini\n[mod-shadows]\nenableBroadcasts = true\nbroadcastChanceMaxValue = 100\nbroadcastToGuildGlobalChance = 50\nbroadcastChanceQuestAccepted = 20\nbroadcastChanceQuestUpdateComplete = 15\nbroadcastChanceGuildManagement = 10\n```\n\n### Injected Content File\n\nThe module injects the following content into the bot's chat system to handle dynamic placeholders:\n\n```cpp\nstd::map<std::string, std::string> placeholders;\nplaceholders[\"%item_link\"] = ai->GetChatHelper()->FormatItem(proto);\nAreaTableEntry const* current_area = ai->GetCurrentArea();\nAreaTableEntry const* current_zone = ai->GetCurrentZone();\nplaceholders[\"%area_name\"] = current_area ? ai->GetLocalizedAreaName(current_area) : BOT_TEXT1(\"string_unknown_area\");\nplaceholders[\"%zone_name\"] = current_zone ? ai->GetLocalizedZoneName(current_zone) : BOT_TEXT1(\"string_unknown_zone\");\n```\n\n> **Note**: Ensure no unsupported tags, CSS, or scripts are used in the injected content. The markup must strictly follow the C++ string formatting style shown above.",
+   "ai": true
+  },
+  "raw": "{\"summary\": \"The mod-shadows C++ module enhances server bots with intelligent AI behavior, dynamic spec detection, and comprehensive chat broadcasting capabilities.\", \"body\": \"# mod-shadows Module Wiki\\n\\n## Overview\\n\\nThe **mod-shadows** module is a high-performance C++ extension for World of Warcraft game servers. It equips bot players with advanced artificial intelligence that adapts to class-specific roles (Tank, Healer, DPS) and spec tabs. Additionally, it provides a robust broadcasting system allowing bots to communicate guild messages, quest updates, loot notifications, and social suggestions directly into the chat channels.\\n\\n## How It Works\\n\\nThe module operates through a modular architecture centered around the `AiFactory` class, which manages the lifecycle of bot intelligence. The flow is as follows:\\n\\n1.  **Context Creation**: When a bot is instantiated, `AiFactory::createAiObjectContext` determines the player's class and creates a specific object context (e.g., `PriestAiObjectContext`, `WarriorAiObjectContext`).\\n2.  **Role & Spec Detection**: The factory analyzes the bot's talent map and active spec mask to determine their role (`BOT_ROLE_TANK`, `BOT_ROLE_HEALER`, etc.) and preferred spec tab.\\n3.  **Engine Initialization**: Depending on the game state (Combat, Non-Combat, Dead), the factory creates a dedicated `Engine` instance using `createCombatEngine`, `createNonCombatEngine`, or `createDeadEngine`. These engines load specific strategies relevant to the bot's current situation.\\n4.  **Broadcasting**: The `BroadcastHelper` class intercepts events (kills, quests, level-ups) and, if configured, generates localized chat messages with dynamic placeholders.\\n\\n### Key Functions and Classes\\n\\n| Component | Function/Class | Description |\\n| :--- | :--- | :--- |\\n| **Factory** | `AiFactory::createAiObjectContext` | Initializes the bot's AI context based on class (Priest, Mage, Warlock, etc.). |\\n| **Factory** | `AiFactory::GetPlayerSpecTab` | Identifies the active spec tab by analyzing the talent map and level requirements. |\\n| **Factory** | `AiFactory::IsFeralTank` | Checks if a Druid bot is currently acting as a Feral Tank based on form or auras. |\\n| **Factory** | `AiFactory::GetPlayerRoles` | Maps class/spec combinations to specific bot roles (e.g., Paladin Tab 1 = Tank). |\\n| **Factory** | `AiFactory::AddDefaultCombatStrategies` | Loads combat strategies like \\\"avoid aoe\\\", \\\"formation\\\", and racials for active players. |\\n| **Factory** | `AiFactory::createCombatEngine` | Constructs the primary combat engine initialized with default strategies. |\\n| **Broadcast** | `BroadcastHelper::BroadcastToChannelWithGlobalChance` | Handles probabilistic broadcasting to guilds or channels based on configured chances. |\\n| **Broadcast** | `BroadcastHelper::BroadcastLootingItem` | Formats and broadcasts item loot messages with dynamic item links. |\\n\\n## Configuration for Operators\\n\\nServer operators can customize bot behavior through configuration keys found in the module's config file. Below are the primary options available:\\n\\n| Option Name | Default Value | Description |\\n| :--- | :--- | :--- |\\n| `enableBroadcasts` | `true` | Enables or disables all chat broadcasting features globally. |\\n| `broadcastChanceMaxValue` | `100` | The maximum value for random chance rolls used in broadcast logic. |\\n| `broadcastToGuildGlobalChance` | `50` | Chance (percentage) to broadcast a message to the guild channel. |\\n| `broadcastChanceQuestAccepted` | `20` | Chance to broadcast when a bot accepts a quest. |\\n| `broadcastChanceQuestUpdateComplete` | `15` | Chance to broadcast upon completing a quest update. |\\n| `broadcastChanceGuildManagement` | `10` | Chance to broadcast guild member promotions or demotions. |\\n\\n## Usage Example\\n\\nTo implement the module, configure the options in your server's configuration file and ensure the injected content files match the expected format.\\n\\n### Configuration Options\\n\\n```ini\\n[mod-shadows]\\nenableBroadcasts = true\\nbroadcastChanceMaxValue = 100\\nbroadcastToGuildGlobalChance = 50\\nbroadcastChanceQuestAccepted = 20\\nbroadcastChanceQuestUpdateComplete = 15\\nbroadcastChanceGuildManagement = 10\\n```\\n\\n### Injected Content File\\n\\nThe module injects the following content into the bot's chat system to handle dynamic placeholders:\\n\\n```cpp\\nstd::map<std::string, std::string> placeholders;\\nplaceholders[\\\"%item_link\\\"] = ai->GetChatHelper()->FormatItem(proto);\\nAreaTableEntry const* current_area = ai->GetCurrentArea();\\nAreaTableEntry const* current_zone = ai->GetCurrentZone();\\nplaceholders[\\\"%area_name\\\"] = current_area ? ai->GetLocalizedAreaName(current_area) : BOT_TEXT1(\\\"string_unknown_area\\\");\\nplaceholders[\\\"%zone_name\\\"] = current_zone ? ai->GetLocalizedZoneName(current_zone) : BOT_TEXT1(\\\"string_unknown_zone\\\");\\n```\\n\\n> **Note**: Ensure no unsupported tags, CSS, or scripts are used in the injected content. The markup must strictly follow the C++ string formatting style shown above.\\n\"}",
+  "model": "qwen3.5:4b"
+ },
+ "src/ShadowAI.cpp::GetMapGroundZ@1a4efd09:qwen3-5-4b": {
+  "hash": "9b4b7632333b",
+  "doc": {
+   "summary": "Retrieves the ground elevation at a specific coordinate by delegating to the bot's map height calculation.",
+   "overview": "This function acts as a thin wrapper that forwards coordinate-based queries to the active bot instance, ensuring consistent access to map geometry data. It utilizes a maximum height limit during the lookup to prevent overflow errors when determining terrain elevation. The implementation relies entirely on the underlying bot object being initialized and accessible within the current execution context.",
+   "params": [
+    {
+     "name": "x",
+     "desc": "The horizontal coordinate on the map where ground elevation is requested."
+    },
+    {
+     "name": "y",
+     "desc": "The vertical coordinate on the map where ground elevation is requested."
+    }
+   ],
+   "returns": "float",
+   "side_effects": "None",
+   "notes": "Requires a valid bot instance; returns undefined behavior if the bot pointer is null. Edge case: Coordinates outside the defined map bounds may result in unexpected height values or errors depending on the underlying implementation.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Retrieves the ground elevation at a specific coordinate by delegating to the bot's map height calculation.\",\n  \"overview\": \"This function acts as a thin wrapper that forwards coordinate-based queries to the active bot instance, ensuring consistent access to map geometry data. It utilizes a maximum height limit during the lookup to prevent overflow errors when determining terrain elevation. The implementation relies entirely on the underlying bot object being initialized and accessible within the current execution context.\",\n  \"params\": [\n    {\n      \"name\": \"x\",\n      \"desc\": \"The horizontal coordinate on the map where ground elevation is requested.\"\n    },\n    {\n      \"name\": \"y\",\n      \"desc\": \"The vertical coordinate on the map where ground elevation is requested.\"\n    }\n  ],\n  \"returns\": \"float\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Requires a valid bot instance; returns undefined behavior if the bot pointer is null. Edge case: Coordinates outside the defined map bounds may result in unexpected height values or errors depending on the underlying implementation.\"\n}",
+  "model": "qwen3.5:4b"
+ },
+ "src/ShadowAI.cpp::GetFloorAboveZ@948f9489:qwen3-5-4b": {
+  "hash": "2d0cd2c19162",
+  "doc": {
+   "summary": "Determines the highest valid height above a given horizontal position by querying both the VMap and phase mask for object hit positions.",
+   "overview": "This function calculates the maximum altitude reachable at specific x and y coordinates without colliding with game objects. It performs two separate queries: one against the global VMap manager and another against the bot's current phase mask, comparing results to find the highest valid height within a defined search range starting from slightly above the bot's current position.",
+   "params": [
+    {
+     "name": "x",
+     "desc": "Horizontal coordinate for the vertical search."
+    },
+    {
+     "name": "y",
+     "desc": "Horizontal coordinate for the vertical search."
+    }
+   ],
+   "returns": "float",
+   "side_effects": "None",
+   "notes": "Relies on VMap::VMapFactory and bot state access; returns INVALID_HEIGHT if no objects are found in the search range.",
+   "ai": true
+  },
+  "raw": "{\n  \"summary\": \"Determines the highest valid height above a given horizontal position by querying both the VMap and phase mask for object hit positions.\",\n  \"overview\": \"This function calculates the maximum altitude reachable at specific x and y coordinates without colliding with game objects. It performs two separate queries: one against the global VMap manager and another against the bot's current phase mask, comparing results to find the highest valid height within a defined search range starting from slightly above the bot's current position.\",\n  \"params\": [\n    {\n      \"name\": \"x\",\n      \"desc\": \"Horizontal coordinate for the vertical search.\"\n    },\n    {\n      \"name\": \"y\",\n      \"desc\": \"Horizontal coordinate for the vertical search.\"\n    }\n  ],\n  \"returns\": \"float\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on VMap::VMapFactory and bot state access; returns INVALID_HEIGHT if no objects are found in the search range.\"\n}",
   "model": "qwen3.5:4b"
  }
 }
