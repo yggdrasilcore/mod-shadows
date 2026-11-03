@@ -424,6 +424,8 @@ public:
     static bool IsCaster(Player* player, bool bySpec = false);
     static bool IsRangedDps(Player* player, bool bySpec = false);
     uint32 PredictFallDamage(float zDiff) const;
+    float GetMapGroundZ(float x, float y) const;
+    float GetFloorAboveZ(float x, float y) const;
     void DoFallJump(float x, float y, float z);
     static bool IsCombo(Player* player);
     static bool IsBotMainTank(Player* player);

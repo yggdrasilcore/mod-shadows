@@ -57,6 +57,8 @@
 #include "Transport.h"
 #include "Unit.h"
 #include "UpdateTime.h"
+#include "VMapFactory.h"
+#include "VMapMgr2.h"
 #include "Vehicle.h"
 
 const int SPELL_TITAN_GRIP = 49152;
@@ -479,10 +481,38 @@ float ShadowAI::GetFallJumpSpeed(float fromZ, float toZ) const
 {
     if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW))
         return 7.0f;
-    float zDiff = fromZ - toZ;
+    float zDiff = std::fabs(fromZ - toZ);
     if (zDiff < 1.0f)
         zDiff = 1.0f;
     return std::min(zDiff, 70.0f);
+}
+
+float ShadowAI::GetMapGroundZ(float x, float y) const
+{
+    // Query from the top so the result does not depend on the bot's Z. A bot that
+    // glitched below the world gets INVALID_HEIGHT from the normal bot-Z query.
+    return bot->GetMapHeight(x, y, MAX_HEIGHT);
+}
+
+float ShadowAI::GetFloorAboveZ(float x, float y) const
+{
+    // Every height query in the core casts straight down, so a floor above the bot
+    // is invisible to them. Cast a short ray straight up instead.
+    constexpr float kUpSearchDist = 200.0f;
+    float fromZ = bot->GetPositionZ() + 0.1f;
+    float toZ = fromZ + kUpSearchDist;
+    float hx, hy, hz;
+    float best = INVALID_HEIGHT;
+
+    if (VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(bot->GetMapId(), x, y, fromZ, x, y, toZ, hx, hy,
+                                                                hz, 0.0f))
+        best = hz;
+
+    if (bot->GetMap()->GetObjectHitPos(bot->GetPhaseMask(), x, y, fromZ, x, y, toZ, hx, hy, hz, 0.0f) &&
+        (best <= INVALID_HEIGHT || hz < best))
+        best = hz;
+
+    return best;
 }
 
 uint32 ShadowAI::PredictFallDamage(float zDiff) const
@@ -734,19 +764,45 @@ void ShadowAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
     {
         float botZ = bot->GetPositionZ();
         float groundBelowBot = bot->GetMapHeight(bot->GetPositionX(), bot->GetPositionY(), botZ);
-        if (groundBelowBot > INVALID_HEIGHT && botZ - groundBelowBot > 4.0f)
+        if (groundBelowBot > INVALID_HEIGHT)
         {
-            float dx, dy, dz;
-            if (!bot->GetMotionMaster()->GetDestination(dx, dy, dz) || dz >= botZ)
+            if (botZ - groundBelowBot > 4.0f)
             {
-                // Already airborne: must land anyway, damage (if any) applied on landing.
-                DoFallJump(bot->GetPositionX(), bot->GetPositionY(), groundBelowBot);
+                float dx, dy, dz;
+                if (!bot->GetMotionMaster()->GetDestination(dx, dy, dz) || dz >= botZ)
+                {
+                    // Already airborne: must land anyway, damage (if any) applied on landing.
+                    DoFallJump(bot->GetPositionX(), bot->GetPositionY(), groundBelowBot);
+                }
             }
         }
-        else if (groundBelowBot <= INVALID_HEIGHT && !bot->GetTransport())
+        else if (!bot->GetTransport())
         {
-            // Void below: drop anyway; dead rezzes, hanging sticks forever (no transports).
-            DoFallJump(bot->GetPositionX(), bot->GetPositionY(), botZ - 500.0f);
+            // Nothing below. Map ground and WMO/gameobject floors above are searched
+            // from the top/upwards; any surface above pulls the bot back, ungated.
+            float mapGround = GetMapGroundZ(bot->GetPositionX(), bot->GetPositionY());
+            float floorAbove = GetFloorAboveZ(bot->GetPositionX(), bot->GetPositionY());
+            float surfaceAbove = INVALID_HEIGHT;
+            if (mapGround > botZ && (surfaceAbove <= INVALID_HEIGHT || mapGround < surfaceAbove))
+                surfaceAbove = mapGround;
+            if (floorAbove > botZ && (surfaceAbove <= INVALID_HEIGHT || floorAbove < surfaceAbove))
+                surfaceAbove = floorAbove;
+
+            if (surfaceAbove > INVALID_HEIGHT)
+            {
+                DoFallJump(bot->GetPositionX(), bot->GetPositionY(), surfaceAbove);
+            }
+            else if (mapGround > INVALID_HEIGHT)
+            {
+                // Only drop to map ground when it is more than 4 Z below the bot.
+                if (botZ - mapGround > 4.0f)
+                    DoFallJump(bot->GetPositionX(), bot->GetPositionY(), mapGround);
+            }
+            else
+            {
+                // Real void: drop anyway.
+                DoFallJump(bot->GetPositionX(), bot->GetPositionY(), botZ - 500.0f);
+            }
         }
     }
 
@@ -1675,10 +1731,30 @@ void ShadowAI::DoNextAction(bool min)
                     bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE;
                 if (!descending && !controlledBusy)
                 {
+                    float target = INVALID_HEIGHT;
                     if (hasFloor)
-                        DoFallJump(bot->GetPositionX(), bot->GetPositionY(), groundBelow);
+                    {
+                        target = groundBelow;
+                    }
                     else
-                        DoFallJump(bot->GetPositionX(), bot->GetPositionY(), botZ - 500.0f);
+                    {
+                        // Nothing below: prefer any surface above (ungated), then the
+                        // map ground if it is a real drop, then the void.
+                        float mapGround = GetMapGroundZ(bot->GetPositionX(), bot->GetPositionY());
+                        float surfaceAbove = mapGround > botZ ? mapGround : INVALID_HEIGHT;
+                        float floorAbove = GetFloorAboveZ(bot->GetPositionX(), bot->GetPositionY());
+                        if (floorAbove > botZ && (surfaceAbove <= INVALID_HEIGHT || floorAbove < surfaceAbove))
+                            surfaceAbove = floorAbove;
+
+                        if (surfaceAbove > INVALID_HEIGHT)
+                            target = surfaceAbove;
+                        else if (mapGround > INVALID_HEIGHT && botZ - mapGround > 4.0f)
+                            target = mapGround;
+                        else if (mapGround <= INVALID_HEIGHT)
+                            target = botZ - 500.0f;
+                    }
+                    if (target > INVALID_HEIGHT)
+                        DoFallJump(bot->GetPositionX(), bot->GetPositionY(), target);
                 }
                 SetNextCheckDelay(sShadowAIConfig->globalCoolDown);
                 return;
