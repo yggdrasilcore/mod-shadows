@@ -29668,17 +29668,17 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ImbueAction.cpp::Execute@99556895:qwen3-5-4b": {
-  "hash": "8ef152df19ed",
+  "hash": "b1210a4f4c1a",
   "doc": {
-   "summary": "Executes a stealth imbuing action by removing existing stealth auras and applying temporary enchantments to the main and off-hand weapons.",
-   "overview": "This function attempts to apply a stealth effect to the bot's primary and secondary weapons if they are not currently enchanted. It first checks for and removes any active stealth auras, then verifies the bot is standing before proceeding. The logic iterates through both the main hand and off-hand slots to find unenchanted items and applies temporary enchantments using the imbue stone mechanism.",
+   "summary": "Executes a stealth imbuing action by removing existing stealth auras and applying an oil enchantment to the main hand weapon if combat is not active.",
+   "overview": "This function checks whether the bot is currently in combat before proceeding with any actions. If the bot has an active stealth aura, it removes that aura first, then ensures the bot is standing. The function attempts to find and apply an oil enchantment to the main hand weapon if one is available and not already enchanted.",
    "params": [],
    "returns": "bool",
    "side_effects": "network, global state",
-   "notes": "The function returns false if the bot is not in combat; otherwise it always returns true. It relies on external AI logic for finding and applying enchantments.",
+   "notes": "Calls botAI->ImbueItem which may trigger network packets; relies on botAI->FindOilFor for oil selection.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a stealth imbuing action by removing existing stealth auras and applying temporary enchantments to the main and off-hand weapons.\",\n  \"overview\": \"This function attempts to apply a stealth effect to the bot's primary and secondary weapons if they are not currently enchanted. It first checks for and removes any active stealth auras, then verifies the bot is standing before proceeding. The logic iterates through both the main hand and off-hand slots to find unenchanted items and applies temporary enchantments using the imbue stone mechanism.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network, global state\",\n  \"notes\": \"The function returns false if the bot is not in combat; otherwise it always returns true. It relies on external AI logic for finding and applying enchantments.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a stealth imbuing action by removing existing stealth auras and applying an oil enchantment to the main hand weapon if combat is not active.\",\n  \"overview\": \"This function checks whether the bot is currently in combat before proceeding with any actions. If the bot has an active stealth aura, it removes that aura first, then ensures the bot is standing. The function attempts to find and apply an oil enchantment to the main hand weapon if one is available and not already enchanted.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network, global state\",\n  \"notes\": \"Calls botAI->ImbueItem which may trigger network packets; relies on botAI->FindOilFor for oil selection.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ImbueAction.cpp::Action@4af87259:qwen3-5-4b": {
