@@ -1,7 +1,6 @@
 #ifndef _SHADOW_RAIDICC_H
 #define _SHADOW_RAIDICC_H
 
-#include "../../../../src/server/scripts/Northrend/IcecrownCitadel/icecrown_citadel.h"
 #include "ShadowAI.h"
 #include "Shadows.h"
 #include "Trigger.h"
@@ -21,10 +20,6 @@
 #include "GridNotifiersImpl.h"
 #include "Vehicle.h"
 #include "NamedObjectContext.h"
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
