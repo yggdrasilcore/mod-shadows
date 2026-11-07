@@ -2,17 +2,17 @@
 #define _SHADOW_RAIDSTRATEGYCONTEXT_H_
 
 #include "Strategy.h"
-#include "RaidAq20Strategy.h"
-#include "RaidMcStrategy.h"
-#include "RaidBwlStrategy.h"
-#include "RaidKarazhanStrategy.h"
-#include "RaidNaxxStrategy.h"
-#include "RaidOsStrategy.h"
-#include "RaidEoEStrategy.h"
-#include "RaidVoAStrategy.h"
-#include "RaidUlduarStrategy.h"
-#include "RaidOnyxiaStrategy.h"
-#include "RaidIccStrategy.h"
+#include "RaidAq20.h"
+#include "RaidMc.h"
+#include "RaidBwl.h"
+#include "RaidKarazhan.h"
+#include "RaidNaxx.h"
+#include "RaidOs.h"
+#include "RaidEoE.h"
+#include "RaidVoA.h"
+#include "RaidUlduar.h"
+#include "RaidOnyxia.h"
+#include "RaidIcc.h"
 
 class RaidStrategyContext : public NamedObjectContext<Strategy>
 {
