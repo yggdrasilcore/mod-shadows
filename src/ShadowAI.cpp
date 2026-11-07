@@ -538,6 +538,9 @@ uint32 ShadowAI::PredictFallDamage(float zDiff) const
 
 void ShadowAI::DoFallJump(float x, float y, float z)
 {
+    if (IsMovementSuppressed())
+        return;
+
     float fromZ = bot->GetPositionZ();
     float jumpSpeed = GetFallJumpSpeed(fromZ, z);
     bot->GetMotionMaster()->Clear();
@@ -549,6 +552,9 @@ void ShadowAI::DoFallJump(float x, float y, float z)
 
 bool ShadowAI::DoAirDismountFollow()
 {
+    if (IsMovementSuppressed())
+        return false;
+
     if (!IsAirDismountFollow())
         return false;
     // Fly to the dismount point first (skip while already going there).
@@ -807,8 +813,8 @@ void ShadowAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
     }
 
     // Slow fall gained mid-descent: relaunch the same descent slower, once.
-    if (bot->IsAlive() && !botFlying && !bot->isSwimming() && !bot->IsInFlight() && !bot->GetVehicle() &&
-        !bot->IsCharmed() && !bot->IsBeingTeleported() &&
+    if (!IsMovementSuppressed() && bot->IsAlive() && !botFlying && !bot->isSwimming() && !bot->IsInFlight() &&
+        !bot->GetVehicle() && !bot->IsCharmed() && !bot->IsBeingTeleported() &&
         bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) &&
         bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE)
     {
@@ -1958,6 +1964,29 @@ std::vector<std::string> ShadowAI::GetStrategies(BotState type)
         return std::vector<std::string>();
 
     return e->GetStrategies();
+}
+
+bool ShadowAI::SetSpellEnabled(uint32 spellId, bool enabled)
+{
+    if (!aiObjectContext || !spellId)
+        return false;
+
+    std::set<uint32>& skipSpells = aiObjectContext->GetValue<std::set<uint32>&>("skip spells list")->Get();
+    if (enabled)
+        skipSpells.erase(spellId);
+    else
+        skipSpells.insert(spellId);
+
+    return true;
+}
+
+bool ShadowAI::IsSpellEnabled(uint32 spellId)
+{
+    if (!aiObjectContext || !spellId)
+        return false;
+
+    std::set<uint32>& skipSpells = aiObjectContext->GetValue<std::set<uint32>&>("skip spells list")->Get();
+    return skipSpells.find(spellId) == skipSpells.end();
 }
 
 void ShadowAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
@@ -6354,8 +6383,34 @@ int32 ShadowAI::GetNearGroupMemberCount(float dis)
     return count;
 }
 
+void ShadowAI::SuppressMovement(uint32 durationMs)
+{
+    if (!durationMs)
+    {
+        ClearMovementSuppression();
+        return;
+    }
+
+    movementSuppressedUntil = getMSTime() + durationMs;
+    if (bot)
+    {
+        bot->StopMoving();
+        bot->GetMotionMaster()->Clear();
+    }
+}
+
+void ShadowAI::ClearMovementSuppression() { movementSuppressedUntil = 0; }
+
+bool ShadowAI::IsMovementSuppressed() const
+{
+    return movementSuppressedUntil && getMSTime() < movementSuppressedUntil;
+}
+
 bool ShadowAI::CanMove()
 {
+    if (IsMovementSuppressed())
+        return false;
+
     // do not allow if not vehicle driver
     if (IsInVehicle() && !IsInVehicle(true))
         return false;

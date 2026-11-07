@@ -1027,6 +1027,9 @@ bool MovementAction::IsWaitingForLastMove(MovementPriority priority)
 
 bool MovementAction::IsMovingAllowed()
 {
+    if (botAI->IsMovementSuppressed())
+        return false;
+
     // do not allow if not vehicle driver
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(true))
         return false;
@@ -1279,6 +1282,9 @@ std::optional<bool> MovementAction::TryJumpDownTo(Unit* target)
 
 bool MovementAction::Follow(Unit* target, float distance, float angle)
 {
+    if (botAI->IsMovementSuppressed())
+        return false;
+
     UpdateMovementState();
 
     if (!target)
