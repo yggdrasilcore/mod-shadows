@@ -7,6 +7,8 @@
 #include "Trigger.h"
 #include "Action.h"
 #include "MovementActions.h"
+#include "BossAuraActions.h"
+#include "BossAuraTriggers.h"
 #include "ShadowAI.h"
 #include "Event.h"
 #include "Strategy.h"
