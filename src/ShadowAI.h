@@ -407,6 +407,10 @@ public:
     void ChangeStrategy(std::string const name, BotState type);
     void ClearStrategies(BotState type);
     std::vector<std::string> GetStrategies(BotState type);
+    // Enables or disables a spell for the bot by adding/removing it from the
+    // "skip spells list" (the same list used by the `ss` chat command).
+    bool SetSpellEnabled(uint32 spellId, bool enabled);
+    bool IsSpellEnabled(uint32 spellId);
     void ApplyInstanceStrategies(uint32 mapId, bool tellMaster = false);
     void EvaluateHealerDpsStrategy();
     bool ContainsStrategy(StrategyType type);
@@ -591,6 +595,15 @@ public:
     void ResetJumpDestination() { jumpDestination = Position(); }
 
     bool CanMove();
+
+    // While suppressed, mod-shadows issues no movement commands of its own
+    // (Lua is expected to drive the bot's MotionMaster directly). Enabling
+    // suppression stops any movement currently in progress. durationMs = 0
+    // clears the suppression immediately.
+    void SuppressMovement(uint32 durationMs);
+    void ClearMovementSuppression();
+    bool IsMovementSuppressed() const;
+
     static bool IsRealGuild(uint32 guildId);
     bool IsInRealGuild();
     static std::vector<std::string> dispel_whitelist;
@@ -646,6 +659,8 @@ private:
     void HandleCommands();
     void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
     bool _isBotInitializing = false;
+    // getMSTime() deadline for movement suppression (0 = not suppressed).
+    uint32 movementSuppressedUntil = 0;
 
 protected:
     Player* bot;

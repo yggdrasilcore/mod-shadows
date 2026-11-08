@@ -23,6 +23,9 @@ bool ReachAreaTriggerAction::Execute(Event event)
     if (botAI->IsRealPlayer())  // Do not trigger own area trigger.
         return false;
 
+    if (botAI->IsMovementSuppressed())
+        return false;
+
     uint32 triggerId;
     WorldPacket p(event.getPacket());
     p.rpos(0);
