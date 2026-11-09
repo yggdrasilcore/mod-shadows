@@ -29286,20 +29286,20 @@
  "src/strategy/actions/GuildManagementActions.cpp::PlayerIsValid@0f0e2c00:qwen3-5-4b": {
   "hash": "724b872c0960",
   "doc": {
-   "summary": "Verifies if a player belongs to the same guild as the bot and holds a lower rank.",
-   "overview": "This function checks whether a specific player is eligible for an action by confirming they share the bot's guild and possess a lower rank. It returns true only if both conditions are met, ensuring that actions requiring higher authority are restricted to the bot itself or players with superior ranks within the same organization.",
+   "summary": "Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.",
+   "overview": "This function checks two conditions: whether the provided player is a member of the same guild as the bot, and whether their rank is strictly lower than the bot's rank. It returns true only if both conditions are satisfied, ensuring that actions requiring higher authority can be restricted to specific guild members with appropriate hierarchy.",
    "params": [
     {
      "name": "member",
-     "desc": "Pointer to the Player object whose guild membership and rank will be validated."
+     "desc": "Pointer to the Player object whose validity is being checked."
     }
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Caller must ensure 'member' is not null before invoking; returns false if player is in a different guild or has equal/greater rank than the bot.",
+   "notes": "Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank.\",\n  \"overview\": \"This function checks whether a specific player is eligible for an action by confirming they share the bot's guild and possess a lower rank. It returns true only if both conditions are met, ensuring that actions requiring higher authority are restricted to the bot itself or players with superior ranks within the same organization.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose guild membership and rank will be validated.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking; returns false if player is in a different guild or has equal/greater rank than the bot.\"\n}",
+  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.\",\n  \"overview\": \"This function checks two conditions: whether the provided player is a member of the same guild as the bot, and whether their rank is strictly lower than the bot's rank. It returns true only if both conditions are satisfied, ensuring that actions requiring higher authority can be restricted to specific guild members with appropriate hierarchy.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose validity is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::GetRankId@a8ae41b2:qwen3-5-4b": {
