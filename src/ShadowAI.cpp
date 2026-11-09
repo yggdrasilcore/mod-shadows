@@ -1787,6 +1787,30 @@ void ShadowAI::DoNextAction(bool min)
         }
     }
 
+    // Drop a commanded attack target once it dies, despawns or starts evading/resetting,
+    // otherwise it becomes valid again after respawn and gets re-acquired.
+    GuidVector prioritizedTargets = aiObjectContext->GetValue<GuidVector>("prioritized targets")->Get();
+    if (!prioritizedTargets.empty())
+    {
+        GuidVector activePrioritizedTargets;
+        activePrioritizedTargets.reserve(prioritizedTargets.size());
+        for (ObjectGuid const& guid : prioritizedTargets)
+        {
+            Unit* target = GetUnit(guid);
+            if (target && target->IsInWorld() && !target->isDead() && !target->HasUnitState(UNIT_STATE_EVADE))
+            {
+                activePrioritizedTargets.push_back(guid);
+                continue;
+            }
+
+            if (aiObjectContext->GetValue<ObjectGuid>("pull target")->Get() == guid)
+                aiObjectContext->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
+        }
+
+        if (activePrioritizedTargets.size() != prioritizedTargets.size())
+            aiObjectContext->GetValue<GuidVector>("prioritized targets")->Set(activePrioritizedTargets);
+    }
+
     bool minimal = !AllowActivity();
 
     // Refresh the eating/drinking regen state before the engine tick so the
