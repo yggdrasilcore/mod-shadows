@@ -496,11 +496,6 @@ float ShadowAI::GetMapGroundZ(float x, float y) const
 
 float ShadowAI::GetFootprintGroundZ(float x, float y, float z) const
 {
-    // A centre-only height query treats a bot as airborne the moment its origin
-    // passes a ledge, even while the rest of its footprint still rests on it.
-    // Keep the centre result when it supports the bot, otherwise take the highest
-    // surface under the whole footprint so a partially supported bot is not
-    // forced down.
     float const center = bot->GetMapHeight(x, y, z);
     if (center > INVALID_HEIGHT && z - center <= 4.0f)
         return center;
