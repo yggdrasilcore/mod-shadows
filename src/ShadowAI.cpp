@@ -550,6 +550,19 @@ void ShadowAI::DoFallJump(float x, float y, float z)
     pendingFallDamage = true;
 }
 
+void ShadowAI::DoJumpUp(float x, float y, float z)
+{
+    if (IsMovementSuppressed())
+        return;
+
+    // A normal player jump clears 2z. Jump 1z above the target so the arc peaks
+    // over the ledge before the spline pulls the bot down onto it.
+    float const height = std::max(z - bot->GetPositionZ(), 0.0f) + 1.0f;
+    float const jumpSpeed = std::max(height, 3.0f);
+    bot->GetMotionMaster()->Clear();
+    bot->GetMotionMaster()->MoveJump(x, y, z, bot->GetSpeed(MOVE_RUN), jumpSpeed);
+}
+
 bool ShadowAI::DoAirDismountFollow()
 {
     if (IsMovementSuppressed())

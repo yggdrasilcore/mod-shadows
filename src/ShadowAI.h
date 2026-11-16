@@ -431,6 +431,7 @@ public:
     float GetMapGroundZ(float x, float y) const;
     float GetFloorAboveZ(float x, float y) const;
     void DoFallJump(float x, float y, float z);
+    void DoJumpUp(float x, float y, float z);
     static bool IsCombo(Player* player);
     static bool IsBotMainTank(Player* player);
     static bool IsMainTank(Player* player);
