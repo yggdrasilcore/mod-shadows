@@ -494,6 +494,26 @@ float ShadowAI::GetMapGroundZ(float x, float y) const
     return bot->GetMapHeight(x, y, MAX_HEIGHT);
 }
 
+float ShadowAI::GetFootprintGroundZ(float x, float y, float z) const
+{
+    float const center = bot->GetMapHeight(x, y, z);
+    if (center > INVALID_HEIGHT && z - center <= 4.0f)
+        return center;
+
+    float best = center;
+    float const radius = std::max(bot->GetCollisionRadius(), 0.1f);
+    for (uint8 i = 0; i < 8; ++i)
+    {
+        float const angle = float(i) * float(M_PI) / 4.0f;
+        float const ground =
+            bot->GetMapHeight(x + std::cos(angle) * radius, y + std::sin(angle) * radius, z);
+        if (ground > INVALID_HEIGHT && (best <= INVALID_HEIGHT || ground > best))
+            best = ground;
+    }
+
+    return best;
+}
+
 float ShadowAI::GetFloorAboveZ(float x, float y) const
 {
     // Every height query in the core casts straight down, so a floor above the bot
@@ -769,7 +789,7 @@ void ShadowAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
         bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
     {
         float botZ = bot->GetPositionZ();
-        float groundBelowBot = bot->GetMapHeight(bot->GetPositionX(), bot->GetPositionY(), botZ);
+        float groundBelowBot = GetFootprintGroundZ(bot->GetPositionX(), bot->GetPositionY(), botZ);
         if (groundBelowBot > INVALID_HEIGHT)
         {
             if (botZ - groundBelowBot > 4.0f)
@@ -1726,7 +1746,7 @@ void ShadowAI::DoNextAction(bool min)
         if (!botFlying)
         {
             float botZ = bot->GetPositionZ();
-            float groundBelow = bot->GetMapHeight(bot->GetPositionX(), bot->GetPositionY(), botZ);
+            float groundBelow = GetFootprintGroundZ(bot->GetPositionX(), bot->GetPositionY(), botZ);
             bool hasFloor = groundBelow > INVALID_HEIGHT;
             if (!hasFloor || botZ - groundBelow > 4.0f)
             {
