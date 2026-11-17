@@ -876,6 +876,9 @@ bool MovementAction::MoveTo(WorldObject* target, float distance, MovementPriorit
     {
         dz = tz;
     }
+    LOG_ERROR("server", "MoveTo target bz={:.3f} tz={:.3f} dist={:.3f} needToGo={:.3f} dz={:.3f} targetZ={:.3f} "
+              "targetMap={} botMap={}",
+              bz, tz, distanceToTarget, needToGo, dz, tz, target->GetMapId(), bot->GetMapId());
     return MoveTo(target->GetMapId(), dx, dy, dz, false, false, false, false, priority);
 }
 
