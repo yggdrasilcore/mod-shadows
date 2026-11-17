@@ -1237,16 +1237,23 @@ std::optional<bool> MovementAction::TryJumpDownTo(Unit* target)
     float const horiz = std::sqrt(dirX * dirX + dirY * dirY);
     G3D::Vector3 lip(bx, by, bz);
     bool atEdge = horiz < 1.0f; // straight above => already at the drop
+    bool found = atEdge;        // ground under the bot itself counts as known
     for (float step = 1.0f; !atEdge && step <= horiz; step += 1.0f)
     {
         float const px = bx + dirX * (step / horiz);
         float const py = by + dirY * (step / horiz);
         float const g = bot->GetMapHeight(px, py, bz);
-        if (g <= INVALID_HEIGHT || bz - g > 3.0f)
+        // Unreadable ground is not an edge: the ray from the bot's Z falls short
+        // of the floor under the master (WMO above terrain), so nothing is sampled.
+        if (g <= INVALID_HEIGHT)
+            continue;
+        lip = G3D::Vector3(px, py, g);
+        found = true;
+        if (bz - g > 3.0f)
             atEdge = true;
-        else
-            lip = G3D::Vector3(px, py, g);
     }
+    if (!found)
+        return std::nullopt; // no ground could be sampled; no basis for a lip or a drop
     if (!atEdge)
         return false; // ground stays level toward the master; walk it
 
