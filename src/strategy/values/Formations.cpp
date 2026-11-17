@@ -362,6 +362,8 @@ public:
         float z = master->GetPositionZ();
 
         float ground = master->GetMapHeight(x, y, z + 30.0f);
+        LOG_ERROR("server", "FarFormation master_z={:.3f} loc=({:.3f},{:.3f}) mapheight={:.3f} followRange={:.3f}",
+                  z, x, y, ground, followRange);
         if (ground <= INVALID_HEIGHT)
         {
             float minDist = 0, minX = 0, minY = 0;
