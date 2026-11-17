@@ -207,7 +207,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
     return false;
 }
 
-bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle [[maybe_unused]], bool react [[maybe_unused]], bool normal_only,
+bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle [[maybe_unused]], bool react [[maybe_unused]], bool normal_only [[maybe_unused]],
                             bool exact_waypoint, MovementPriority priority, bool lessDelay, bool backwards)
 {
     UpdateMovementState();
@@ -309,14 +309,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle [
     }
     else
     {
-        float modifiedZ;
-        Movement::PointsArray path =
-            SearchForBestPath(x, y, z, modifiedZ, sShadowAIConfig->maxMovementSearchTime, normal_only);
-        if (modifiedZ == INVALID_HEIGHT)
-        {
-            return false;
-        }
-        float distance = bot->GetExactDist(x, y, modifiedZ);
+        float distance = bot->GetExactDist(x, y, z);
         if (distance > 0.01f)
         {
             if (bot->IsSitState())
@@ -329,7 +322,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle [
             // }
 
             MotionMaster& mm = *bot->GetMotionMaster();
-            G3D::Vector3 endP [[maybe_unused]] = path.back();
             // No ground pathfinding if the bot/master are flying => allow true 3D (Z) movement
             auto isFlying = [](Unit* u){ return u && (u->HasUnitMovementFlag(MOVEMENTFLAG_FLYING) || u->IsInFlight()); };
             bool allowPath = generatePath;
@@ -337,15 +329,13 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle [
             if (isFlying(bot) || isFlying(master))
                 allowPath = false;
             mm.Clear();
-            // Drive to the validated layer height, not the raw request: under low
-            // ceilings the raw Z snaps to the floor above and clips through.
             if (!backwards)
             {
-                mm.MovePoint(0, x, y, modifiedZ, FORCED_MOVEMENT_NONE, 0.0f, 0.0f, allowPath);
+                mm.MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.0f, 0.0f, allowPath);
             }
             else
             {
-                mm.MovePointBackwards(0, x, y, modifiedZ, allowPath);
+                mm.MovePointBackwards(0, x, y, z, allowPath);
             }
             float delay = 1000.0f * MoveDelay(distance, backwards);
             if (lessDelay)
@@ -1896,75 +1886,6 @@ bool MovementAction::MoveInside(uint32 mapId, float x, float y, float z, float d
 //     }
 //     return current_z;
 // }
-
-const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, float z, float& modified_z,
-                                                              int maxSearchCount, bool normal_only, float step)
-{
-    bool found = false;
-    modified_z = INVALID_HEIGHT;
-    float tempZ = bot->GetMapHeight(x, y, z);
-    PathGenerator gen(bot);
-    gen.CalculatePath(x, y, tempZ);
-    Movement::PointsArray result = gen.GetPath();
-    float min_length = gen.getPathLength();
-    int typeOk = PATHFIND_NORMAL | PATHFIND_INCOMPLETE;
-    if ((gen.GetPathType() & typeOk) && abs(tempZ - z) < 0.5f)
-    {
-        modified_z = tempZ;
-        return result;
-    }
-    // Start searching
-    if (gen.GetPathType() & typeOk)
-    {
-        modified_z = tempZ;
-        found = true;
-    }
-    int count = 1;
-    for (float delta = step; count < maxSearchCount / 2 + 1; count++, delta += step)
-    {
-        tempZ = bot->GetMapHeight(x, y, z + delta);
-        if (tempZ == INVALID_HEIGHT)
-        {
-            continue;
-        }
-        PathGenerator gen(bot);
-        gen.CalculatePath(x, y, tempZ);
-        if ((gen.GetPathType() & typeOk) && gen.getPathLength() < min_length)
-        {
-            found = true;
-            min_length = gen.getPathLength();
-            result = gen.GetPath();
-            modified_z = tempZ;
-        }
-    }
-    for (float delta = -step; count < maxSearchCount; count++, delta -= step)
-    {
-        tempZ = bot->GetMapHeight(x, y, z + delta);
-        if (tempZ == INVALID_HEIGHT)
-        {
-            continue;
-        }
-        PathGenerator gen(bot);
-        gen.CalculatePath(x, y, tempZ);
-        if ((gen.GetPathType() & typeOk) && gen.getPathLength() < min_length)
-        {
-            found = true;
-            min_length = gen.getPathLength();
-            result = gen.GetPath();
-            modified_z = tempZ;
-        }
-    }
-    if (!found && normal_only)
-    {
-        modified_z = INVALID_HEIGHT;
-        return Movement::PointsArray{};
-    }
-    if (!found && !normal_only)
-    {
-        return result;
-    }
-    return result;
-}
 
 bool FleeAction::Execute(Event event [[maybe_unused]])
 {
