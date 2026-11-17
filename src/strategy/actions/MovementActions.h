@@ -80,8 +80,6 @@ protected:
 private:
     // float SearchBestGroundZForPath(float x, float y, float z, bool generatePath, float range = 20.0f, bool
     // normal_only = false, float step = 8.0f);
-    const Movement::PointsArray SearchForBestPath(float x, float y, float z, float& modified_z, int maxSearchCount = 5,
-                                                  bool normal_only = false, float step = 8.0f);
     bool wasMovementRestricted = false;
 };
 
