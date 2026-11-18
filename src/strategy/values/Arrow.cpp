@@ -5,6 +5,8 @@
 
 #include "Arrow.h"
 
+#include <cmath>
+
 #include "Map.h"
 #include "Shadows.h"
 
@@ -57,6 +59,13 @@ WorldLocation ArrowFormation::GetLocationInternal()
         z = master->GetPositionZ() + master->GetHoverHeight();
         master->UpdateAllowedPositionZ(x, y, z);
     }
+    // TODO: revisit this guard if movement makes long-winded air walks.
+    // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+    float const mdx = x - master->GetPositionX();
+    float const mdy = y - master->GetPositionY();
+    if (std::fabs(z - master->GetPositionZ()) >
+        std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+        return Formation::NullLocation;
     return WorldLocation(master->GetMapId(), x, y, z);
 }
 

@@ -5,6 +5,8 @@
 
 #include "Formations.h"
 
+#include <cmath>
+
 #include "Arrow.h"
 #include "Event.h"
 #include "Map.h"
@@ -97,6 +99,13 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - master->GetPositionX();
+        float const mdy = y - master->GetPositionY();
+        if (std::fabs(z - master->GetPositionZ()) >
+            std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+            return Formation::NullLocation;
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
@@ -149,6 +158,13 @@ public:
             }
             // bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
             // bot->GetPositionZ(), x, y, z);
+            // TODO: revisit this guard if movement makes long-winded air walks.
+            // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+            float const mdx = x - master->GetPositionX();
+            float const mdy = y - master->GetPositionY();
+            if (std::fabs(z - master->GetPositionZ()) >
+                std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+                return Formation::NullLocation;
             return WorldLocation(master->GetMapId(), x, y, z);
         }
 
@@ -163,6 +179,13 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - master->GetPositionX();
+        float const mdy = y - master->GetPositionY();
+        if (std::fabs(z - master->GetPositionZ()) >
+            std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+            return Formation::NullLocation;
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
@@ -222,6 +245,13 @@ public:
             z = target->GetPositionZ();
             target->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - target->GetPositionX();
+        float const mdy = y - target->GetPositionY();
+        if (std::fabs(z - target->GetPositionZ()) >
+            std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+            return Formation::NullLocation;
         return WorldLocation(bot->GetMapId(), x, y, z);
     }
 };
@@ -389,6 +419,13 @@ public:
                     z = master->GetPositionZ() + master->GetHoverHeight();
                     master->UpdateAllowedPositionZ(x, y, z);
                 }
+                // TODO: revisit this guard if movement makes long-winded air walks.
+                // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+                float const mdx = minX - master->GetPositionX();
+                float const mdy = minY - master->GetPositionY();
+                if (std::fabs(z - master->GetPositionZ()) >
+                    std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+                    return Formation::NullLocation;
                 return WorldLocation(bot->GetMapId(), minX, minY, z);
             }
 
@@ -403,6 +440,13 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - master->GetPositionX();
+        float const mdy = y - master->GetPositionY();
+        if (std::fabs(z - master->GetPositionZ()) >
+            std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+            return Formation::NullLocation;
         return WorldLocation(bot->GetMapId(), x, y, z);
     }
 };
