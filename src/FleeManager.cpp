@@ -5,6 +5,8 @@
 
 #include "FleeManager.h"
 
+#include <cmath>
+
 #include "Shadows.h"
 #include "ServerFacade.h"
 
@@ -102,6 +104,12 @@ void FleeManager::calculatePossibleDestinations(std::vector<FleePoint*>& points)
                     continue;
 
                 bot->UpdateAllowedPositionZ(x, y, z);
+
+                // TODO: revisit this guard if movement makes long-winded air walks.
+                // A walkable point stays within the 60 degree slope limit; anything steeper is a fall.
+                if (std::fabs(z - botPosZ) >
+                    std::sqrt((x - botPosX) * (x - botPosX) + (y - botPosY) * (y - botPosY)) * std::tan(M_PI / 3.0f))
+                    continue;
 
                 Map* map = startPosition.getMap();
                 if (map && map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))

@@ -5,6 +5,8 @@
 
 #include "GoAction.h"
 
+#include <cmath>
+
 #include "ChooseTravelTargetAction.h"
 #include "Event.h"
 #include "Formations.h"
@@ -175,6 +177,16 @@ bool GoAction::Execute(Event event)
         Map* map = bot->GetMap();
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
+
+        // TODO: revisit this guard if movement makes long-winded air walks.
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - bot->GetPositionX();
+        float const mdy = y - bot->GetPositionY();
+        if (std::fabs(z - bot->GetPositionZ()) > std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+        {
+            botAI->TellError("I can't go there");
+            return false;
+        }
 
         if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, x, y),
                                                  sShadowAIConfig->reactDistance))
