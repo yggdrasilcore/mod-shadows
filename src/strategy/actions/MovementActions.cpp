@@ -1822,8 +1822,11 @@ bool MovementAction::Move(float angle, float distance)
                                                         bot->GetPositionZ(), x, y, z, false))
         return false;
 
-    // Deny the move rather than walk to the ground far beneath the bot's floor.
-    if (std::fabs(z - bot->GetPositionZ()) > 8.0f)
+    // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+    float const mdx = x - bot->GetPositionX();
+    float const mdy = y - bot->GetPositionY();
+    if (std::fabs(z - bot->GetPositionZ()) >
+        std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
         return false;
 
     return MoveTo(bot->GetMapId(), x, y, z);

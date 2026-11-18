@@ -178,8 +178,10 @@ bool GoAction::Execute(Event event)
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
 
-        // Deny the move rather than walk to the map ground far beneath the bot's floor.
-        if (std::fabs(z - bot->GetPositionZ()) > 8.0f)
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - bot->GetPositionX();
+        float const mdy = y - bot->GetPositionY();
+        if (std::fabs(z - bot->GetPositionZ()) > std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
         {
             botAI->TellError("I can't go there");
             return false;
