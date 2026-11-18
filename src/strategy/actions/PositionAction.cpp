@@ -5,6 +5,8 @@
 
 #include "PositionAction.h"
 
+#include <cmath>
+
 #include "Event.h"
 #include "Shadows.h"
 #include "PositionValue.h"
@@ -136,6 +138,10 @@ bool SetReturnPositionAction::Execute(Event event [[maybe_unused]])
         float y = returnPos.y + sin(angle) * dist;
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
+
+        // Deny the position rather than store a destination on the map ground far beneath the bot's floor.
+        if (std::fabs(z - bot->GetPositionZ()) > 8.0f)
+            return false;
 
         if (!bot->IsWithinLOS(x, y, z))
             return false;

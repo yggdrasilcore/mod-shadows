@@ -5,6 +5,8 @@
 
 #include "GoAction.h"
 
+#include <cmath>
+
 #include "ChooseTravelTargetAction.h"
 #include "Event.h"
 #include "Formations.h"
@@ -175,6 +177,13 @@ bool GoAction::Execute(Event event)
         Map* map = bot->GetMap();
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
+
+        // Deny the move rather than walk to the map ground far beneath the bot's floor.
+        if (std::fabs(z - bot->GetPositionZ()) > 8.0f)
+        {
+            botAI->TellError("I can't go there");
+            return false;
+        }
 
         if (sServerFacade->IsDistanceGreaterThan(sServerFacade->GetDistance2d(bot, x, y),
                                                  sShadowAIConfig->reactDistance))

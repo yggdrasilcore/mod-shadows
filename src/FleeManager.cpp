@@ -5,6 +5,8 @@
 
 #include "FleeManager.h"
 
+#include <cmath>
+
 #include "Shadows.h"
 #include "ServerFacade.h"
 
@@ -102,6 +104,10 @@ void FleeManager::calculatePossibleDestinations(std::vector<FleePoint*>& points)
                     continue;
 
                 bot->UpdateAllowedPositionZ(x, y, z);
+
+                // Deny the point rather than flee to the map ground far beneath the bot's floor.
+                if (std::fabs(z - botPosZ) > 8.0f)
+                    continue;
 
                 Map* map = startPosition.getMap();
                 if (map && map->IsInWater(bot->GetPhaseMask(), x, y, z, bot->GetCollisionHeight()))

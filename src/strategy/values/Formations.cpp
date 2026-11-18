@@ -5,6 +5,8 @@
 
 #include "Formations.h"
 
+#include <cmath>
+
 #include "Arrow.h"
 #include "Event.h"
 #include "Map.h"
@@ -97,6 +99,9 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // Deny the move rather than walk to the ground far beneath the master's floor.
+        if (std::fabs(z - master->GetPositionZ()) > 8.0f)
+            return Formation::NullLocation;
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
@@ -149,6 +154,9 @@ public:
             }
             // bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
             // bot->GetPositionZ(), x, y, z);
+            // Deny the move rather than walk to the ground far beneath the master's floor.
+            if (std::fabs(z - master->GetPositionZ()) > 8.0f)
+                return Formation::NullLocation;
             return WorldLocation(master->GetMapId(), x, y, z);
         }
 
@@ -163,6 +171,9 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // Deny the move rather than walk to the ground far beneath the master's floor.
+        if (std::fabs(z - master->GetPositionZ()) > 8.0f)
+            return Formation::NullLocation;
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
@@ -222,6 +233,9 @@ public:
             z = target->GetPositionZ();
             target->UpdateAllowedPositionZ(x, y, z);
         }
+        // Deny the move rather than walk to the ground far beneath the target's floor.
+        if (std::fabs(z - target->GetPositionZ()) > 8.0f)
+            return Formation::NullLocation;
         return WorldLocation(bot->GetMapId(), x, y, z);
     }
 };
@@ -389,6 +403,9 @@ public:
                     z = master->GetPositionZ() + master->GetHoverHeight();
                     master->UpdateAllowedPositionZ(x, y, z);
                 }
+                // Deny the move rather than walk to the ground far beneath the master's floor.
+                if (std::fabs(z - master->GetPositionZ()) > 8.0f)
+                    return Formation::NullLocation;
                 return WorldLocation(bot->GetMapId(), minX, minY, z);
             }
 
@@ -403,6 +420,9 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // Deny the move rather than walk to the ground far beneath the master's floor.
+        if (std::fabs(z - master->GetPositionZ()) > 8.0f)
+            return Formation::NullLocation;
         return WorldLocation(bot->GetMapId(), x, y, z);
     }
 };

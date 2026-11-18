@@ -1215,7 +1215,9 @@ std::optional<bool> MovementAction::TryJumpDownTo(Unit* target)
 
     float const gz = bot->GetMapHeight(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
     uint32 const predicted = gz > INVALID_HEIGHT ? botAI->PredictFallDamage(bot->GetPositionZ() - gz) : 0;
-    if (!(gz > INVALID_HEIGHT && predicted < bot->GetHealth()))
+    // The landing must be the master's own floor, not the map ground far beneath it.
+    if (!(gz > INVALID_HEIGHT && std::fabs(gz - target->GetPositionZ()) <= 8.0f &&
+          predicted < bot->GetHealth()))
         return std::nullopt;
 
     PathGenerator dropProbe(bot);
@@ -1818,6 +1820,10 @@ bool MovementAction::Move(float angle, float distance)
         z = bot->GetPositionZ();
     if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                         bot->GetPositionZ(), x, y, z, false))
+        return false;
+
+    // Deny the move rather than walk to the ground far beneath the bot's floor.
+    if (std::fabs(z - bot->GetPositionZ()) > 8.0f)
         return false;
 
     return MoveTo(bot->GetMapId(), x, y, z);

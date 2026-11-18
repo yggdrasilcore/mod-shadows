@@ -5,6 +5,8 @@
 
 #include "Arrow.h"
 
+#include <cmath>
+
 #include "Map.h"
 #include "Shadows.h"
 
@@ -57,6 +59,9 @@ WorldLocation ArrowFormation::GetLocationInternal()
         z = master->GetPositionZ() + master->GetHoverHeight();
         master->UpdateAllowedPositionZ(x, y, z);
     }
+    // Deny the move rather than walk to the ground far beneath the master's floor.
+    if (std::fabs(z - master->GetPositionZ()) > 8.0f)
+        return Formation::NullLocation;
     return WorldLocation(master->GetMapId(), x, y, z);
 }
 
