@@ -139,6 +139,7 @@ bool SetReturnPositionAction::Execute(Event event [[maybe_unused]])
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
 
+        // TODO: revisit this guard if movement makes long-winded air walks.
         // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
         float const mdx = x - bot->GetPositionX();
         float const mdy = y - bot->GetPositionY();

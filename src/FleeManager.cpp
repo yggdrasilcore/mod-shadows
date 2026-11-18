@@ -105,6 +105,7 @@ void FleeManager::calculatePossibleDestinations(std::vector<FleePoint*>& points)
 
                 bot->UpdateAllowedPositionZ(x, y, z);
 
+                // TODO: revisit this guard if movement makes long-winded air walks.
                 // A walkable point stays within the 60 degree slope limit; anything steeper is a fall.
                 if (std::fabs(z - botPosZ) >
                     std::sqrt((x - botPosX) * (x - botPosX) + (y - botPosY) * (y - botPosY)) * std::tan(M_PI / 3.0f))

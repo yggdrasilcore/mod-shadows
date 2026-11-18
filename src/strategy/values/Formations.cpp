@@ -158,6 +158,7 @@ public:
             }
             // bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
             // bot->GetPositionZ(), x, y, z);
+            // TODO: revisit this guard if movement makes long-winded air walks.
             // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
             float const mdx = x - master->GetPositionX();
             float const mdy = y - master->GetPositionY();
@@ -178,6 +179,7 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
         // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
         float const mdx = x - master->GetPositionX();
         float const mdy = y - master->GetPositionY();
@@ -243,6 +245,7 @@ public:
             z = target->GetPositionZ();
             target->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
         // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
         float const mdx = x - target->GetPositionX();
         float const mdy = y - target->GetPositionY();
@@ -416,6 +419,7 @@ public:
                     z = master->GetPositionZ() + master->GetHoverHeight();
                     master->UpdateAllowedPositionZ(x, y, z);
                 }
+                // TODO: revisit this guard if movement makes long-winded air walks.
                 // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
                 float const mdx = minX - master->GetPositionX();
                 float const mdy = minY - master->GetPositionY();
@@ -436,6 +440,7 @@ public:
             z = master->GetPositionZ() + master->GetHoverHeight();
             master->UpdateAllowedPositionZ(x, y, z);
         }
+        // TODO: revisit this guard if movement makes long-winded air walks.
         // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
         float const mdx = x - master->GetPositionX();
         float const mdy = y - master->GetPositionY();

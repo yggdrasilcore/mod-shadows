@@ -1215,6 +1215,7 @@ std::optional<bool> MovementAction::TryJumpDownTo(Unit* target)
 
     float const gz = bot->GetMapHeight(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
     uint32 const predicted = gz > INVALID_HEIGHT ? botAI->PredictFallDamage(bot->GetPositionZ() - gz) : 0;
+    // TODO: revisit this guard if movement makes long-winded air walks.
     // The landing must be the master's own floor, not the map ground far beneath it.
     if (!(gz > INVALID_HEIGHT && std::fabs(gz - target->GetPositionZ()) <= 8.0f &&
           predicted < bot->GetHealth()))
@@ -1822,6 +1823,7 @@ bool MovementAction::Move(float angle, float distance)
                                                         bot->GetPositionZ(), x, y, z, false))
         return false;
 
+    // TODO: revisit this guard if movement makes long-winded air walks.
     // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
     float const mdx = x - bot->GetPositionX();
     float const mdy = y - bot->GetPositionY();
