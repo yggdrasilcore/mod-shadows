@@ -11,12 +11,14 @@
 #include <string>
 
 #include "AiFactory.h"
+#include "AttackersValue.h"
 #include "BudgetValues.h"
 #include "ChannelMgr.h"
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "CreatureAIImpl.h"
 #include "CreatureData.h"
+#include "CurrentTargetValue.h"
 #include "EmoteAction.h"
 #include "Engine.h"
 #include "EventProcessor.h"
@@ -54,6 +56,7 @@
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
+#include "TargetValue.h"
 #include "Transport.h"
 #include "Unit.h"
 #include "UpdateTime.h"
@@ -6448,6 +6451,67 @@ void ShadowAI::ClearMovementSuppression() { movementSuppressedUntil = 0; }
 bool ShadowAI::IsMovementSuppressed() const
 {
     return movementSuppressedUntil && getMSTime() < movementSuppressedUntil;
+}
+
+void ShadowAI::SetTarget(Unit* target)
+{
+    if (!target)
+    {
+        ClearTarget();
+        return;
+    }
+
+    bot->SetSelection(target->GetGUID());
+    if (auto* value = dynamic_cast<CurrentTargetValue*>(aiObjectContext->GetValue<Unit*>("current target")))
+        value->SetForced(target);
+}
+
+void ShadowAI::SetPrioritizedTargets(GuidVector const& targets)
+{
+    if (auto* value = dynamic_cast<PrioritizedTargetsValue*>(
+            aiObjectContext->GetValue<GuidVector>("prioritized targets")))
+        value->SetForced(targets);
+}
+
+void ShadowAI::SetPullTarget(ObjectGuid guid)
+{
+    if (auto* value = dynamic_cast<PullTargetValue*>(aiObjectContext->GetValue<ObjectGuid>("pull target")))
+        value->SetForced(guid);
+}
+
+void ShadowAI::ClearTarget()
+{
+    if (auto* value = dynamic_cast<CurrentTargetValue*>(aiObjectContext->GetValue<Unit*>("current target")))
+        value->SetForced(nullptr);
+    bot->SetTarget(ObjectGuid::Empty);
+    bot->SetSelection(ObjectGuid());
+}
+
+Unit* ShadowAI::GetTarget() { return aiObjectContext->GetValue<Unit*>("current target")->Get(); }
+
+GuidVector ShadowAI::GetPrioritizedTargets()
+{
+    return aiObjectContext->GetValue<GuidVector>("prioritized targets")->Get();
+}
+
+ObjectGuid ShadowAI::GetPullTarget() { return aiObjectContext->GetValue<ObjectGuid>("pull target")->Get(); }
+
+void ShadowAI::SuppressTargeting(uint32 durationMs)
+{
+    if (!durationMs)
+    {
+        ClearTargetingSuppression();
+        return;
+    }
+
+    targetingSuppressedUntil = getMSTime() + durationMs;
+}
+
+void ShadowAI::ClearTargetingSuppression() { targetingSuppressedUntil = 0; }
+
+bool ShadowAI::IsTargetingSuppressed() const
+{
+    return targetingSuppressedUntil && getMSTime() < targetingSuppressedUntil;
 }
 
 bool ShadowAI::CanMove()

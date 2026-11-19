@@ -21,6 +21,7 @@ public:
 
     Unit* Get() override;
     void Set(Unit* unit) override;
+    void SetForced(Unit* unit);
 
 private:
     ObjectGuid selection;

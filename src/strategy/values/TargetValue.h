@@ -114,6 +114,9 @@ public:
         : ManualSetValue<ObjectGuid>(botAI, ObjectGuid::Empty, name)
     {
     }
+
+    void Set(ObjectGuid val) override;
+    void SetForced(ObjectGuid val);
 };
 
 class FindTargetValue : public UnitCalculatedValue, public Qualified
