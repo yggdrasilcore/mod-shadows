@@ -6487,6 +6487,15 @@ void ShadowAI::ClearTarget()
     bot->SetSelection(ObjectGuid());
 }
 
+Unit* ShadowAI::GetTarget() { return aiObjectContext->GetValue<Unit*>("current target")->Get(); }
+
+GuidVector ShadowAI::GetPrioritizedTargets()
+{
+    return aiObjectContext->GetValue<GuidVector>("prioritized targets")->Get();
+}
+
+ObjectGuid ShadowAI::GetPullTarget() { return aiObjectContext->GetValue<ObjectGuid>("pull target")->Get(); }
+
 void ShadowAI::SuppressTargeting(uint32 durationMs)
 {
     if (!durationMs)

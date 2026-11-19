@@ -611,6 +611,9 @@ public:
     void SetPrioritizedTargets(GuidVector const& targets);
     void SetPullTarget(ObjectGuid guid);
     void ClearTarget();
+    Unit* GetTarget();
+    GuidVector GetPrioritizedTargets();
+    ObjectGuid GetPullTarget();
 
     // While suppressed, mod-shadows ignores its own changes to the bot's
     // combat target (current/prioritized/pull) and refuses to acquire new
