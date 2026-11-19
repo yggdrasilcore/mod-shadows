@@ -62,6 +62,9 @@ bool AttackAnythingAction::isUseful()
 
 bool DropTargetAction::Execute(Event event [[maybe_unused]])
 {
+    if (botAI->IsTargetingSuppressed())
+        return false;
+
     Unit* target = context->GetValue<Unit*>("current target")->Get();
     if (target && target->isDead())
     {

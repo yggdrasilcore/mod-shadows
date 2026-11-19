@@ -47,6 +47,9 @@ public:
         : ManualSetValue(botAI, GuidVector(), name)
     {
     }
+
+    void Set(GuidVector val) override;
+    void SetForced(GuidVector val);
 };
 
 #endif

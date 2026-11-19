@@ -605,6 +605,20 @@ public:
     void ClearMovementSuppression();
     bool IsMovementSuppressed() const;
 
+    // Targeting control for external drivers (e.g. Lua). These write the
+    // bot's target state directly and bypass targeting suppression below.
+    void SetTarget(Unit* target);
+    void SetPrioritizedTargets(GuidVector const& targets);
+    void SetPullTarget(ObjectGuid guid);
+    void ClearTarget();
+
+    // While suppressed, mod-shadows ignores its own changes to the bot's
+    // combat target (current/prioritized/pull) and refuses to acquire new
+    // targets. durationMs = 0 clears the suppression immediately.
+    void SuppressTargeting(uint32 durationMs);
+    void ClearTargetingSuppression();
+    bool IsTargetingSuppressed() const;
+
     static bool IsRealGuild(uint32 guildId);
     bool IsInRealGuild();
     static std::vector<std::string> dispel_whitelist;
@@ -662,6 +676,8 @@ private:
     bool _isBotInitializing = false;
     // getMSTime() deadline for movement suppression (0 = not suppressed).
     uint32 movementSuppressedUntil = 0;
+    // getMSTime() deadline for targeting suppression (0 = not suppressed).
+    uint32 targetingSuppressedUntil = 0;
 
 protected:
     Player* bot;
