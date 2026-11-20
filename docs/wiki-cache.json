@@ -7177,30 +7177,30 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::DoFallJump@02766cc7:qwen3-5-4b": {
-  "hash": "043fa04522ef",
+  "hash": "bae3b72be1de",
   "doc": {
-   "summary": "Executes a fall jump animation and motion command for the bot at specified coordinates while tracking state for subsequent damage calculations.",
-   "overview": "This function checks if movement is currently suppressed before proceeding to calculate the necessary jump parameters. It retrieves the bot's current vertical position, computes the appropriate jump speed based on the target height, and clears any existing motion commands to ensure a clean start. Finally, it issues a new jump command with the provided coordinates and speed while updating internal state variables for pending fall mechanics.",
+   "summary": "Executes a fall jump animation for the bot by clearing and setting motion master movement parameters.",
+   "overview": "This function initiates a fall jump sequence by first checking if movement is suppressed, returning early if so. It calculates the jump speed based on the starting and target Z coordinates, then clears any existing motion master commands to ensure a clean transition. Finally, it sets the specific jump trajectory and registers internal state flags for pending landing and damage.",
    "params": [
     {
      "name": "x",
-     "desc": "The horizontal X coordinate where the bot should land or initiate the jump."
+     "desc": "The X coordinate of the jump destination."
     },
     {
      "name": "y",
-     "desc": "The vertical Y coordinate representing the target height for the jump."
+     "desc": "The Y coordinate of the jump destination."
     },
     {
      "name": "z",
-     "desc": "The target Z coordinate (height) used to calculate the specific jump speed required."
+     "desc": "The Z coordinate of the jump destination."
     }
    ],
    "returns": "void",
-   "side_effects": "MotionMaster commands, internal state updates (pendingFallStartZ, pendingFallDamage)",
-   "notes": "Caller must ensure coordinates are within valid world bounds; if IsMovementSuppressed is true, the function exits early without side effects.",
+   "side_effects": "Motion master command execution, global state updates (pendingFallStartZ, pendingFallLandZ, pendingFallDamage)",
+   "notes": "Callers must ensure movement is not suppressed before invoking; the function relies on bot->GetPositionZ() and GetFallJumpSpeed() for dynamic speed calculation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a fall jump animation and motion command for the bot at specified coordinates while tracking state for subsequent damage calculations.\",\n  \"overview\": \"This function checks if movement is currently suppressed before proceeding to calculate the necessary jump parameters. It retrieves the bot's current vertical position, computes the appropriate jump speed based on the target height, and clears any existing motion commands to ensure a clean start. Finally, it issues a new jump command with the provided coordinates and speed while updating internal state variables for pending fall mechanics.\",\n  \"params\": [\n    {\n      \"name\": \"x\",\n      \"desc\": \"The horizontal X coordinate where the bot should land or initiate the jump.\"\n    },\n    {\n      \"name\": \"y\",\n      \"desc\": \"The vertical Y coordinate representing the target height for the jump.\"\n    },\n    {\n      \"name\": \"z\",\n      \"desc\": \"The target Z coordinate (height) used to calculate the specific jump speed required.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"MotionMaster commands, internal state updates (pendingFallStartZ, pendingFallDamage)\",\n  \"notes\": \"Caller must ensure coordinates are within valid world bounds; if IsMovementSuppressed is true, the function exits early without side effects.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a fall jump animation for the bot by clearing and setting motion master movement parameters.\",\n  \"overview\": \"This function initiates a fall jump sequence by first checking if movement is suppressed, returning early if so. It calculates the jump speed based on the starting and target Z coordinates, then clears any existing motion master commands to ensure a clean transition. Finally, it sets the specific jump trajectory and registers internal state flags for pending landing and damage.\",\n  \"params\": [\n    {\n      \"name\": \"x\",\n      \"desc\": \"The X coordinate of the jump destination.\"\n    },\n    {\n      \"name\": \"y\",\n      \"desc\": \"The Y coordinate of the jump destination.\"\n    },\n    {\n      \"name\": \"z\",\n      \"desc\": \"The Z coordinate of the jump destination.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Motion master command execution, global state updates (pendingFallStartZ, pendingFallLandZ, pendingFallDamage)\",\n  \"notes\": \"Callers must ensure movement is not suppressed before invoking; the function relies on bot->GetPositionZ() and GetFallJumpSpeed() for dynamic speed calculation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::DoAirDismountFollow@352e53e5:qwen3-5-4b": {
@@ -7259,26 +7259,26 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::UpdateAIInternal@b655a7e0:qwen3-5-4b": {
-  "hash": "460252100c08",
+  "hash": "ecf488af8b1a",
   "doc": {
    "summary": "Updates the internal AI logic for a Shadow bot by processing chat replies, handling commands, managing logout states, and executing fall jump animations.",
-   "overview": "This function first validates that the bot is not being teleported or outside the world before proceeding. It then iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers for both the bot and its master. The logic includes a detailed check for logout conditions based on player flags, unit states, and security levels, returning early if a logout is imminent.",
+   "overview": "This function first validates that the bot is not being teleported or outside the world before proceeding. It then iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers for both the bot and its master. The logic checks specific conditions regarding the bot's session state, including logging out status, security levels, and resting flags, triggering a logout sequence if necessary.",
    "params": [
     {
      "name": "elapsed",
-     "desc": "The elapsed time since the last update (unused in this function)."
+     "desc": "The elapsed time since the last update; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic."
     },
     {
      "name": "minimal",
-     "desc": "A flag indicating if minimal processing is required (unused in this function)."
+     "desc": "A boolean flag indicating whether to run a minimal version of the AI update; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic."
     }
    ],
    "returns": "void",
-   "side_effects": "Network packet handling, I/O operations for chat replies and logout logic, global state updates via performance monitoring and shadow manager configurations.",
-   "notes": "The function performs complex fall jump calculations based on the bot's position relative to ground, floors, and surfaces. It checks multiple conditions including flight status, swimming, charm, and movement suppression before triggering animations.",
+   "side_effects": "Network (packet handling), I/O (chat reply execution), Global State (performance monitoring, logout state updates)",
+   "notes": "The function performs complex fall jump calculations based on the bot's position relative to ground and surfaces. It relies heavily on external handlers for chat and packet processing and checks multiple flags related to movement states and security levels.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Updates the internal AI logic for a Shadow bot by processing chat replies, handling commands, managing logout states, and executing fall jump animations.\",\n  \"overview\": \"This function first validates that the bot is not being teleported or outside the world before proceeding. It then iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers for both the bot and its master. The logic includes a detailed check for logout conditions based on player flags, unit states, and security levels, returning early if a logout is imminent.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The elapsed time since the last update (unused in this function).\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A flag indicating if minimal processing is required (unused in this function).\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network packet handling, I/O operations for chat replies and logout logic, global state updates via performance monitoring and shadow manager configurations.\",\n  \"notes\": \"The function performs complex fall jump calculations based on the bot's position relative to ground, floors, and surfaces. It checks multiple conditions including flight status, swimming, charm, and movement suppression before triggering animations.\"\n}",
+  "raw": "{\n  \"summary\": \"Updates the internal AI logic for a Shadow bot by processing chat replies, handling commands, managing logout states, and executing fall jump animations.\",\n  \"overview\": \"This function first validates that the bot is not being teleported or outside the world before proceeding. It then iterates through pending chat replies to execute actions and processes incoming and outgoing packet handlers for both the bot and its master. The logic checks specific conditions regarding the bot's session state, including logging out status, security levels, and resting flags, triggering a logout sequence if necessary.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The elapsed time since the last update; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A boolean flag indicating whether to run a minimal version of the AI update; marked as [[maybe_unused]] indicating it is not currently utilized in this function's logic.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (packet handling), I/O (chat reply execution), Global State (performance monitoring, logout state updates)\",\n  \"notes\": \"The function performs complex fall jump calculations based on the bot's position relative to ground and surfaces. It relies heavily on external handlers for chat and packet processing and checks multiple flags related to movement states and security levels.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::HandleCommands@16e6b583:qwen3-5-4b": {
@@ -7327,17 +7327,17 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::HandleTeleportAck@8767dd76:qwen3-5-4b": {
-  "hash": "e06643853ef4",
+  "hash": "94fe4b0774ce",
   "doc": {
-   "summary": "Handles acknowledgment of teleport events for bots by clearing motion, repositioning them in the world if necessary, and executing instance-specific strategies.",
-   "overview": "This function processes teleport acknowledgments for bot entities, first verifying they are not real players before proceeding. It clears the bot's motion master and stops movement, then checks if the bot is being teleported near or far to handle repositioning logic and world state updates accordingly. Depending on configuration flags, it may apply instance strategies, evaluate healer DPS limits, and reset internal states.",
+   "summary": "Handles acknowledgment of teleport events for Shadow AI bots by clearing motion masters, repositioning the bot if necessary, and executing instance-specific strategies.",
+   "overview": "This function processes teleport acknowledgments for Shadow AI entities, first verifying that the target is not a real player before proceeding. It clears the bot's current movement state and attempts to re-add the bot to its map if it has been teleported near but is currently outside the world boundaries. Depending on whether the teleport was local or distant, it enters loops to send appropriate motion master acknowledgments and then applies configured instance strategies such as healer DPS restrictions.",
    "params": [],
    "returns": "void",
    "side_effects": "Network (WorldPacket handling), Global State (instance strategy application, cooldown setting)",
-   "notes": "Called by teleport event handlers; relies on bot state flags like IsBeingTeleportedNear and IsBeingTeleportedFar to determine execution path.",
+   "notes": "Caller: Shadow AI logic; Edge case: Bot teleported near but not in world requires manual re-addition to map.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Handles acknowledgment of teleport events for bots by clearing motion, repositioning them in the world if necessary, and executing instance-specific strategies.\",\n  \"overview\": \"This function processes teleport acknowledgments for bot entities, first verifying they are not real players before proceeding. It clears the bot's motion master and stops movement, then checks if the bot is being teleported near or far to handle repositioning logic and world state updates accordingly. Depending on configuration flags, it may apply instance strategies, evaluate healer DPS limits, and reset internal states.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (WorldPacket handling), Global State (instance strategy application, cooldown setting)\",\n  \"notes\": \"Called by teleport event handlers; relies on bot state flags like IsBeingTeleportedNear and IsBeingTeleportedFar to determine execution path.\"\n}",
+  "raw": "{\n  \"summary\": \"Handles acknowledgment of teleport events for Shadow AI bots by clearing motion masters, repositioning the bot if necessary, and executing instance-specific strategies.\",\n  \"overview\": \"This function processes teleport acknowledgments for Shadow AI entities, first verifying that the target is not a real player before proceeding. It clears the bot's current movement state and attempts to re-add the bot to its map if it has been teleported near but is currently outside the world boundaries. Depending on whether the teleport was local or distant, it enters loops to send appropriate motion master acknowledgments and then applies configured instance strategies such as healer DPS restrictions.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (WorldPacket handling), Global State (instance strategy application, cooldown setting)\",\n  \"notes\": \"Caller: Shadow AI logic; Edge case: Bot teleported near but not in world requires manual re-addition to map.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::Reset@ad9c222e:qwen3-5-4b": {
@@ -10855,7 +10855,7 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.h::ShadowAI@862a100e:qwen3-5-4b": {
-  "hash": "d92b2048b98f",
+  "hash": "f2cbbace159b",
   "doc": {
    "summary": "The ShadowAI class serves as the primary artificial intelligence controller for player bots in the game server, managing combat logic, strategy execution, and communication with the master server.",
    "overview": "Inheriting from ShadowAIBase, this class encapsulates all behaviors required for a bot to act intelligently within the game world. It handles core mechanics such as spell casting, aggro management, group coordination, and dynamic strategy switching based on combat state or map conditions. The architecture supports both local simulation updates and remote command handling via the master server.",
@@ -29326,17 +29326,17 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
-  "hash": "cd7b8d8f966f",
+  "hash": "fcb42fac5664",
   "doc": {
-   "summary": "Returns true if the guild ID is set on the bot, indicating the guild management action should be executed.",
-   "overview": "This function checks whether a guild has been assigned to the current bot instance by retrieving its unique identifier. It serves as a guard condition for guild-specific actions, ensuring that operations are only performed when a valid target guild exists. The implementation relies on the bot object's internal state to determine the presence of a guild.",
+   "summary": "Checks if a bot has the necessary rights to perform promotion, demotion, or invite actions within its guild.",
+   "overview": "This function verifies whether a specific bot possesses the required permissions to manage guild members by promoting, demoting, or inviting them. It first ensures the bot belongs to a guild and then retrieves the bot's rank rights from the guild data structure to determine if any of the specified action rights are granted.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should verify this return value before proceeding with guild-related logic to avoid errors when no guild is configured.",
+   "notes": "The function relies on external state including the bot object, guild manager, and guild member data; callers must ensure these objects are valid before invocation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns true if the guild ID is set on the bot, indicating the guild management action should be executed.\",\n  \"overview\": \"This function checks whether a guild has been assigned to the current bot instance by retrieving its unique identifier. It serves as a guard condition for guild-specific actions, ensuring that operations are only performed when a valid target guild exists. The implementation relies on the bot object's internal state to determine the presence of a guild.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify this return value before proceeding with guild-related logic to avoid errors when no guild is configured.\"\n}",
+  "raw": "{\n  \"summary\": \"Checks if a bot has the necessary rights to perform promotion, demotion, or invite actions within its guild.\",\n  \"overview\": \"This function verifies whether a specific bot possesses the required permissions to manage guild members by promoting, demoting, or inviting them. It first ensures the bot belongs to a guild and then retrieves the bot's rank rights from the guild data structure to determine if any of the specified action rights are granted.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on external state including the bot object, guild manager, and guild member data; callers must ensure these objects are valid before invocation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::SendPacket@d96affb9:qwen3-5-4b": {
