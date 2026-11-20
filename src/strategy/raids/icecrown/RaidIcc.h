@@ -27,11 +27,6 @@
 enum CreatureIdsICC
 {
 
-    // Lord Marrowgar
-    NPC_SPIKE1                          = 36619,
-    NPC_SPIKE2                          = 38711,
-    NPC_SPIKE3                          = 38712,
-
     // Lady Deathwhisper
     NPC_SHADE                           = 38222,
 
@@ -61,9 +56,6 @@ enum CreatureIdsICC
     NPC_KINETIC_BOMB4                   = 38777,
     NPC_BALL_OF_FLAME                   = 38332,
     NPC_BALL_OF_INFERNO_FLAME           = 38451,
-
-    // Blood Queen Lana'thel
-    NPC_SWARMING_SHADOWS                = 38163,
 
     // Sister Svalna
     NPC_SPEAR                           = 38248,
@@ -149,9 +141,6 @@ enum SpellIdsICC
     // Gunship Battle
     SPELL_DEATH_PLAGUE                  = 72865,
 
-    // Festergut
-    SPELL_GAS_SPORE                     = 69279,
-
     // Rotface
     SPELL_SLIME_SPRAY                   = 69508,
     SPELL_OOZE_FLOOD                    = 71215,
@@ -167,9 +156,6 @@ enum SpellIdsICC
     SPELL_EMPOWERED_SHOCK_VORTEX2       = 73037,
     SPELL_EMPOWERED_SHOCK_VORTEX3       = 73038,
     SPELL_EMPOWERED_SHOCK_VORTEX4       = 73039,
-
-    // Blood Queen Lana'thel
-    SPELL_PACT_OF_THE_DARKFALLEN        = 71340,
 
     // Sister Svalna
     SPELL_AETHER_SHIELD                 = 71463,
@@ -215,16 +201,6 @@ const std::vector<uint32> spellEntriesFlood           = {
                                                         69782, 69783, 69796, 69797, 69798,
                                                         69799, 69801, 69802, 69795};
 
-static std::vector<ObjectGuid> sporeOrder;
-
-//Lord Marrowgar
-class IccLmTrigger : public Trigger
-{
-public:
-    IccLmTrigger(ShadowAI* botAI) : Trigger(botAI, "icc lm") {}
-    bool IsActive() override;
-};
-
 //Lady Deathwhisper
 class IccDarkReckoningTrigger : public Trigger
 {
@@ -268,28 +244,6 @@ class IccStinkyPreciousMainTankMortalWoundTrigger : public Trigger
 {
 public:
     IccStinkyPreciousMainTankMortalWoundTrigger(ShadowAI* botAI) : Trigger(botAI, "icc stinky precious main tank mortal wound") {}
-    bool IsActive() override;
-};
-
-//FESTERGUT
-class IccFestergutGroupPositionTrigger : public Trigger
-{
-public:
-    IccFestergutGroupPositionTrigger(ShadowAI* botAI) : Trigger(botAI, "icc festergut group position") {}
-    bool IsActive() override;
-};
-
-class IccFestergutMainTankGastricBloatTrigger : public Trigger
-{
-public:
-    IccFestergutMainTankGastricBloatTrigger(ShadowAI* botAI) : Trigger(botAI, "icc festergut main tank gastric bloat") {}
-    bool IsActive() override;
-};
-
-class IccFestergutSporeTrigger : public Trigger
-{
-public:
-    IccFestergutSporeTrigger(ShadowAI* botAI) : Trigger(botAI, "icc festergut spore") {}
     bool IsActive() override;
 };
 
@@ -386,28 +340,6 @@ class IccBpcBallOfFlameTrigger : public Trigger
 {
 public:
     IccBpcBallOfFlameTrigger(ShadowAI* botAI) : Trigger(botAI, "icc bpc ball of flame") {}
-    bool IsActive() override;
-};
-
-//Bql
-class IccBqlGroupPositionTrigger : public Trigger
-{
-public:
-    IccBqlGroupPositionTrigger(ShadowAI* botAI) : Trigger(botAI, "icc bql tank position") {}
-    bool IsActive() override;
-};
-
-class IccBqlPactOfDarkfallenTrigger : public Trigger
-{
-public:
-    IccBqlPactOfDarkfallenTrigger(ShadowAI* botAI) : Trigger(botAI, "icc bql pact of darkfallen") {}
-    bool IsActive() override;
-};
-
-class IccBqlVampiricBiteTrigger : public Trigger
-{
-public:
-    IccBqlVampiricBiteTrigger(ShadowAI* botAI) : Trigger(botAI, "icc bql vampiric bite") {}
     bool IsActive() override;
 };
 
@@ -580,14 +512,6 @@ public:
     virtual float GetValue(Action* action);
 };
 
-//FESTERGUT
-class IccFestergutMultiplier : public Multiplier
-{
-public:
-    IccFestergutMultiplier(ShadowAI* ai) : Multiplier(ai, "icc festergut") {}
-    virtual float GetValue(Action* action);
-};
-
 //ROTFACE
 class IccRotfaceMultiplier : public Multiplier
 {
@@ -617,14 +541,6 @@ class IccBpcAssistMultiplier : public Multiplier
 public:
     IccBpcAssistMultiplier(ShadowAI* botAI) : Multiplier(botAI, "icc bpc assist") {}
     virtual float GetValue(Action* action);
-};
-
-//BQL
-class IccBqlMultiplier : public Multiplier
-{
-public:
-    IccBqlMultiplier(ShadowAI* botAI) : Multiplier(botAI, "icc bql multiplier") {}
-    virtual float GetValue(Action* action) override;
 };
 
 //VDW
@@ -666,14 +582,10 @@ public:
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-const Position ICC_LM_TANK_POSITION = Position(-391.0f, 2259.0f, 42.0f);
 const Position ICC_DARK_RECKONING_SAFE_POSITION = Position(-523.33386f, 2211.2031f, 62.823116f);
 const Position ICC_LDW_TANK_POSTION = Position(-570.1f, 2211.2456f, 49.476616f); //-590.0f
 const Position ICC_ROTTING_FROST_GIANT_TANK_POSITION = Position(-328.5085f, 2225.5142f, 199.97298f);
 const Position ICC_DBS_TANK_POSITION = Position(-494.26517f, 2211.549f, 541.11414f);
-const Position ICC_FESTERGUT_TANK_POSITION = Position(4269.1772f, 3144.7673f, 360.38577f);
-const Position ICC_FESTERGUT_RANGED_SPORE = Position(4261.143f, 3109.4146f, 360.38605f);
-const Position ICC_FESTERGUT_MELEE_SPORE = Position(4269.1772f, 3144.7673f, 360.38577f);
 const Position ICC_ROTFACE_TANK_POSITION = Position(4447.061f, 3150.9758f, 360.38568f);
 const Position ICC_ROTFACE_BIG_OOZE_POSITION = Position(4432.687f, 3142.3035f, 360.38623f);
 const Position ICC_ROTFACE_SAFE_POSITION = Position(4446.557f, 3065.6594f, 360.51843f);
@@ -685,15 +597,6 @@ const Position ICC_PUTRICIDE_BAD_POSITION = Position(4356.1724f, 3261.5232f, 389
 //const Position ICC_PUTRICIDE_GAS4_POSITION = Position(4321.8486f, 3206.464f, 389.3982f);
 const Position ICC_BPC_OT_POSITION = Position(4649.2236f, 2796.0972f, 361.1815f);
 const Position ICC_BPC_MT_POSITION = Position(4648.5674f, 2744.847f, 361.18222f);
-const Position ICC_BQL_CENTER_POSITION = Position(4595.0f, 2769.0f, 400.0f);
-const Position ICC_BQL_LWALL1_POSITION = Position(4624.685f, 2789.4895f, 400.13834f);
-const Position ICC_BQL_LWALL2_POSITION = Position(4600.749f, 2805.7568f, 400.1374f);
-const Position ICC_BQL_LWALL3_POSITION = Position(4572.857f, 2797.3872f, 400.1374f);
-const Position ICC_BQL_RWALL1_POSITION = Position(4625.724f, 2748.9917f, 400.13693f);
-const Position ICC_BQL_RWALL2_POSITION = Position(4608.3774f, 2735.7466f, 400.13693f);
-const Position ICC_BQL_RWALL3_POSITION = Position(4576.813f, 2739.6067f, 400.13693f);
-const Position ICC_BQL_LRWALL4_POSITION = Position(4539.345f, 2769.3853f, 403.7267f);
-const Position ICC_BQL_TANK_POSITION = Position(4629.746f, 2769.6396f, 401.7479f); //old just in front of stairs 4616.102f, 2768.9167f, 400.13797f
 const Position ICC_VDW_HEAL_POSITION = Position(4203.752f, 2483.4343f, 364.87274f);
 const Position ICC_VDW_GROUP1_POSITION = Position(4203.585f, 2464.422f, 364.86887f);
 const Position ICC_VDW_GROUP2_POSITION = Position(4203.5806f, 2505.2383f, 364.87677f);
@@ -726,28 +629,6 @@ const Position ICC_LK_FROST3_POSITION = Position(503.40182f, -2067.3435f, 840.85
 const Position ICC_LK_FROSTR1_POSITION = Position(481.168f, -2177.8723f, 840.857f);
 const Position ICC_LK_FROSTR2_POSITION = Position(562.20807f, -2100.2393f, 840.857f);
 const Position ICC_LK_FROSTR3_POSITION = Position(526.35297f, -2071.0317f, 840.857f);
-
-//Lord Marrogwar
-class IccLmTankPositionAction : public AttackAction
-{
-public:
-    IccLmTankPositionAction(ShadowAI* botAI, std::string const name = "icc lm tank position")
-        : AttackAction(botAI, name) {}
-    bool Execute(Event event) override;
-
-    bool MoveTowardPosition(const Position& position, float incrementSize);
-};
-
-class IccSpikeAction : public AttackAction
-{
-public:
-    IccSpikeAction(ShadowAI* botAI) : AttackAction(botAI, "icc spike") {}
-    bool Execute(Event event) override;
-
-    bool HandleSpikeTargeting(Unit* boss);
-    bool MoveTowardPosition(const Position& position, float incrementSize);
-    void UpdateRaidTargetIcon(Unit* target);
-};
 
 //Lady Deathwhisper
 class IccDarkReckoningAction : public MovementAction
@@ -821,38 +702,6 @@ public:
 
     Unit* FindPriorityTarget(Unit* boss);
     void UpdateSkullMarker(Unit* priorityTarget);
-};
-
-//FESTERGUT
-class IccFestergutGroupPositionAction : public AttackAction
-{
-public:
-    IccFestergutGroupPositionAction(ShadowAI* botAI, std::string const name = "icc festergut group position")
-        : AttackAction(botAI, name) {}
-    bool Execute(Event event) override;
-
-    bool HasSporesInGroup();
-    bool PositionNonTankMembers();
-    int CalculatePositionIndex(Group* group);
-};
-
-class IccFestergutSporeAction : public AttackAction
-{
-public:
-    IccFestergutSporeAction(ShadowAI* botAI, std::string const name = "icc festergut spore")
-        : AttackAction(botAI, name) {}
-    bool Execute(Event event) override;
-
-    Position CalculateSpreadPosition();
-    struct SporeInfo
-    {
-        std::vector<Unit*> sporedPlayers;
-        ObjectGuid lowestGuid;
-        bool hasLowestGuid = false;
-    };
-    SporeInfo FindSporedPlayers();
-    Position DetermineTargetPosition(bool hasSpore, const SporeInfo& sporeInfo, const Position& spreadRangedPos);
-    bool CheckMainTankSpore();
 };
 
 //Rotface
@@ -1001,58 +850,6 @@ public:
     IccBpcBallOfFlameAction(ShadowAI* botAI)
         : MovementAction(botAI, "icc bpc ball of flame") {}
     bool Execute(Event event) override;
-};
-
-//Blood Queen Lana'thel
-class IccBqlGroupPositionAction : public AttackAction
-{
-public:
-    IccBqlGroupPositionAction(ShadowAI* botAI)
-        : AttackAction(botAI, "icc group tank position") {}
-    bool Execute(Event event) override;
-
-    bool HandleTankPosition(Unit* boss, Aura* frenzyAura, Aura* shadowAura);
-    bool HandleShadowsMovement();
-    Position AdjustControlPoint(const Position& wall, const Position& center, float factor);
-    Position CalculateBezierPoint(float t, const Position path[4]);
-    bool HandleGroupPosition(Unit* boss, Aura* frenzyAura, Aura* shadowAura);
-
-private:
-    // Evaluate curves
-    struct CurveInfo
-    {
-        Position moveTarget;
-        int curveIdx = 0;
-        bool foundSafe = false;
-        float minDist = 0.0f;
-        float score = 0.0f;
-        Position closestPoint;
-        float t_closest = 0.0f;
-    };
-};
-
-class IccBqlPactOfDarkfallenAction : public MovementAction
-{
-public:
-    IccBqlPactOfDarkfallenAction(ShadowAI* botAI)
-        : MovementAction(botAI, "icc bql pact of darkfallen") {}
-    bool Execute(Event event) override;
-
-    void CalculateCenterPosition(Position& targetPos, const std::vector<Player*>& playersWithAura);
-    bool MoveToTargetPosition(const Position& targetPos, int auraCount);
-};
-
-class IccBqlVampiricBiteAction : public AttackAction
-{
-public:
-    IccBqlVampiricBiteAction(ShadowAI* botAI)
-            : AttackAction(botAI, "icc bql vampiric bite") {}
-    bool Execute(Event event) override;
-
-    Player* FindBestBiteTarget(Group* group);
-    bool IsInvalidTarget(Player* player);
-    bool MoveTowardsTarget(Player* target);
-    bool CastVampiricBite(Player* target);
 };
 
 // Sister Svalna
@@ -1274,9 +1071,6 @@ class RaidIccActionContext : public NamedObjectContext<Action>
 public:
     RaidIccActionContext()
     {
-        creators["icc lm tank position"] = &RaidIccActionContext::icc_lm_tank_position;
-        creators["icc spike"] = &RaidIccActionContext::icc_spike;
-
         creators["icc dark reckoning"] = &RaidIccActionContext::icc_dark_reckoning;
         creators["icc ranged position lady deathwhisper"] = &RaidIccActionContext::icc_ranged_position_lady_deathwhisper;
         creators["icc adds lady deathwhisper"] = &RaidIccActionContext::icc_adds_lady_deathwhisper;
@@ -1286,9 +1080,6 @@ public:
 
         creators["icc dbs tank position"] = &RaidIccActionContext::icc_dbs_tank_position;
         creators["icc adds dbs"] = &RaidIccActionContext::icc_adds_dbs;
-
-        creators["icc festergut group position"] = &RaidIccActionContext::icc_festergut_group_position;
-        creators["icc festergut spore"] = &RaidIccActionContext::icc_festergut_spore;
 
         creators["icc rotface tank position"] = &RaidIccActionContext::icc_rotface_tank_position;
         creators["icc rotface group position"] = &RaidIccActionContext::icc_rotface_group_position;
@@ -1304,10 +1095,6 @@ public:
         creators["icc bpc empowered vortex"] = &RaidIccActionContext::icc_bpc_empowered_vortex;
         creators["icc bpc kinetic bomb"] = &RaidIccActionContext::icc_bpc_kinetic_bomb;
         creators["icc bpc ball of flame"] = &RaidIccActionContext::icc_bpc_ball_of_flame;
-
-        creators["icc bql group position"] = &RaidIccActionContext::icc_bql_group_position;
-        creators["icc bql pact of darkfallen"] = &RaidIccActionContext::icc_bql_pact_of_darkfallen;
-        creators["icc bql vampiric bite"] = &RaidIccActionContext::icc_bql_vampiric_bite;
 
         creators["icc valkyre spear"] = &RaidIccActionContext::icc_valkyre_spear;
         creators["icc sister svalna"] = &RaidIccActionContext::icc_sister_svalna;
@@ -1333,9 +1120,6 @@ public:
     }
 
 private:
-    static Action* icc_lm_tank_position(ShadowAI* ai) { return new IccLmTankPositionAction(ai); }
-    static Action* icc_spike(ShadowAI* ai) { return new IccSpikeAction(ai); }
-
     static Action* icc_dark_reckoning(ShadowAI* ai) { return new IccDarkReckoningAction(ai); }
     static Action* icc_ranged_position_lady_deathwhisper(ShadowAI* ai) { return new IccRangedPositionLadyDeathwhisperAction(ai); }
     static Action* icc_adds_lady_deathwhisper(ShadowAI* ai) { return new IccAddsLadyDeathwhisperAction(ai); }
@@ -1345,9 +1129,6 @@ private:
 
     static Action* icc_dbs_tank_position(ShadowAI* ai) { return new IccDbsTankPositionAction(ai); }
     static Action* icc_adds_dbs(ShadowAI* ai) { return new IccAddsDbsAction(ai); }
-
-    static Action* icc_festergut_group_position(ShadowAI* ai) { return new IccFestergutGroupPositionAction(ai); }
-    static Action* icc_festergut_spore(ShadowAI* ai) { return new IccFestergutSporeAction(ai); }
 
     static Action* icc_rotface_tank_position(ShadowAI* ai) { return new IccRotfaceTankPositionAction(ai); }
     static Action* icc_rotface_group_position(ShadowAI* ai) { return new IccRotfaceGroupPositionAction(ai); }
@@ -1363,10 +1144,6 @@ private:
     static Action* icc_bpc_empowered_vortex(ShadowAI* ai) { return new IccBpcEmpoweredVortexAction(ai); }
     static Action* icc_bpc_kinetic_bomb(ShadowAI* ai) { return new IccBpcKineticBombAction(ai); }
     static Action* icc_bpc_ball_of_flame(ShadowAI* ai) { return new IccBpcBallOfFlameAction(ai); }
-
-    static Action* icc_bql_group_position(ShadowAI* ai) { return new IccBqlGroupPositionAction(ai); }
-    static Action* icc_bql_pact_of_darkfallen(ShadowAI* ai) { return new IccBqlPactOfDarkfallenAction(ai); }
-    static Action* icc_bql_vampiric_bite(ShadowAI* ai) { return new IccBqlVampiricBiteAction(ai); }
 
     static Action* icc_valkyre_spear(ShadowAI* ai) { return new IccValkyreSpearAction(ai); }
     static Action* icc_sister_svalna(ShadowAI* ai) { return new IccSisterSvalnaAction(ai); }
@@ -1400,8 +1177,6 @@ class RaidIccTriggerContext : public NamedObjectContext<Trigger>
 public:
     RaidIccTriggerContext()
     {
-        creators["icc lm"] = &RaidIccTriggerContext::icc_lm;
-
         creators["icc dark reckoning"] = &RaidIccTriggerContext::icc_dark_reckoning;
         creators["icc lady deathwhisper"] = &RaidIccTriggerContext::icc_lady_deathwhisper;
 
@@ -1411,10 +1186,6 @@ public:
         creators["icc dbs main tank rune of blood"] = &RaidIccTriggerContext::icc_dbs_main_tank_rune_of_blood;
 
         creators["icc stinky precious main tank mortal wound"] = &RaidIccTriggerContext::icc_stinky_precious_main_tank_mortal_wound;
-
-        creators["icc festergut group position"] = &RaidIccTriggerContext::icc_festergut_group_position;
-        creators["icc festergut main tank gastric bloat"] = &RaidIccTriggerContext::icc_festergut_main_tank_gastric_bloat;
-        creators["icc festergut spore"] = &RaidIccTriggerContext::icc_festergut_spore;
 
         creators["icc rotface tank position"] = &RaidIccTriggerContext::icc_rotface_tank_position;
         creators["icc rotface group position"] = &RaidIccTriggerContext::icc_rotface_group_position;
@@ -1431,10 +1202,6 @@ public:
         creators["icc bpc empowered vortex"] = &RaidIccTriggerContext::icc_bpc_empowered_vortex;
         creators["icc bpc kinetic bomb"] = &RaidIccTriggerContext::icc_bpc_kinetic_bomb;
         creators["icc bpc ball of flame"] = &RaidIccTriggerContext::icc_bpc_ball_of_flame;
-
-        creators["icc bql group position"] = &RaidIccTriggerContext::icc_bql_group_position;
-        creators["icc bql pact of darkfallen"] = &RaidIccTriggerContext::icc_bql_pact_of_darkfallen;
-        creators["icc bql vampiric bite"] = &RaidIccTriggerContext::icc_bql_vampiric_bite;
 
         creators["icc valkyre spear"] = &RaidIccTriggerContext::icc_valkyre_spear;
         creators["icc sister svalna"] = &RaidIccTriggerContext::icc_sister_svalna;
@@ -1461,8 +1228,6 @@ public:
     }
 
 private:
-    static Trigger* icc_lm(ShadowAI* ai) { return new IccLmTrigger(ai); }
-
     static Trigger* icc_dark_reckoning(ShadowAI* ai) { return new IccDarkReckoningTrigger(ai); }
     static Trigger* icc_lady_deathwhisper(ShadowAI* ai) { return new IccLadyDeathwhisperTrigger(ai); }
 
@@ -1472,10 +1237,6 @@ private:
     static Trigger* icc_dbs_main_tank_rune_of_blood(ShadowAI* ai) { return new IccDbsMainTankRuneOfBloodTrigger(ai); }
 
     static Trigger* icc_stinky_precious_main_tank_mortal_wound(ShadowAI* ai) { return new IccStinkyPreciousMainTankMortalWoundTrigger(ai); }
-
-    static Trigger* icc_festergut_group_position(ShadowAI* ai) { return new IccFestergutGroupPositionTrigger(ai); }
-    static Trigger* icc_festergut_main_tank_gastric_bloat(ShadowAI* ai) { return new IccFestergutMainTankGastricBloatTrigger(ai); }
-    static Trigger* icc_festergut_spore(ShadowAI* ai) { return new IccFestergutSporeTrigger(ai); }
 
     static Trigger* icc_rotface_tank_position(ShadowAI* ai) { return new IccRotfaceTankPositionTrigger(ai); }
     static Trigger* icc_rotface_group_position(ShadowAI* ai) { return new IccRotfaceGroupPositionTrigger(ai); }
@@ -1492,10 +1253,6 @@ private:
     static Trigger* icc_bpc_empowered_vortex(ShadowAI* ai) { return new IccBpcEmpoweredVortexTrigger(ai); }
     static Trigger* icc_bpc_kinetic_bomb(ShadowAI* ai) { return new IccBpcKineticBombTrigger(ai); }
     static Trigger* icc_bpc_ball_of_flame(ShadowAI* ai) { return new IccBpcBallOfFlameTrigger(ai); }
-
-    static Trigger* icc_bql_group_position(ShadowAI* ai) { return new IccBqlGroupPositionTrigger(ai); }
-    static Trigger* icc_bql_pact_of_darkfallen(ShadowAI* ai) { return new IccBqlPactOfDarkfallenTrigger(ai); }
-    static Trigger* icc_bql_vampiric_bite(ShadowAI* ai) { return new IccBqlVampiricBiteTrigger(ai); }
 
     static Trigger* icc_valkyre_spear(ShadowAI* ai) { return new IccValkyreSpearTrigger(ai); }
     static Trigger* icc_sister_svalna(ShadowAI* ai) { return new IccSisterSvalnaTrigger(ai); }
