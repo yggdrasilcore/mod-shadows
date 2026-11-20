@@ -35,20 +35,6 @@ enum CreatureIdsICC
     // Lady Deathwhisper
     NPC_SHADE                           = 38222,
 
-    // Gunship Battle
-    NPC_KOR_KRON_BATTLE_MAGE            = 37117,
-    NPC_KOR_KRON_AXETHROWER             = 36968,
-    NPC_KOR_KRON_ROCKETEER              = 36982,
-    NPC_SKYBREAKER_SORCERER             = 37116,
-    NPC_SKYBREAKER_RIFLEMAN             = 36969,
-    NPC_SKYBREAKER_MORTAR_SOLDIER       = 36978,
-    NPC_IGB_HIGH_OVERLORD_SAURFANG      = 36939,
-    NPC_IGB_MURADIN_BRONZEBEARD         = 36948,
-    NPC_CANNONA                         = 36838,
-    NPC_CANNONH                         = 36839,
-    NPC_MURADIN_BRONZEBEARD             = 36948,
-    NPC_HIGH_OVERLORD_SAURFANG          = 36939,
-
     // Deathbringer Saurfang
     NPC_BLOOD_BEAST1                    = 38508,
     NPC_BLOOD_BEAST2                    = 38596,
@@ -162,7 +148,6 @@ enum SpellIdsICC
 
     // Gunship Battle
     SPELL_DEATH_PLAGUE                  = 72865,
-    SPELL_BELOW_ZERO                    = 69705,
 
     // Festergut
     SPELL_GAS_SPORE                     = 69279,
@@ -230,10 +215,6 @@ const std::vector<uint32> spellEntriesFlood           = {
                                                         69782, 69783, 69796, 69797, 69798,
                                                         69799, 69801, 69802, 69795};
 
-const std::vector<uint32> availableTargetsGS          = {
-    NPC_KOR_KRON_AXETHROWER, NPC_KOR_KRON_ROCKETEER,        NPC_KOR_KRON_BATTLE_MAGE, NPC_IGB_HIGH_OVERLORD_SAURFANG,
-    NPC_SKYBREAKER_RIFLEMAN, NPC_SKYBREAKER_MORTAR_SOLDIER, NPC_SKYBREAKER_SORCERER,  NPC_IGB_MURADIN_BRONZEBEARD};
-
 static std::vector<ObjectGuid> sporeOrder;
 
 //Lord Marrowgar
@@ -264,34 +245,6 @@ class IccRottingFrostGiantTankPositionTrigger : public Trigger
 {
 public:
     IccRottingFrostGiantTankPositionTrigger(ShadowAI* botAI) : Trigger(botAI, "icc rotting frost giant tank position") {}
-    bool IsActive() override;
-};
-
-class IccInCannonTrigger : public Trigger
-{
-public:
-    IccInCannonTrigger(ShadowAI* botAI) : Trigger(botAI, "icc in cannon") {}
-    bool IsActive() override;
-};
-
-class IccGunshipCannonNearTrigger : public Trigger
-{
-public:
-    IccGunshipCannonNearTrigger(ShadowAI* botAI) : Trigger(botAI, "icc in cannon") {}
-    bool IsActive() override;
-};
-
-class IccGunshipTeleportAllyTrigger : public Trigger
-{
-public:
-    IccGunshipTeleportAllyTrigger(ShadowAI* botAI) : Trigger(botAI, "icc gunship teleport ally") {}
-    bool IsActive() override;
-};
-
-class IccGunshipTeleportHordeTrigger : public Trigger
-{
-public:
-    IccGunshipTeleportHordeTrigger(ShadowAI* botAI) : Trigger(botAI, "icc gunship teleport horde") {}
     bool IsActive() override;
 };
 
@@ -717,10 +670,6 @@ const Position ICC_LM_TANK_POSITION = Position(-391.0f, 2259.0f, 42.0f);
 const Position ICC_DARK_RECKONING_SAFE_POSITION = Position(-523.33386f, 2211.2031f, 62.823116f);
 const Position ICC_LDW_TANK_POSTION = Position(-570.1f, 2211.2456f, 49.476616f); //-590.0f
 const Position ICC_ROTTING_FROST_GIANT_TANK_POSITION = Position(-328.5085f, 2225.5142f, 199.97298f);
-const Position ICC_GUNSHIP_TELEPORT_ALLY = Position (-370.04645f, 1993.3536f, 466.65656f);
-const Position ICC_GUNSHIP_TELEPORT_ALLY2 = Position (-392.66208f, 2064.893f, 466.5672f, 5.058196f);
-const Position ICC_GUNSHIP_TELEPORT_HORDE = Position (-449.5343f, 2477.2024f, 470.17648f);
-const Position ICC_GUNSHIP_TELEPORT_HORDE2 = Position (-429.81586f, 2400.6804f, 471.56537f);
 const Position ICC_DBS_TANK_POSITION = Position(-494.26517f, 2211.549f, 541.11414f);
 const Position ICC_FESTERGUT_TANK_POSITION = Position(4269.1772f, 3144.7673f, 360.38577f);
 const Position ICC_FESTERGUT_RANGED_SPORE = Position(4261.143f, 3109.4146f, 360.38605f);
@@ -848,51 +797,6 @@ public:
     IccRottingFrostGiantTankPositionAction(ShadowAI* botAI, std::string const name = "icc rotting frost giant tank position")
         : AttackAction(botAI, name) {}
     bool Execute(Event event) override;
-};
-
-class IccCannonFireAction : public Action
-{
-public:
-    IccCannonFireAction(ShadowAI* botAI, std::string const name = "icc cannon fire")
-        : Action(botAI, name) {}
-    bool Execute(Event event) override;
-
-    Unit* FindValidCannonTarget();
-    bool TryCastCannonSpell(uint32 spellId, Unit* target, Unit* vehicleBase);
-};
-
-class IccGunshipEnterCannonAction : public MovementAction
-{
-public:
-    IccGunshipEnterCannonAction(ShadowAI* botAI, std::string const name = "icc gunship enter cannon")
-        : MovementAction(botAI, name) {}
-    bool Execute(Event event) override;
-
-    bool EnterVehicle(Unit* vehicleBase, bool moveIfFar);
-    Unit* FindBestAvailableCannon();
-    bool IsValidCannon(Unit* vehicle, const uint32 validEntries[]);
-};
-
-class IccGunshipTeleportAllyAction : public AttackAction
-{
-public:
-    IccGunshipTeleportAllyAction(ShadowAI* botAI, std::string const name = "icc gunship teleport ally")
-        : AttackAction(botAI, name) {}
-    bool Execute(Event event) override;
-
-    void CleanupSkullIcon(uint8_t SKULL_ICON_INDEX);
-    void UpdateBossSkullIcon(Unit* boss, uint8_t SKULL_ICON_INDEX);
-};
-
-class IccGunshipTeleportHordeAction : public AttackAction
-{
-public:
-    IccGunshipTeleportHordeAction(ShadowAI* botAI, std::string const name = "icc gunship teleport horde")
-        : AttackAction(botAI, name) {}
-    bool Execute(Event event) override;
-
-    void CleanupSkullIcon(uint8_t SKULL_ICON_INDEX);
-    void UpdateBossSkullIcon(Unit* boss, uint8_t SKULL_ICON_INDEX);
 };
 
 //DBS
@@ -1379,10 +1283,6 @@ public:
         creators["icc shade lady deathwhisper"] = &RaidIccActionContext::icc_shade_lady_deathwhisper;
 
         creators["icc rotting frost giant tank position"] = &RaidIccActionContext::icc_rotting_frost_giant_tank_position;
-        creators["icc cannon fire"] = &RaidIccActionContext::icc_cannon_fire;
-        creators["icc gunship enter cannon"] = &RaidIccActionContext::icc_gunship_enter_cannon;
-        creators["icc gunship teleport ally"] = &RaidIccActionContext::icc_gunship_teleport_ally;
-        creators["icc gunship teleport horde"] = &RaidIccActionContext::icc_gunship_teleport_horde;
 
         creators["icc dbs tank position"] = &RaidIccActionContext::icc_dbs_tank_position;
         creators["icc adds dbs"] = &RaidIccActionContext::icc_adds_dbs;
@@ -1442,10 +1342,6 @@ private:
     static Action* icc_shade_lady_deathwhisper(ShadowAI* ai) { return new IccShadeLadyDeathwhisperAction(ai); }
 
     static Action* icc_rotting_frost_giant_tank_position(ShadowAI* ai) { return new IccRottingFrostGiantTankPositionAction(ai); }
-    static Action* icc_cannon_fire(ShadowAI* ai) { return new IccCannonFireAction(ai); }
-    static Action* icc_gunship_enter_cannon(ShadowAI* ai) { return new IccGunshipEnterCannonAction(ai); }
-    static Action* icc_gunship_teleport_ally(ShadowAI* ai) { return new IccGunshipTeleportAllyAction(ai); }
-    static Action* icc_gunship_teleport_horde(ShadowAI* ai) { return new IccGunshipTeleportHordeAction(ai); }
 
     static Action* icc_dbs_tank_position(ShadowAI* ai) { return new IccDbsTankPositionAction(ai); }
     static Action* icc_adds_dbs(ShadowAI* ai) { return new IccAddsDbsAction(ai); }
@@ -1510,10 +1406,6 @@ public:
         creators["icc lady deathwhisper"] = &RaidIccTriggerContext::icc_lady_deathwhisper;
 
         creators["icc rotting frost giant tank position"] = &RaidIccTriggerContext::icc_rotting_frost_giant_tank_position;
-        creators["icc in cannon"] = &RaidIccTriggerContext::icc_in_cannon;
-        creators["icc gunship cannon near"] = &RaidIccTriggerContext::icc_gunship_cannon_near;
-        creators["icc gunship teleport ally"] = &RaidIccTriggerContext::icc_gunship_teleport_ally;
-        creators["icc gunship teleport horde"] = &RaidIccTriggerContext::icc_gunship_teleport_horde;
 
         creators["icc dbs"] = &RaidIccTriggerContext::icc_dbs;
         creators["icc dbs main tank rune of blood"] = &RaidIccTriggerContext::icc_dbs_main_tank_rune_of_blood;
@@ -1575,10 +1467,6 @@ private:
     static Trigger* icc_lady_deathwhisper(ShadowAI* ai) { return new IccLadyDeathwhisperTrigger(ai); }
 
     static Trigger* icc_rotting_frost_giant_tank_position(ShadowAI* ai) { return new IccRottingFrostGiantTankPositionTrigger(ai); }
-    static Trigger* icc_in_cannon(ShadowAI* ai) { return new IccInCannonTrigger(ai); }
-    static Trigger* icc_gunship_cannon_near(ShadowAI* ai) { return new IccGunshipCannonNearTrigger(ai); }
-    static Trigger* icc_gunship_teleport_ally(ShadowAI* ai) { return new IccGunshipTeleportAllyTrigger(ai); }
-    static Trigger* icc_gunship_teleport_horde(ShadowAI* ai) { return new IccGunshipTeleportHordeTrigger(ai); }
 
     static Trigger* icc_dbs(ShadowAI* ai) { return new IccDbsTrigger(ai); }
     static Trigger* icc_dbs_main_tank_rune_of_blood(ShadowAI* ai) { return new IccDbsMainTankRuneOfBloodTrigger(ai); }
