@@ -5,6 +5,8 @@
 
 #include "PositionAction.h"
 
+#include <cmath>
+
 #include "Event.h"
 #include "Shadows.h"
 #include "PositionValue.h"
@@ -136,6 +138,14 @@ bool SetReturnPositionAction::Execute(Event event [[maybe_unused]])
         float y = returnPos.y + sin(angle) * dist;
         float z = bot->GetPositionZ();
         bot->UpdateAllowedPositionZ(x, y, z);
+
+        // TODO: revisit this guard if movement makes long-winded air walks.
+        // A walkable move stays within the 60 degree slope limit; anything steeper is a fall, not a walk.
+        float const mdx = x - bot->GetPositionX();
+        float const mdy = y - bot->GetPositionY();
+        if (std::fabs(z - bot->GetPositionZ()) >
+            std::sqrt(mdx * mdx + mdy * mdy) * std::tan(M_PI / 3.0f))
+            return false;
 
         if (!bot->IsWithinLOS(x, y, z))
             return false;

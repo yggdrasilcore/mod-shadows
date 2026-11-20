@@ -8,9 +8,20 @@
 #include "LastMovementValue.h"
 #include "ObjectGuid.h"
 #include "Shadows.h"
+#include "ShadowAI.h"
 #include "RtiTargetValue.h"
 #include "ScriptedCreature.h"
 #include "ThreatMgr.h"
+
+void PullTargetValue::Set(ObjectGuid val)
+{
+    if (botAI->IsTargetingSuppressed())
+        return;
+
+    SetForced(val);
+}
+
+void PullTargetValue::SetForced(ObjectGuid val) { value = val; }
 
 Unit* FindTargetStrategy::GetResult() { return result; }
 

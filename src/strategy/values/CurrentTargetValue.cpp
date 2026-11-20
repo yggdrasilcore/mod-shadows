@@ -5,6 +5,7 @@
 
 #include "CurrentTargetValue.h"
 
+#include "ShadowAI.h"
 #include "Shadows.h"
 
 Unit* CurrentTargetValue::Get()
@@ -19,4 +20,12 @@ Unit* CurrentTargetValue::Get()
     return unit;
 }
 
-void CurrentTargetValue::Set(Unit* target) { selection = target ? target->GetGUID() : ObjectGuid::Empty; }
+void CurrentTargetValue::Set(Unit* target)
+{
+    if (botAI->IsTargetingSuppressed())
+        return;
+
+    SetForced(target);
+}
+
+void CurrentTargetValue::SetForced(Unit* target) { selection = target ? target->GetGUID() : ObjectGuid::Empty; }

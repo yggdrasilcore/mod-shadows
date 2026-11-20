@@ -9,8 +9,19 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Shadows.h"
+#include "ShadowAI.h"
 #include "ReputationMgr.h"
 #include "ServerFacade.h"
+
+void PrioritizedTargetsValue::Set(GuidVector val)
+{
+    if (botAI->IsTargetingSuppressed())
+        return;
+
+    SetForced(val);
+}
+
+void PrioritizedTargetsValue::SetForced(GuidVector val) { value = val; }
 
 GuidVector AttackersValue::Calculate()
 {
