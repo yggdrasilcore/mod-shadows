@@ -54,14 +54,6 @@ bool AttackMyTargetAction::Execute(Event event [[maybe_unused]])
 
 bool AttackAction::Attack(Unit* target, bool with_pet [[maybe_unused]] /*true*/)
 {
-    if (botAI->IsTargetingSuppressed())
-    {
-        if (verbose)
-            botAI->TellError("Targeting is suppressed.");
-
-        return false;
-    }
-
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
     bool shouldMelee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
 
