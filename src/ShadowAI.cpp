@@ -569,7 +569,10 @@ void ShadowAI::DoFallJump(float x, float y, float z)
     bot->GetMotionMaster()->Clear();
     bot->GetMotionMaster()->MoveJump(x, y, z, jumpSpeed, 5.0f);
     // Touchdown damage: evaluated once against current auras, never on a timer.
+    // The landing Z is stored so a descent that ends anywhere but its own target
+    // (teleport, knockback, anything that takes over the controlled slot) never pays.
     pendingFallStartZ = fromZ;
+    pendingFallLandZ = z;
     pendingFallDamage = true;
 }
 
@@ -848,6 +851,8 @@ void ShadowAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
             if (remaining > 0 &&
                 bot->GetExactDist(dx, dy, dz) / (remaining / 1000.0f) > 20.0f)
             {
+                // Relaunch takes over the descent; the old drop no longer pays on landing.
+                pendingFallDamage = false;
                 bot->GetMotionMaster()->Clear();
                 bot->GetMotionMaster()->MoveJump(dx, dy, dz, 7.0f, 5.0f);
             }
@@ -855,20 +860,30 @@ void ShadowAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal)
     }
 
     // Touchdown fall damage: pending descent ended, evaluate once against current auras.
+    // Only the fall spline landing on its own target pays. Anything that hijacks the
+    // controlled slot (teleport, knockback, slow-fall relaunch) ends here with no fall damage.
     if (!bot->IsAlive() || bot->IsBeingTeleported())
         pendingFallDamage = false;
     else if (pendingFallDamage && bot->movespline->Finalized())
     {
         float botZ = bot->GetPositionZ();
-        float ground = bot->GetMapHeight(bot->GetPositionX(), bot->GetPositionY(), botZ);
-        if (ground > INVALID_HEIGHT && botZ - ground < 2.0f)
+        // Ends anywhere but its own landing Z: the descent was taken over, no damage.
+        if (std::fabs(botZ - pendingFallLandZ) > 2.0f)
         {
-            uint32 damage = PredictFallDamage(pendingFallStartZ - botZ);
             pendingFallDamage = false;
-            if (damage > 0)
+        }
+        else
+        {
+            float ground = bot->GetMapHeight(bot->GetPositionX(), bot->GetPositionY(), botZ);
+            if (ground > INVALID_HEIGHT && botZ - ground < 2.0f)
             {
-                damage = std::min(damage, bot->GetMaxHealth());
-                bot->EnvironmentalDamage(DAMAGE_FALL, damage);
+                uint32 damage = PredictFallDamage(pendingFallStartZ - botZ);
+                pendingFallDamage = false;
+                if (damage > 0)
+                {
+                    damage = std::min(damage, bot->GetMaxHealth());
+                    bot->EnvironmentalDamage(DAMAGE_FALL, damage);
+                }
             }
         }
     }
@@ -1080,6 +1095,8 @@ void ShadowAI::HandleTeleportAck()
     if (IsRealPlayer())
         return;
 
+    // A teleport takes over the controlled slot: any descent it interrupted is over, no damage.
+    pendingFallDamage = false;
     bot->GetMotionMaster()->Clear(true);
     bot->StopMoving();
     if (bot->IsBeingTeleportedNear())
