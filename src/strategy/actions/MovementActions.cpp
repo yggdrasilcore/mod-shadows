@@ -226,6 +226,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle [
     bool generatePath = !bot->IsFlying() && !bot->isSwimming();
     bool disableMoveSplinePath = sShadowAIConfig->disableMoveSplinePath >= 2 ||
                                  (sShadowAIConfig->disableMoveSplinePath == 1 && bot->InBattleground());
+    if (generatePath && !bot->GetVehicle() && TryJumpShortcutTo(mapId, x, y, z, priority))
+        return true;
+    if (generatePath && !bot->GetVehicle() && TryJumpUpTo(mapId, x, y, z, priority))
+        return true;
     if (Vehicle* vehicle = bot->GetVehicle())
     {
         VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(bot);
@@ -1200,6 +1204,23 @@ void MovementAction::UpdateMovementState()
     // }
 }
 
+bool MovementAction::HasReciprocalJumpLOS(float x, float y, float z) const
+{
+    Map* map = bot->GetMap();
+    if (!map)
+        return false;
+
+    float const bx = bot->GetPositionX();
+    float const by = bot->GetPositionY();
+    float const bz = bot->GetPositionZ() + 2.0f;
+    float const tz = z + 2.0f;
+    uint32 const phase = bot->GetPhaseMask();
+    return map->isInLineOfSight(bx, by, bz, x, y, tz, phase, LINEOFSIGHT_ALL_CHECKS,
+                                VMAP::ModelIgnoreFlags::Nothing) &&
+           map->isInLineOfSight(x, y, tz, bx, by, bz, phase, LINEOFSIGHT_ALL_CHECKS,
+                                VMAP::ModelIgnoreFlags::Nothing);
+}
+
 std::optional<bool> MovementAction::TryJumpDownTo(Unit* target)
 {
     if (!target)
@@ -1266,7 +1287,85 @@ std::optional<bool> MovementAction::TryJumpDownTo(Unit* target)
     }
 
     // At the lip: drop straight to the master's ground; falling needs no mesh.
+    if (!HasReciprocalJumpLOS(target->GetPositionX(), target->GetPositionY(), gz))
+        return std::nullopt;
+
     botAI->DoFallJump(target->GetPositionX(), target->GetPositionY(), gz);
+    return true;
+}
+
+bool MovementAction::TryJumpUpTo(uint32 mapId, float x, float y, float z, MovementPriority priority)
+{
+    // Target on a ledge the bot cannot walk up but a normal jump clears.
+    float const rise = z - bot->GetPositionZ();
+    float const dist2d = bot->GetDistance2d(x, y);
+    if (!(rise > CONTACT_DISTANCE && rise <= 2.0f && dist2d >= CONTACT_DISTANCE && dist2d <= 8.0f &&
+          mapId == bot->GetMapId() && !bot->CanFly() && !bot->IsInFlight() && !bot->isSwimming() &&
+          !bot->IsInWater() && !bot->IsUnderWater()))
+        return false;
+
+    PathGenerator upProbe(bot);
+    upProbe.CalculatePath(x, y, z, false);
+
+    // A walkable route means the bot can just follow up normally.
+    if (upProbe.GetPathType() & (PATHFIND_NORMAL | PATHFIND_SHORT))
+        return false;
+
+    if (!HasReciprocalJumpLOS(x, y, z))
+        return false;
+
+    if (!IsMovingAllowed(mapId, x, y, z) || IsWaitingForLastMove(priority))
+        return false;
+
+    UpdateMovementState();
+    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
+    botAI->DoJumpUp(x, y, z);
+    return true;
+}
+
+bool MovementAction::TryJumpShortcutTo(uint32 mapId, float x, float y, float z, MovementPriority priority)
+{
+    // Target on ground far below: a safe drop can beat walking the mesh route down.
+    float const dropDz = bot->GetPositionZ() - z;
+    float const dist2d = bot->GetDistance2d(x, y);
+    if (!(dropDz > 2.0f && dist2d >= CONTACT_DISTANCE && dist2d <= 25.0f && mapId == bot->GetMapId() &&
+          !bot->CanFly() && !bot->IsInFlight() && !bot->isSwimming() && !bot->IsInWater() && !bot->IsUnderWater()))
+        return false;
+
+    // Refuse a drop larger than the run to the target: that is a wall, not a cliff.
+    if (dropDz > dist2d)
+        return false;
+
+    float const gz = bot->GetMapHeight(x, y, z);
+    if (gz <= INVALID_HEIGHT)
+        return false;
+
+    uint32 const predicted = botAI->PredictFallDamage(bot->GetPositionZ() - gz);
+    if (predicted >= bot->GetHealth())
+        return false;
+
+    // The drop must end where the bot wants to stand, not on a floor further down.
+    if (std::fabs(gz - z) > 2.0f)
+        return false;
+
+    PathGenerator shortcutProbe(bot);
+    shortcutProbe.CalculatePath(x, y, z, false);
+
+    // Nothing worth replacing: no mesh route, or a route the jump hardly shortens.
+    if (!(shortcutProbe.GetPathType() & (PATHFIND_NORMAL | PATHFIND_SHORT | PATHFIND_INCOMPLETE)))
+        return false;
+    if (!(dropDz < 0.7f * shortcutProbe.getPathLength()))
+        return false;
+
+    if (!HasReciprocalJumpLOS(x, y, gz))
+        return false;
+
+    if (!IsMovingAllowed(mapId, x, y, z) || IsWaitingForLastMove(priority))
+        return false;
+
+    UpdateMovementState();
+    AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
+    botAI->DoFallJump(x, y, gz);
     return true;
 }
 
@@ -1355,8 +1454,18 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         }
     }
 
+    MovementPriority const jumpPriority = botAI->GetState() == BOT_STATE_COMBAT ? MovementPriority::MOVEMENT_COMBAT
+                                                                                : MovementPriority::MOVEMENT_NORMAL;
+    if (TryJumpShortcutTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),
+                          jumpPriority))
+        return true;
+
     if (std::optional<bool> drop = TryJumpDownTo(target); drop.has_value())
         return *drop;
+
+    if (TryJumpUpTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),
+                    jumpPriority))
+        return true;
 
     if (sServerFacade->IsDistanceGreaterOrEqualThan(sServerFacade->GetDistance2d(bot, target),
                                                     sShadowAIConfig->sightDistance))
@@ -1474,6 +1583,12 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle [[may
         bot->CastStop();
         botAI->InterruptSpell();
     }
+
+    if (TryJumpShortcutTo(obj->GetMapId(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(),
+                          MovementPriority::MOVEMENT_COMBAT) ||
+        TryJumpUpTo(obj->GetMapId(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(),
+                    MovementPriority::MOVEMENT_COMBAT))
+        return true;
 
     // bot->GetMotionMaster()->Clear();
     bot->GetMotionMaster()->MoveChase((Unit*)obj, distance);
