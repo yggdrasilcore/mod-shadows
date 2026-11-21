@@ -3859,6 +3859,9 @@ bool ShadowAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     if (!target)
         target = bot;
 
+    if (IsTargetingSuppressed() && !bot->IsFriendlyTo(target) && target != GetTarget())
+        return false;
+
     Pet* pet = bot->GetPet();
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (pet && pet->HasSpell(spellId))
