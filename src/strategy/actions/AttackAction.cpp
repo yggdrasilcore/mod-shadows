@@ -147,7 +147,8 @@ bool AttackAction::Attack(Unit* target, bool with_pet [[maybe_unused]] /*true*/)
     // }
 
     ObjectGuid guid = target->GetGUID();
-    bot->SetSelection(target->GetGUID());
+    if (!botAI->IsTargetingSuppressed())
+        bot->SetSelection(target->GetGUID());
 
         context->GetValue<Unit*>("old target")->Set(oldTarget);
 
