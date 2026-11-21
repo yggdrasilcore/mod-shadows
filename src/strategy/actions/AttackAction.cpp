@@ -31,6 +31,9 @@ bool AttackAction::Execute(Event event [[maybe_unused]])
 
 bool AttackMyTargetAction::Execute(Event event [[maybe_unused]])
 {
+    if (botAI->IsTargetingSuppressed())
+        return false;
+
     Player* master = GetMaster();
     if (!master)
         return false;
@@ -54,6 +57,14 @@ bool AttackMyTargetAction::Execute(Event event [[maybe_unused]])
 
 bool AttackAction::Attack(Unit* target, bool with_pet [[maybe_unused]] /*true*/)
 {
+    if (botAI->IsTargetingSuppressed())
+    {
+        Unit* scriptTarget = context->GetValue<Unit*>("current target")->Get();
+        if (!scriptTarget)
+            return false;
+        target = scriptTarget;
+    }
+
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
     bool shouldMelee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
 
@@ -147,7 +158,8 @@ bool AttackAction::Attack(Unit* target, bool with_pet [[maybe_unused]] /*true*/)
     // }
 
     ObjectGuid guid = target->GetGUID();
-    bot->SetSelection(target->GetGUID());
+    if (!botAI->IsTargetingSuppressed())
+        bot->SetSelection(target->GetGUID());
 
         context->GetValue<Unit*>("old target")->Set(oldTarget);
 

@@ -94,7 +94,8 @@ bool EmoteActionBase::Emote(Unit* target, uint32 type, bool textEmote)
     ObjectGuid oldSelection = bot->GetTarget();
     if (target)
     {
-        bot->SetSelection(target->GetGUID());
+        if (!botAI->IsTargetingSuppressed())
+            bot->SetSelection(target->GetGUID());
 
         Player* player = dynamic_cast<Player*>(target);
         if (player)

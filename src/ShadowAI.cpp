@@ -3859,6 +3859,9 @@ bool ShadowAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     if (!target)
         target = bot;
 
+    if (IsTargetingSuppressed() && !bot->IsFriendlyTo(target) && target != GetTarget())
+        return false;
+
     Pet* pet = bot->GetPet();
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (pet && pet->HasSpell(spellId))
@@ -3923,7 +3926,8 @@ bool ShadowAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     }
 
     ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
-    bot->SetSelection(target->GetGUID());
+    if (!IsTargetingSuppressed())
+        bot->SetSelection(target->GetGUID());
     WorldObject* faceTo = target;
     if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, faceTo) && (spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT))
     {
