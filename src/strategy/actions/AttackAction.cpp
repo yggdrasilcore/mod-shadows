@@ -31,6 +31,9 @@ bool AttackAction::Execute(Event event [[maybe_unused]])
 
 bool AttackMyTargetAction::Execute(Event event [[maybe_unused]])
 {
+    if (botAI->IsTargetingSuppressed())
+        return false;
+
     Player* master = GetMaster();
     if (!master)
         return false;
@@ -170,7 +173,8 @@ bool AttackAction::Attack(Unit* target, bool with_pet [[maybe_unused]] /*true*/)
     }
     botAI->ChangeEngine(BOT_STATE_COMBAT);
 
-    bot->Attack(target, shouldMelee);
+    if (!botAI->IsTargetingSuppressed())
+        bot->Attack(target, shouldMelee);
     /* prevent pet dead immediately in group */
     // if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
     //     with_pet = false;
