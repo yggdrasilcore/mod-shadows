@@ -173,8 +173,7 @@ bool AttackAction::Attack(Unit* target, bool with_pet [[maybe_unused]] /*true*/)
     }
     botAI->ChangeEngine(BOT_STATE_COMBAT);
 
-    if (!botAI->IsTargetingSuppressed())
-        bot->Attack(target, shouldMelee);
+    bot->Attack(target, shouldMelee);
     /* prevent pet dead immediately in group */
     // if (bot->GetMap()->IsDungeon() && bot->GetGroup() && !target->IsInCombat()) {
     //     with_pet = false;
