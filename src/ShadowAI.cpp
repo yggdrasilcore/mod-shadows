@@ -5939,8 +5939,14 @@ Item* ShadowAI::FindOpenableItem() const
     return FindItemInInventory(
         [this](ItemTemplate const* itemTemplate) -> bool
         {
-            return (itemTemplate->Flags & ITEM_FLAG_HAS_LOOT) &&
-                   (itemTemplate->LockID == 0 || !this->bot->GetItemByEntry(itemTemplate->ItemId)->IsLocked());
+            if (!(itemTemplate->Flags & ITEM_FLAG_HAS_LOOT))
+                return false;
+
+            if (itemTemplate->LockID == 0)
+                return true;
+
+            Item* item = this->bot->GetItemByEntry(itemTemplate->ItemId);
+            return item && !item->IsLocked();
         });
 }
 
