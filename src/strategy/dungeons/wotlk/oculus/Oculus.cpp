@@ -150,7 +150,7 @@ bool MountDrakeAction::Execute(Event event [[maybe_unused]])
     for (auto& member : members)
     {
         Player* player = botAI->GetPlayer(member);
-        if (!player->GetSession()->IsBot()) { continue; }
+        if (!player || !player->GetSession()->IsBot()) { continue; }
 
         for (size_t i = 0; i < composition.size(); i++)
         {
