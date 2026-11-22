@@ -43,6 +43,12 @@ protected:
     // issued movement (heading to the lip or jumping), false to suppress normal
     // movement, or nullopt when the situation does not apply.
     std::optional<bool> TryJumpDownTo(Unit* target);
+    // Jump up to a target standing on a ledge at most 2z above the bot.
+    bool TryJumpUpTo(uint32 mapId, float x, float y, float z, MovementPriority priority);
+    // Jump down a safe drop when it is much shorter than the mesh route there.
+    bool TryJumpShortcutTo(uint32 mapId, float x, float y, float z, MovementPriority priority);
+    // Clear line of sight both ways between 2 yds above the bot and 2 yds above the destination.
+    bool HasReciprocalJumpLOS(float x, float y, float z) const;
     bool ChaseTo(WorldObject* obj, float distance = 0.0f, float angle = 0.0f);
     bool ReachCombatTo(Unit* target, float distance = 0.0f);
     float MoveDelay(float distance, bool backwards = false);
