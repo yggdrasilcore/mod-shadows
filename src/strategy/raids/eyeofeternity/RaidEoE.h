@@ -122,7 +122,7 @@ public:
     bool isPossible() override;
 
 protected:
-    Unit* vehicleBase;
+    Unit* vehicleBase = nullptr;
     bool CastDrakeSpellAction(Unit* target, uint32 spellId, uint32 cooldown);
     bool DrakeDpsAction(Unit* target);
     bool DrakeHealAction();

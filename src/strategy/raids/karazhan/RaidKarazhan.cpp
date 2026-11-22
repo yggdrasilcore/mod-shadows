@@ -359,6 +359,11 @@ bool RaidKarazhanHelpers::IsSafePosition(float x, float y, float z [[maybe_unuse
 {
     for (Unit* hazard : hazards)
     {
+        if (!hazard)
+        {
+            continue;
+        }
+
         float dist = std::sqrt(std::pow(x - hazard->GetPositionX(), 2) + std::pow(y - hazard->GetPositionY(), 2));
         if (dist < hazardRadius)
         {
@@ -407,6 +412,11 @@ bool RaidKarazhanHelpers::IsStraightPathSafe(const Position& start, const Positi
         float checkZ [[maybe_unused]] = sz + (tz - sz) * t;
         for (Unit* hazard : hazards)
         {
+            if (!hazard)
+            {
+                continue;
+            }
+
             float hazardDist = std::sqrt(std::pow(checkX - hazard->GetPositionX(), 2) + std::pow(checkY - hazard->GetPositionY(), 2));
             if (hazardDist < hazardRadius)
             {
@@ -538,6 +548,10 @@ bool KarazhanAttumenTheHuntsmanStackBehindAction::Execute(Event event [[maybe_un
 {
     RaidKarazhanHelpers karazhanHelper(botAI);
     Unit* boss = karazhanHelper.GetFirstAliveUnitByEntry(NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED);
+    if (!boss)
+    {
+        return false;
+    }
 
     float distance = 5.0f;
     float orientation = boss->GetOrientation() + M_PI;
@@ -583,6 +597,11 @@ bool KarazhanMoroesMarkTargetAction::Execute(Event event [[maybe_unused]])
 bool KarazhanMaidenOfVirtuePositionBossAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "maiden of virtue");
+    if (!boss)
+    {
+        return false;
+    }
+
     Unit* healer = nullptr;
 
     if (Group* group = bot->GetGroup())
@@ -694,6 +713,10 @@ bool KarazhanMaidenOfVirtuePositionRangedAction::isUseful()
 bool KarazhanBigBadWolfPositionBossAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the big bad wolf");
+    if (!boss)
+    {
+        return false;
+    }
 
     const float maxDistance = 3.0f;
     const float distanceToBossPosition = boss->GetExactDist2d(KARAZHAN_BIG_BAD_WOLF_BOSS_POSITION);
@@ -757,6 +780,10 @@ bool KarazhanRomuloAndJulianneMarkTargetAction::Execute(Event event [[maybe_unus
     Unit* target = nullptr;
     Unit* romulo = AI_VALUE2(Unit*, "find target", "romulo");
     Unit* julianne = AI_VALUE2(Unit*, "find target", "julianne");
+    if (!romulo || !julianne)
+    {
+        return false;
+    }
 
     const int maxPctDifference = 10;
     if (julianne->GetHealthPct() + maxPctDifference < romulo->GetHealthPct() || julianne->GetHealthPct() < 1.0f)
@@ -827,6 +854,11 @@ bool KarazhanTheCuratorMarkTargetAction::Execute(Event event [[maybe_unused]])
 bool KarazhanTheCuratorPositionBossAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the curator");
+    if (!boss)
+    {
+        return false;
+    }
+
     const float maxDistance = 3.0f;
     const float distanceToBossPosition = boss->GetExactDist2d(KARAZHAN_THE_CURATOR_BOSS_POSITION);
 
@@ -903,6 +935,11 @@ bool KarazhanTerestianIllhoofMarkTargetAction::Execute(Event event [[maybe_unuse
 bool KarazhanShadeOfAranArcaneExplosionRunAwayAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "shade of aran");
+    if (!boss)
+    {
+        return false;
+    }
+
     const float safeDistance = 20.0f;
     const float distance = bot->GetDistance2d(boss);
 
@@ -962,6 +999,10 @@ bool KarazhanShadeOfAranMarkConjuredElementalAction::Execute(Event event [[maybe
 bool KarazhanShadeOfAranSpreadRangedAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "shade of aran");
+    if (!boss)
+    {
+        return false;
+    }
 
     const float maxBossDistance = 12.0f;
     float bossDistance = bot->GetExactDist2d(boss);
@@ -1006,6 +1047,10 @@ bool KarazhanNetherspiteBlockRedBeamAction::Execute(Event event [[maybe_unused]]
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
     Unit* redPortal = bot->FindNearestCreature(NPC_RED_PORTAL, 150.0f);
+    if (!boss || !redPortal)
+    {
+        return false;
+    }
 
     RaidKarazhanHelpers karazhanHelper(botAI);
     static std::map<ObjectGuid, bool> wasBlockingRedBeam;
@@ -1104,6 +1149,10 @@ bool KarazhanNetherspiteBlockBlueBeamAction::Execute(Event event [[maybe_unused]
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
     Unit* bluePortal = bot->FindNearestCreature(NPC_BLUE_PORTAL, 150.0f);
+    if (!boss || !bluePortal)
+    {
+        return false;
+    }
 
     RaidKarazhanHelpers karazhanHelper(botAI);
     static std::map<ObjectGuid, bool> wasBlockingBlueBeam;
@@ -1214,6 +1263,10 @@ bool KarazhanNetherspiteBlockGreenBeamAction::Execute(Event event [[maybe_unused
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
     Unit* greenPortal = bot->FindNearestCreature(NPC_GREEN_PORTAL, 150.0f);
+    if (!boss || !greenPortal)
+    {
+        return false;
+    }
 
     RaidKarazhanHelpers karazhanHelper(botAI);
     static std::map<ObjectGuid, bool> wasBlockingGreenBeam;
@@ -1321,6 +1374,11 @@ bool KarazhanNetherspiteBlockGreenBeamAction::isUseful()
 bool KarazhanNetherspiteAvoidBeamAndVoidZoneAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
+    if (!boss)
+    {
+        return false;
+    }
+
     RaidKarazhanHelpers karazhanHelper(botAI);
     [[maybe_unused]] auto [redBlocker, greenBlocker, blueBlocker] = karazhanHelper.GetCurrentBeamBlockers();
     std::vector<Unit*> voidZones = karazhanHelper.GetAllVoidZones();
@@ -1516,6 +1574,11 @@ bool KarazhanNetherspiteBanishPhaseAvoidVoidZoneAction::isUseful()
 bool KarazhanPrinceMalchezaarNonTankAvoidHazardAction::Execute(Event event [[maybe_unused]])
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "prince malchezaar");
+    if (!boss)
+    {
+        return false;
+    }
+
     RaidKarazhanHelpers karazhanHelper(botAI);
     std::vector<Unit*> infernals = karazhanHelper.GetSpawnedInfernals();
 

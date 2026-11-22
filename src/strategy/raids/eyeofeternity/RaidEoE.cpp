@@ -392,6 +392,9 @@ bool EoEDrakeAttackAction::Execute(Event event [[maybe_unused]])
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
+        if (!member)
+            continue;
+
         sortedMembers.push_back(std::make_pair(member->GetGUID(), member));
     }
     std::sort(sortedMembers.begin(), sortedMembers.end());

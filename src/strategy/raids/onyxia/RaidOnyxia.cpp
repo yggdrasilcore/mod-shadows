@@ -159,8 +159,16 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event [[maybe_unused]])
     if (!boss)
         return false;
 
-    Player* target = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_targets.GetUnitTarget()->ToPlayer();
-    if (target != bot)
+    Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (!currentSpell)
+        return false;
+
+    Unit* spellTarget = currentSpell->m_targets.GetUnitTarget();
+    if (!spellTarget)
+        return false;
+
+    Player* target = spellTarget->ToPlayer();
+    if (!target || target != bot)
         return false;
 
     // bot->Yell("Spreading out — I'm the Fireball target!", LANG_UNIVERSAL);

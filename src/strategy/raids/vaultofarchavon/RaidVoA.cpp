@@ -35,6 +35,11 @@ bool EmalonMarkBossTrigger::IsActive()
 
     // Check if boss have skull mark
     Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
     int8 skullIndex = 7;  // Skull
     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
     if (currentSkullTarget == boss->GetGUID())
@@ -126,6 +131,11 @@ bool EmalonOverchargeTrigger::IsActive()
 
     // Check if minion have skull mark
     Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
     int8 skullIndex = 7;  // Skull
     ObjectGuid currentSkullTarget = group->GetTargetIcon(skullIndex);
     if (currentSkullTarget == overchargedMinion->GetGUID())

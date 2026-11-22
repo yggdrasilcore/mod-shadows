@@ -554,6 +554,9 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!quest)
+            continue;
+
         if (quest->GetZoneOrSort() < 0 || (quest->GetZoneOrSort() > 0 && static_cast<uint32>(quest->GetZoneOrSort()) != bot->GetZoneId()))
         {
             LOG_DEBUG("shadows", "[New RPG] {} drop quest {}", bot->GetName(), questId);

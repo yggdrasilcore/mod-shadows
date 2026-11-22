@@ -45,6 +45,8 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         return;
 
     Guild* guild = sGuildMgr->GetGuildById(guildMaster->GetGuildId());
+    if (!guild)
+        return;
 
     DenyReason reason = SHADOW_DENY_NONE;
     ShadowSecurityLevel secLevel = masterBotAI->GetSecurity()->LevelFor(player, &reason);
@@ -345,7 +347,12 @@ bool GuildTaskMgr::SendItemAdvertisement(CharacterDatabaseTransaction& trans, ui
                                          uint32 guildId, uint32 validIn)
 {
     Guild* guild = sGuildMgr->GetGuildById(guildId);
+    if (!guild)
+        return false;
+
     Player* leader = ObjectAccessor::FindPlayer(guild->GetLeaderGUID());
+    if (!leader)
+        return false;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
     if (!proto)
@@ -380,7 +387,12 @@ bool GuildTaskMgr::SendKillAdvertisement(CharacterDatabaseTransaction& trans, ui
                                          uint32 guildId, uint32 validIn)
 {
     Guild* guild = sGuildMgr->GetGuildById(guildId);
+    if (!guild)
+        return false;
+
     Player* leader = ObjectAccessor::FindPlayer(guild->GetLeaderGUID());
+    if (!leader)
+        return false;
 
     CreatureTemplate const* proto = sObjectMgr->GetCreatureTemplate(creatureId);
     if (!proto)
@@ -1048,7 +1060,7 @@ void GuildTaskMgr::SendCompletionMessage(Player* player, std::string const verb)
         for (GroupReference* gr = group->GetFirstMember(); gr; gr = gr->next())
         {
             Player* member = gr->GetSource();
-            if (member != player)
+            if (member && member != player)
                 ChatHandler(member->GetSession()).PSendSysMessage(out.str().c_str());
         }
     }
@@ -1080,6 +1092,8 @@ void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
         uint32 guildId = i->first;
         uint32 value = i->second;
         Guild* guild = sGuildMgr->GetGuildById(guildId);
+        if (!guild)
+            continue;
 
         if (value != creature->GetEntry())
             continue;

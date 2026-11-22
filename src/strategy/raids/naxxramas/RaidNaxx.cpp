@@ -60,6 +60,10 @@ bool BossEventTrigger<T>::IsActive()
         return false;
     }
     T* ai = dynamic_cast<T*>(boss->GetAI());
+    if (!ai)
+    {
+        return false;
+    }
     EventMap* eventMap = &ai->events;
     if (!eventMap)
     {
@@ -319,22 +323,35 @@ bool HeiganDanceAction::CalculateSafe()
 
 bool HeiganDanceMeleeAction::Execute(Event event [[maybe_unused]])
 {
-    CalculateSafe();
+    if (!CalculateSafe())
+    {
+        return false;
+    }
     if (prev_phase == 0 && botAI->IsMainTank(bot) && !AI_VALUE2(bool, "has aggro", "boss target"))
     {
         return false;
     }
-    assert(curr_safe >= 0 && curr_safe <= 3);
+    if (curr_safe < 0 || curr_safe > 3)
+    {
+        return false;
+    }
     return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(),
                       botAI->IsMainTank(bot) ? 0 : 0, MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool HeiganDanceRangedAction::Execute(Event event [[maybe_unused]])
 {
-    CalculateSafe();
+    if (!CalculateSafe())
+    {
+        return false;
+    }
     if (prev_phase != 1)
     {
         return MoveTo(bot->GetMapId(), platform.first, platform.second, 276.54f, false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+    }
+    if (curr_safe < 0 || curr_safe > 3)
+    {
+        return false;
     }
     botAI->InterruptSpell();
     return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), 0, MovementPriority::MOVEMENT_COMBAT);
@@ -351,7 +368,7 @@ bool ThaddiusAttackNearestPetAction::isUseful()
         return false;
     }
     Unit* target = helper.GetNearestPet();
-    if (bot->GetDistance(target) > 50.0f)
+    if (!target || bot->GetDistance(target) > 50.0f)
     {
         return false;
     }
@@ -361,6 +378,10 @@ bool ThaddiusAttackNearestPetAction::isUseful()
 bool ThaddiusAttackNearestPetAction::Execute(Event event [[maybe_unused]])
 {
     Unit* target = helper.GetNearestPet();
+    if (!target)
+    {
+        return false;
+    }
     if (!bot->IsWithinLOSInMap(target))
     {
         return MoveTo(target, 0, MovementPriority::MOVEMENT_COMBAT);
@@ -777,7 +798,7 @@ bool SapphironFlightPositionAction::MoveToNearestIcebolt()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (botAI->HasAura("icebolt", member, false, false, -1, true))
+        if (member && botAI->HasAura("icebolt", member, false, false, -1, true))
         {
             if (!playerWithIcebolt || minDistance > bot->GetDistance(member))
             {

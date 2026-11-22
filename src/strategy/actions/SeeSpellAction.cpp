@@ -98,6 +98,9 @@ bool SeeSpellAction::Execute(Event event)
         Creature* wpCreature =
             bot->SummonCreature(15631, spellPosition.getX(), spellPosition.getY(), spellPosition.getZ(),
                                 spellPosition.getO(), TEMPSUMMON_TIMED_DESPAWN, 2000.0f);
+        if (!wpCreature)
+            return false;
+
         wpCreature->SetObjectScale(0.5f);
         RESET_AI_VALUE(std::string, "RTSC next spell action");
 
@@ -110,6 +113,9 @@ bool SeeSpellAction::Execute(Event event)
 bool SeeSpellAction::SelectSpell(WorldPosition& spellPosition)
 {
     Player* master = botAI->GetMaster();
+    if (!master)
+        return false;
+
     if (spellPosition.distance(bot) <= 5 || AI_VALUE(bool, "RTSC selected"))
     {
         SET_AI_VALUE(bool, "RTSC selected", true);
@@ -143,8 +149,12 @@ bool SeeSpellAction::MoveToSpell(WorldPosition& spellPosition, bool inFormation)
 void SeeSpellAction::SetFormationOffset(WorldPosition& spellPosition)
 {
     Player* master = botAI->GetMaster();
+    if (!master)
+        return;
 
     Formation* formation = AI_VALUE(Formation*, "formation");
+    if (!formation)
+        return;
 
     WorldLocation formationLocation = formation->GetLocation();
 
