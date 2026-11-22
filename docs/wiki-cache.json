@@ -9094,30 +9094,30 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::CastSpell@31070459:qwen3-5-4b": {
-  "hash": "5d2d77c92381",
+  "hash": "7afa46f63a36",
   "doc": {
-   "summary": "Attempts to cast a spell on a target unit or item, handling pet autocast logic, targeting requirements, and special cases like opening locks.",
-   "overview": "This function first checks if the provided spell ID is valid and attempts to handle specific spells that toggle pet auto-casting. It then verifies that the bot is grounded and standing before setting up the target selection and facing orientation. Finally, it constructs a Spell object with appropriate targets based on the spell's requirements and executes the cast.",
+   "summary": "Attempts to cast a spell on the bot's target or an item, handling pet auto-cast logic and various targeting conditions.",
+   "overview": "This function first checks if the provided spell ID is valid and attempts to toggle autocast for specific spells if the bot has a pet. It then verifies that the bot is not flying and sets the bot to a standing state if necessary. The function proceeds to handle targeting logic, including setting the bot's facing direction based on the target or face-to object, and prepares the spell cast with appropriate targets such as units, items, or game objects.",
    "params": [
     {
      "name": "spellId",
-     "desc": "The ID of the spell to attempt casting."
+     "desc": "The ID of the spell to be cast."
     },
     {
      "name": "target",
-     "desc": "The unit intended to be targeted by the spell; defaults to the bot if null."
+     "desc": "The unit target for the spell; defaults to the bot if null."
     },
     {
      "name": "itemTarget",
-     "desc": "An optional item to target; used for spells targeting items or in specific trade scenarios."
+     "desc": "An optional item target for spells that require an item target."
     }
    ],
    "returns": "bool",
-   "side_effects": "Network (TellMaster, HandleGameObjectUseOpcode), Global State (SetNextCheckDelay, SetFacingTo)",
-   "notes": "Returns false if the bot is flying, not standing, or if the spell cast fails due to movement during casting. Special handling exists for spells that open locks or require specific loot interactions.",
+   "side_effects": "Network (TellMaster), Global State (SetFacingTo, SetNextCheckDelay)",
+   "notes": "Callers should ensure the bot is in a state where casting is possible. Edge cases include spells that require specific targeting flags or effects like OPEN_LOCK or SKINNING which have special handling logic.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Attempts to cast a spell on a target unit or item, handling pet autocast logic, targeting requirements, and special cases like opening locks.\",\n  \"overview\": \"This function first checks if the provided spell ID is valid and attempts to handle specific spells that toggle pet auto-casting. It then verifies that the bot is grounded and standing before setting up the target selection and facing orientation. Finally, it constructs a Spell object with appropriate targets based on the spell's requirements and executes the cast.\",\n  \"params\": [\n    {\n      \"name\": \"spellId\",\n      \"desc\": \"The ID of the spell to attempt casting.\"\n    },\n    {\n      \"name\": \"target\",\n      \"desc\": \"The unit intended to be targeted by the spell; defaults to the bot if null.\"\n    },\n    {\n      \"name\": \"itemTarget\",\n      \"desc\": \"An optional item to target; used for spells targeting items or in specific trade scenarios.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (TellMaster, HandleGameObjectUseOpcode), Global State (SetNextCheckDelay, SetFacingTo)\",\n  \"notes\": \"Returns false if the bot is flying, not standing, or if the spell cast fails due to movement during casting. Special handling exists for spells that open locks or require specific loot interactions.\"\n}",
+  "raw": "{\n  \"summary\": \"Attempts to cast a spell on the bot's target or an item, handling pet auto-cast logic and various targeting conditions.\",\n  \"overview\": \"This function first checks if the provided spell ID is valid and attempts to toggle autocast for specific spells if the bot has a pet. It then verifies that the bot is not flying and sets the bot to a standing state if necessary. The function proceeds to handle targeting logic, including setting the bot's facing direction based on the target or face-to object, and prepares the spell cast with appropriate targets such as units, items, or game objects.\",\n  \"params\": [\n    {\n      \"name\": \"spellId\",\n      \"desc\": \"The ID of the spell to be cast.\"\n    },\n    {\n      \"name\": \"target\",\n      \"desc\": \"The unit target for the spell; defaults to the bot if null.\"\n    },\n    {\n      \"name\": \"itemTarget\",\n      \"desc\": \"An optional item target for spells that require an item target.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (TellMaster), Global State (SetFacingTo, SetNextCheckDelay)\",\n  \"notes\": \"Callers should ensure the bot is in a state where casting is possible. Edge cases include spells that require specific targeting flags or effects like OPEN_LOCK or SKINNING which have special handling logic.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::CastSpell@52b7fffd:qwen3-5-4b": {
@@ -23244,26 +23244,26 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/AttackAction.cpp::Attack@eda96713:qwen3-5-4b": {
-  "hash": "f911ff30538d",
+  "hash": "1cb5f9f39f18",
   "doc": {
-   "summary": "Executes a combat attack against a specified unit target after validating flight status, world presence, PvP restrictions, and line of sight.",
-   "overview": "This function initiates an attack action by first verifying that the bot is not flying, the target exists in the world, and no prohibited conditions such as friendly units or dead targets are present. It further checks for valid attack eligibility including line of sight and current combat state before updating internal context variables and executing the actual attack command.",
+   "summary": "Executes a combat attack action on a specified unit after validating target eligibility and pathfinding requirements.",
+   "overview": "This function initiates an attack by first checking for AI suppression rules, flight states, and various validity conditions such as line of sight, friendly status, and PvP zone restrictions. If the bot is already attacking the same target with the same mode, it returns early to prevent redundant actions, otherwise it sets up the combat state and issues the actual attack command.",
    "params": [
     {
      "name": "target",
-     "desc": "Pointer to the unit entity intended to be attacked."
+     "desc": "The unit intended to be attacked; must be alive, in range, and not protected by AI suppression or friendly status."
     },
     {
      "name": "with_pet",
-     "desc": "Flag indicating whether the bot should attack using its pet (currently unused)."
+     "desc": "A boolean flag indicating whether the attack should include a pet (currently marked as maybe_unused)."
     }
    ],
    "returns": "bool",
    "side_effects": "Network, global state",
-   "notes": "Updates internal context variables for current target and available loot; may trigger movement generation if line of sight is blocked.",
+   "notes": "Modifies AI context variables for 'current target' and 'old target', updates motion master selection, and triggers combat engine state changes.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a combat attack against a specified unit target after validating flight status, world presence, PvP restrictions, and line of sight.\",\n  \"overview\": \"This function initiates an attack action by first verifying that the bot is not flying, the target exists in the world, and no prohibited conditions such as friendly units or dead targets are present. It further checks for valid attack eligibility including line of sight and current combat state before updating internal context variables and executing the actual attack command.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the unit entity intended to be attacked.\"\n    },\n    {\n      \"name\": \"with_pet\",\n      \"desc\": \"Flag indicating whether the bot should attack using its pet (currently unused).\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network, global state\",\n  \"notes\": \"Updates internal context variables for current target and available loot; may trigger movement generation if line of sight is blocked.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a combat attack action on a specified unit after validating target eligibility and pathfinding requirements.\",\n  \"overview\": \"This function initiates an attack by first checking for AI suppression rules, flight states, and various validity conditions such as line of sight, friendly status, and PvP zone restrictions. If the bot is already attacking the same target with the same mode, it returns early to prevent redundant actions, otherwise it sets up the combat state and issues the actual attack command.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"The unit intended to be attacked; must be alive, in range, and not protected by AI suppression or friendly status.\"\n    },\n    {\n      \"name\": \"with_pet\",\n      \"desc\": \"A boolean flag indicating whether the attack should include a pet (currently marked as maybe_unused).\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network, global state\",\n  \"notes\": \"Modifies AI context variables for 'current target' and 'old target', updates motion master selection, and triggers combat engine state changes.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/AttackAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
@@ -27189,30 +27189,30 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/EmoteAction.cpp::Emote@b04875eb:qwen3-5-4b": {
-  "hash": "11b8d44f7269",
+  "hash": "089a356c80ec",
   "doc": {
-   "summary": "Executes a specific emote on a target unit or the bot itself, handling targeting logic and sending network packets for text-based emotes.",
-   "overview": "This function first ensures the bot faces its target if one exists within line of sight, then sets the selection to that target. It checks if the target is a player to potentially adjust their facing towards the bot based on shadow AI configuration. Finally, it sends the emote via network packet if textEmote is true, otherwise handles the command locally, and restores the previous target selection.",
+   "summary": "Executes a specific emote action on a target unit, optionally sending the emote as text to the game server while managing targeting and facing logic.",
+   "overview": "This function first ensures the bot faces the target if one exists within line of sight, then updates the bot's selection. Depending on whether the target is a player, it may adjust the player's facing toward the bot. The emote itself is either sent as a text opcode to the server or handled directly via the internal command system based on the textEmote flag.",
    "params": [
     {
      "name": "target",
-     "desc": "Pointer to the unit object intended to receive the emote; if null, the bot performs the action."
+     "desc": "Pointer to the unit object intended to receive the emote action."
     },
     {
      "name": "type",
-     "desc": "The identifier for the specific emote to be executed."
+     "desc": "The specific emote identifier (uint32) to be performed."
     },
     {
      "name": "textEmote",
-     "desc": "Boolean flag indicating whether to send a network packet (SMSG_TEXT_EMOTE) instead of handling the command locally."
+     "desc": "Boolean flag indicating whether the emote should be transmitted as a text message to the server rather than handled internally."
     }
    ],
    "returns": "true",
-   "side_effects": "Network I/O (if textEmote is true), target selection changes, and potential facing adjustments for bot or player.",
-   "notes": "Relies on global shadow AI configuration; callers should ensure the target is valid before passing it to avoid unnecessary logic execution.",
+   "side_effects": "Network (if textEmote is true), Targeting state changes, Facing adjustments",
+   "notes": "Caller must ensure target validity; handles both player and non-player targets. Edge case: if target is null, only facing logic applies without selection updates.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a specific emote on a target unit or the bot itself, handling targeting logic and sending network packets for text-based emotes.\",\n  \"overview\": \"This function first ensures the bot faces its target if one exists within line of sight, then sets the selection to that target. It checks if the target is a player to potentially adjust their facing towards the bot based on shadow AI configuration. Finally, it sends the emote via network packet if textEmote is true, otherwise handles the command locally, and restores the previous target selection.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the unit object intended to receive the emote; if null, the bot performs the action.\"\n    },\n    {\n      \"name\": \"type\",\n      \"desc\": \"The identifier for the specific emote to be executed.\"\n    },\n    {\n      \"name\": \"textEmote\",\n      \"desc\": \"Boolean flag indicating whether to send a network packet (SMSG_TEXT_EMOTE) instead of handling the command locally.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"Network I/O (if textEmote is true), target selection changes, and potential facing adjustments for bot or player.\",\n  \"notes\": \"Relies on global shadow AI configuration; callers should ensure the target is valid before passing it to avoid unnecessary logic execution.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a specific emote action on a target unit, optionally sending the emote as text to the game server while managing targeting and facing logic.\",\n  \"overview\": \"This function first ensures the bot faces the target if one exists within line of sight, then updates the bot's selection. Depending on whether the target is a player, it may adjust the player's facing toward the bot. The emote itself is either sent as a text opcode to the server or handled directly via the internal command system based on the textEmote flag.\",\n  \"params\": [\n    {\n      \"name\": \"target\",\n      \"desc\": \"Pointer to the unit object intended to receive the emote action.\"\n    },\n    {\n      \"name\": \"type\",\n      \"desc\": \"The specific emote identifier (uint32) to be performed.\"\n    },\n    {\n      \"name\": \"textEmote\",\n      \"desc\": \"Boolean flag indicating whether the emote should be transmitted as a text message to the server rather than handled internally.\"\n    }\n  ],\n  \"returns\": \"true\",\n  \"side_effects\": \"Network (if textEmote is true), Targeting state changes, Facing adjustments\",\n  \"notes\": \"Caller must ensure target validity; handles both player and non-player targets. Edge case: if target is null, only facing logic applies without selection updates.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/EmoteAction.cpp::GetTarget@a3946ab1:qwen3-5-4b": {
