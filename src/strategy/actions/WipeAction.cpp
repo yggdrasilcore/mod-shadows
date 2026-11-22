@@ -8,9 +8,8 @@
 
 bool WipeAction::Execute(Event event)
 {
-    Player* master [[maybe_unused]] = event.getOwner();
-
-    if (botAI->GetMaster()->GetGUID() != event.getOwner()->GetGUID())
+    Player* master = event.getOwner();
+    if (!master || !botAI->GetMaster() || botAI->GetMaster()->GetGUID() != master->GetGUID())
         return false;
 
     bot->Kill(bot, bot);
