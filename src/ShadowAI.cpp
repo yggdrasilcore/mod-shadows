@@ -6292,6 +6292,9 @@ std::vector<std::pair<const Quest*, uint32>> ShadowAI::GetCurrentQuestsRequiring
 
         // QuestStatus status = bot->GetQuestStatus(questId);
         const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!quest)
+            continue;
+
         for (uint8 i = 0; i < std::size(quest->RequiredItemId); ++i)
         {
             if (quest->RequiredItemId[i] == itemId)

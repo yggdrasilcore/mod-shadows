@@ -2247,7 +2247,7 @@ bool YoggSaronMarkTargetTrigger::IsActive()
     {
         ObjectGuid currentMoonTarget = group->GetTargetIcon(RtiTargetValue::moonIndex);
         Creature* yogg_saron = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
-        if (!currentMoonTarget || currentMoonTarget != yogg_saron->GetGUID())
+        if (!yogg_saron || !currentMoonTarget || currentMoonTarget != yogg_saron->GetGUID())
         {
             return true;
         }
@@ -4558,6 +4558,8 @@ bool ThorimGauntletPositioningAction::Execute(Event event [[maybe_unused]])
     FollowMasterStrategy followMasterStrategy(botAI);
 
     Unit* master = botAI->GetMaster();
+    if (!master)
+        return false;
 
     std::string const rti = AI_VALUE(std::string, "rti");
     if (rti != "cross")
@@ -5360,6 +5362,9 @@ bool YoggSaronSanityAction::Execute(Event event [[maybe_unused]])
 {
     Creature* sanityWell = bot->FindNearestCreature(NPC_SANITY_WELL, 200.0f);
 
+    if (!sanityWell)
+        return false;
+
     return MoveTo(bot->GetMapId(), sanityWell->GetPositionX(), sanityWell->GetPositionY(), sanityWell->GetPositionZ(),
                   false, false, false, true, MovementPriority::MOVEMENT_FORCED,
                   true, false);
@@ -5387,6 +5392,10 @@ bool YoggSaronMarkTargetAction::Execute(Event event [[maybe_unused]])
 
         ObjectGuid currentMoonTarget = group->GetTargetIcon(RtiTargetValue::moonIndex);
         Creature* yogg_saron = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
+        if (!yogg_saron)
+        {
+            return false;
+        }
         if (!currentMoonTarget || currentMoonTarget != yogg_saron->GetGUID())
         {
             group->SetTargetIcon(RtiTargetValue::moonIndex, bot->GetGUID(), yogg_saron->GetGUID());
