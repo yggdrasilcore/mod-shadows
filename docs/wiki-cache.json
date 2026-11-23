@@ -993,19 +993,19 @@
   "hash": "76c657c7a90e",
   "doc": {
    "summary": "Applies a sequence of chat filters to the input message, returning an empty string if any filter rejects it.",
-   "overview": "This function iterates through a list of registered chat filters and processes the provided message sequentially. If any individual filter returns an empty string, indicating a rejection, the loop terminates immediately and the empty result is returned. Otherwise, the modified message is passed to the next filter until all have been applied.",
+   "overview": "This function iterates through a list of registered chat filters and processes the provided message sequentially. If any individual filter modifies the message or determines it should be rejected (indicated by an empty result), the loop terminates immediately. The final processed message is returned to the caller, allowing for early rejection of inappropriate content.",
    "params": [
     {
      "name": "message",
-     "desc": "The input chat message to be filtered; modified in place by the filters."
+     "desc": "The input chat message string that will be passed through each filter in the sequence."
     }
    ],
    "returns": "std::string const",
    "side_effects": "None",
-   "notes": "Callers should expect an empty string if any filter blocks the content. The function relies on external state via the global `filters` vector defined elsewhere in the module.",
+   "notes": "Callers should expect an empty string if the message was rejected by any filter. The function relies on external state (the 'filters' vector) being populated before invocation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Applies a sequence of chat filters to the input message, returning an empty string if any filter rejects it.\",\n  \"overview\": \"This function iterates through a list of registered chat filters and processes the provided message sequentially. If any individual filter returns an empty string, indicating a rejection, the loop terminates immediately and the empty result is returned. Otherwise, the modified message is passed to the next filter until all have been applied.\",\n  \"params\": [\n    {\n      \"name\": \"message\",\n      \"desc\": \"The input chat message to be filtered; modified in place by the filters.\"\n    }\n  ],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should expect an empty string if any filter blocks the content. The function relies on external state via the global `filters` vector defined elsewhere in the module.\"\n}",
+  "raw": "{\n  \"summary\": \"Applies a sequence of chat filters to the input message, returning an empty string if any filter rejects it.\",\n  \"overview\": \"This function iterates through a list of registered chat filters and processes the provided message sequentially. If any individual filter modifies the message or determines it should be rejected (indicated by an empty result), the loop terminates immediately. The final processed message is returned to the caller, allowing for early rejection of inappropriate content.\",\n  \"params\": [\n    {\n      \"name\": \"message\",\n      \"desc\": \"The input chat message string that will be passed through each filter in the sequence.\"\n    }\n  ],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should expect an empty string if the message was rejected by any filter. The function relies on external state (the 'filters' vector) being populated before invocation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ChatFilter.cpp::StrategyChatFilter@426e92a1:qwen3-5-4b": {
@@ -5195,24 +5195,24 @@
  "src/RandomShadowMgr.cpp::calculate@6b7d531f:qwen3-5-4b": {
   "hash": "1140fb8fc5ec",
   "doc": {
-   "summary": "Calculates the proportional-integral-derivative (PID) control output by combining weighted error terms and clamping the result to defined limits.",
-   "overview": "This function implements a standard PID controller algorithm used for real-time feedback regulation in the RandomShadowMgr module. It computes the current error between the desired setpoint and the process variable, then aggregates proportional, integral, and derivative components into a single output value. The resulting control signal is constrained within specified minimum and maximum bounds to prevent saturation.",
+   "summary": "Calculates the PID controller output by computing the proportional, integral, and derivative terms based on the difference between the setpoint and process value.",
+   "overview": "This function implements a standard PID control algorithm to regulate a system by adjusting an output value. It first calculates the error as the difference between the desired setpoint and the current process value, then derives the proportional, integral, and derivative components using predefined gain constants (_Kp, _Ki, _Kd) and time delta (_dt). The final output is clamped to a maximum and minimum range, with corresponding adjustments to the internal integral accumulator to prevent windup.",
    "params": [
     {
      "name": "setpoint",
-     "desc": "The target value or desired state that the system aims to reach."
+     "desc": "The target value that the system aims to reach."
     },
     {
      "name": "pv",
-     "desc": "The current process variable representing the actual measured state of the system."
+     "desc": "The current process value or measured output of the system being controlled."
     }
    ],
    "returns": "double",
-   "side_effects": "Modifies internal member variables _integral, _pre_error, and clamps output against _max/_min limits.",
-   "notes": "Caller must ensure setpoint and pv are within valid numeric ranges; integral windup is handled via clamping logic.",
+   "side_effects": "Modifies internal state variables _integral and _pre_error; performs no I/O, network operations, or locks.",
+   "notes": "Callers must ensure _dt is non-zero to avoid division errors in the derivative calculation. The function assumes _max and _min are initialized prior to use.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Calculates the proportional-integral-derivative (PID) control output by combining weighted error terms and clamping the result to defined limits.\",\n  \"overview\": \"This function implements a standard PID controller algorithm used for real-time feedback regulation in the RandomShadowMgr module. It computes the current error between the desired setpoint and the process variable, then aggregates proportional, integral, and derivative components into a single output value. The resulting control signal is constrained within specified minimum and maximum bounds to prevent saturation.\",\n  \"params\": [\n    {\n      \"name\": \"setpoint\",\n      \"desc\": \"The target value or desired state that the system aims to reach.\"\n    },\n    {\n      \"name\": \"pv\",\n      \"desc\": \"The current process variable representing the actual measured state of the system.\"\n    }\n  ],\n  \"returns\": \"double\",\n  \"side_effects\": \"Modifies internal member variables _integral, _pre_error, and clamps output against _max/_min limits.\",\n  \"notes\": \"Caller must ensure setpoint and pv are within valid numeric ranges; integral windup is handled via clamping logic.\"\n}",
+  "raw": "{\n  \"summary\": \"Calculates the PID controller output by computing the proportional, integral, and derivative terms based on the difference between the setpoint and process value.\",\n  \"overview\": \"This function implements a standard PID control algorithm to regulate a system by adjusting an output value. It first calculates the error as the difference between the desired setpoint and the current process value, then derives the proportional, integral, and derivative components using predefined gain constants (_Kp, _Ki, _Kd) and time delta (_dt). The final output is clamped to a maximum and minimum range, with corresponding adjustments to the internal integral accumulator to prevent windup.\",\n  \"params\": [\n    {\n      \"name\": \"setpoint\",\n      \"desc\": \"The target value that the system aims to reach.\"\n    },\n    {\n      \"name\": \"pv\",\n      \"desc\": \"The current process value or measured output of the system being controlled.\"\n    }\n  ],\n  \"returns\": \"double\",\n  \"side_effects\": \"Modifies internal state variables _integral and _pre_error; performs no I/O, network operations, or locks.\",\n  \"notes\": \"Callers must ensure _dt is non-zero to avoid division errors in the derivative calculation. The function assumes _max and _min are initialized prior to use.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/RandomShadowMgr.cpp::~botPID@18ad9fbc:qwen3-5-4b": {
@@ -7023,26 +7023,26 @@
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::UpdateAI@c00ee10d:qwen3-5-4b": {
-  "hash": "5ed9e0538fc4",
+  "hash": "d8e6c30afd20",
   "doc": {
-   "summary": "Updates the Shadow AI state by applying cheats, managing spell interruptions based on target conditions, handling transport switching, and delegating core logic to the base class.",
-   "overview": "This function acts as a wrapper for the bot's AI update cycle, first accounting for elapsed time to manage internal delays. It then checks for active cheats to restore health or mana if applicable before allowing general activity. The core logic evaluates the current spell state to interrupt casting under specific conditions such as dead targets, full health status, or incorrect facing direction, yielding the thread after each decision point.",
+   "summary": "Updates Shadow AI logic by handling elapsed time deltas, applying cheat-based buffs, managing spell states and targeting, and processing transport movement.",
+   "overview": "This function serves as the primary entry point for Shadow AI updates, first normalizing the elapsed time delta against internal check delays. It performs critical checks to ensure the bot is alive and in the world before proceeding, then applies various cheat masks to restore health, mana, or power if enabled by the server configuration. The core logic evaluates the bot's current spell state to interrupt casting under specific conditions such as dead targets, full health status, or incorrect facing angles, while also managing transport passenger assignments when the bot moves between vehicles.",
    "params": [
     {
      "name": "elapsed",
-     "desc": "The amount of time that has passed since the last call to this function."
+     "desc": "The time delta in milliseconds since the last AI update call."
     },
     {
      "name": "minimal",
-     "desc": "A flag indicating whether minimal processing is required (passed through to UpdateAIInternal)."
+     "desc": "A boolean flag indicating whether to perform only minimal updates or full processing."
     }
    ],
    "returns": "void",
-   "side_effects": "Network, Global State",
-   "notes": "Calls AllowActivity(), InterruptSpell(), and YieldThread(); modifies global cheat masks and bot state; relies on sServerFacade for facing updates.",
+   "side_effects": "Network (SendMovementFlagUpdate, SetFacingTo), Global State (nextAICheckDelay, nextTransportCheck, sShadowAIConfig), I/O (LOG_DEBUG)",
+   "notes": "Callers must ensure the bot is in a valid state before invoking this function. Edge cases include bots with no active spells or those currently being removed from the world; both result in early returns without further processing.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Updates the Shadow AI state by applying cheats, managing spell interruptions based on target conditions, handling transport switching, and delegating core logic to the base class.\",\n  \"overview\": \"This function acts as a wrapper for the bot's AI update cycle, first accounting for elapsed time to manage internal delays. It then checks for active cheats to restore health or mana if applicable before allowing general activity. The core logic evaluates the current spell state to interrupt casting under specific conditions such as dead targets, full health status, or incorrect facing direction, yielding the thread after each decision point.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The amount of time that has passed since the last call to this function.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A flag indicating whether minimal processing is required (passed through to UpdateAIInternal).\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network, Global State\",\n  \"notes\": \"Calls AllowActivity(), InterruptSpell(), and YieldThread(); modifies global cheat masks and bot state; relies on sServerFacade for facing updates.\"\n}",
+  "raw": "{\n  \"summary\": \"Updates Shadow AI logic by handling elapsed time deltas, applying cheat-based buffs, managing spell states and targeting, and processing transport movement.\",\n  \"overview\": \"This function serves as the primary entry point for Shadow AI updates, first normalizing the elapsed time delta against internal check delays. It performs critical checks to ensure the bot is alive and in the world before proceeding, then applies various cheat masks to restore health, mana, or power if enabled by the server configuration. The core logic evaluates the bot's current spell state to interrupt casting under specific conditions such as dead targets, full health status, or incorrect facing angles, while also managing transport passenger assignments when the bot moves between vehicles.\",\n  \"params\": [\n    {\n      \"name\": \"elapsed\",\n      \"desc\": \"The time delta in milliseconds since the last AI update call.\"\n    },\n    {\n      \"name\": \"minimal\",\n      \"desc\": \"A boolean flag indicating whether to perform only minimal updates or full processing.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (SendMovementFlagUpdate, SetFacingTo), Global State (nextAICheckDelay, nextTransportCheck, sShadowAIConfig), I/O (LOG_DEBUG)\",\n  \"notes\": \"Callers must ensure the bot is in a valid state before invoking this function. Edge cases include bots with no active spells or those currently being removed from the world; both result in early returns without further processing.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/ShadowAI.cpp::IsFlyingMounted@f31025b0:qwen3-5-4b": {
@@ -14986,14 +14986,14 @@
   "hash": "6c0509083f44",
   "doc": {
    "summary": "Retrieves the creature template associated with a given entry ID from the global object manager.",
-   "overview": "This function acts as a thin wrapper around the ObjectManager's GetCreatureTemplate method, delegating the lookup logic to the centralized sObjectMgr instance. It is typically called by higher-level TravelMgr components when resolving creature data for pathfinding or entity management tasks. The implementation assumes that the entry ID corresponds to a valid creature template already registered in the system.",
+   "overview": "This function acts as a thin wrapper around the Object Manager's internal retrieval logic, delegating the actual lookup of creature data to sObjectMgr. It is typically called by higher-level travel management systems when determining movement properties or visual assets for specific creatures based on their unique identifiers.",
    "params": [],
    "returns": "CreatureTemplate const*",
    "side_effects": "None",
-   "notes": "Callers must ensure the entry ID is valid before invoking this function to avoid potential null pointer dereferences, although the underlying ObjectManager may perform its own validation.",
+   "notes": "Callers must ensure the entry ID corresponds to a valid creature before relying on this return value, as it may return nullptr if the template does not exist.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Retrieves the creature template associated with a given entry ID from the global object manager.\",\n  \"overview\": \"This function acts as a thin wrapper around the ObjectManager's GetCreatureTemplate method, delegating the lookup logic to the centralized sObjectMgr instance. It is typically called by higher-level TravelMgr components when resolving creature data for pathfinding or entity management tasks. The implementation assumes that the entry ID corresponds to a valid creature template already registered in the system.\",\n  \"params\": [],\n  \"returns\": \"CreatureTemplate const*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the entry ID is valid before invoking this function to avoid potential null pointer dereferences, although the underlying ObjectManager may perform its own validation.\"\n}",
+  "raw": "{\n  \"summary\": \"Retrieves the creature template associated with a given entry ID from the global object manager.\",\n  \"overview\": \"This function acts as a thin wrapper around the Object Manager's internal retrieval logic, delegating the actual lookup of creature data to sObjectMgr. It is typically called by higher-level travel management systems when determining movement properties or visual assets for specific creatures based on their unique identifiers.\",\n  \"params\": [],\n  \"returns\": \"CreatureTemplate const*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the entry ID corresponds to a valid creature before relying on this return value, as it may return nullptr if the template does not exist.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/TravelMgr.cpp::GetGameObjectTemplate@9c03f9d9:qwen3-5-4b": {
@@ -15164,22 +15164,22 @@
  "src/TravelMgr.cpp::getTitle@fa248f77:qwen3-5-4b": {
   "hash": "1c446572bdaf",
   "doc": {
-   "summary": "Retrieves the formatted title string for a boss mob entry by concatenating 'boss mob ' with the world entry name.",
-   "overview": "This function constructs a descriptive title string used in chat messages to identify a specific boss mob. It utilizes an `std::ostringstream` to safely concatenate the static prefix 'boss mob ' with the result of `ChatHelper::FormatWorldEntry(entry)`, which likely formats the provided entry data into a readable name.",
+   "summary": "Retrieves the formatted title string for a boss mob entry by concatenating 'boss mob' with the world entry name.",
+   "overview": "This function constructs a standardized title string used in chat messages to identify boss mobs. It utilizes an `std::ostringstream` to safely concatenate the static prefix 'boss mob ' with the result of `ChatHelper::FormatWorldEntry(entry)`, ensuring proper formatting and type safety before returning the final string.",
    "params": [],
    "returns": "std::string const",
    "side_effects": "None",
-   "notes": "The function relies on external formatting logic via `ChatHelper` and assumes `entry` is valid before being passed to this function.",
+   "notes": "The function relies on the `entry` object being passed to the calling context (implied by the definition signature) to access the world entry data. It is primarily used internally within the TravelMgr module to generate consistent boss identification text.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Retrieves the formatted title string for a boss mob entry by concatenating 'boss mob ' with the world entry name.\",\n  \"overview\": \"This function constructs a descriptive title string used in chat messages to identify a specific boss mob. It utilizes an `std::ostringstream` to safely concatenate the static prefix 'boss mob ' with the result of `ChatHelper::FormatWorldEntry(entry)`, which likely formats the provided entry data into a readable name.\",\n  \"params\": [],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on external formatting logic via `ChatHelper` and assumes `entry` is valid before being passed to this function.\"\n}",
+  "raw": "{\n  \"summary\": \"Retrieves the formatted title string for a boss mob entry by concatenating 'boss mob' with the world entry name.\",\n  \"overview\": \"This function constructs a standardized title string used in chat messages to identify boss mobs. It utilizes an `std::ostringstream` to safely concatenate the static prefix 'boss mob ' with the result of `ChatHelper::FormatWorldEntry(entry)`, ensuring proper formatting and type safety before returning the final string.\",\n  \"params\": [],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on the `entry` object being passed to the calling context (implied by the definition signature) to access the world entry data. It is primarily used internally within the TravelMgr module to generate consistent boss identification text.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/TravelMgr.cpp::isActive@a14b2f02:qwen3-5-4b": {
   "hash": "6a4558de93d2",
   "doc": {
    "summary": "Checks if the specified player bot is currently active in a quest.",
-   "overview": "This function delegates the activity check to the bot's internal state by calling its IsActiveQuest method. It returns true if the bot is actively engaged in the current quest and false otherwise. The TravelMgr module uses this to determine whether to apply travel-related logic or restrictions to the bot.",
+   "overview": "This function delegates the activity status check to the bot's internal state by calling its IsActiveQuest method. It returns true if the bot is actively engaged in a quest and false otherwise, allowing TravelMgr to determine which bots require travel-related interactions.",
    "params": [
     {
      "name": "bot",
@@ -15188,10 +15188,10 @@
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Caller must ensure the bot pointer is valid before invoking. Edge case: returns false if the bot has not started a quest or has completed one.",
+   "notes": "Caller must ensure the bot pointer is valid before invoking; returns false if the bot is not in a quest state.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Checks if the specified player bot is currently active in a quest.\",\n  \"overview\": \"This function delegates the activity check to the bot's internal state by calling its IsActiveQuest method. It returns true if the bot is actively engaged in the current quest and false otherwise. The TravelMgr module uses this to determine whether to apply travel-related logic or restrictions to the bot.\",\n  \"params\": [\n    {\n      \"name\": \"bot\",\n      \"desc\": \"Pointer to the Player object representing the bot whose activity status is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure the bot pointer is valid before invoking. Edge case: returns false if the bot has not started a quest or has completed one.\"\n}",
+  "raw": "{\n  \"summary\": \"Checks if the specified player bot is currently active in a quest.\",\n  \"overview\": \"This function delegates the activity status check to the bot's internal state by calling its IsActiveQuest method. It returns true if the bot is actively engaged in a quest and false otherwise, allowing TravelMgr to determine which bots require travel-related interactions.\",\n  \"params\": [\n    {\n      \"name\": \"bot\",\n      \"desc\": \"Pointer to the Player object representing the bot whose activity status is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure the bot pointer is valid before invoking; returns false if the bot is not in a quest state.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/TravelMgr.cpp::getCreatureTemplate@630a925d:qwen3-5-4b": {
@@ -16653,15 +16653,15 @@
  "src/TravelNode.cpp::print@f4156fce:qwen3-5-4b": {
   "hash": "115a18ca841f",
   "doc": {
-   "summary": "Returns a string representation of the travel node's shadow AI configuration timestamp and linear geometry coordinates.",
-   "overview": "This function constructs an ostringstream containing the current timestamp from the shadow AI configuration followed by a LINESTRING WKT format representing the positions of all nodes. It iterates through the nodes collection, extracting display coordinates for each one to build the final string output.",
+   "summary": "Returns a formatted string representation of the shadow AI configuration timestamp and LINESTRING coordinates.",
+   "overview": "This function constructs an ostringstream containing the current shadow AI timestamp followed by a WKT-formatted LINESTRING. It iterates through the nodes collection to append each node's display X and Y coordinates, ensuring consistent formatting for serialization or logging purposes.",
    "params": [],
    "returns": "std::ostringstream const",
    "side_effects": "None",
-   "notes": "The returned stream object is a const reference, meaning it cannot be modified by the caller. The function relies on external objects sShadowAIConfig and nodes being valid.",
+   "notes": "The returned stream object is a copy; callers should not modify it. Requires valid sShadowAIConfig and nodes to function correctly.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns a string representation of the travel node's shadow AI configuration timestamp and linear geometry coordinates.\",\n  \"overview\": \"This function constructs an ostringstream containing the current timestamp from the shadow AI configuration followed by a LINESTRING WKT format representing the positions of all nodes. It iterates through the nodes collection, extracting display coordinates for each one to build the final string output.\",\n  \"params\": [],\n  \"returns\": \"std::ostringstream const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The returned stream object is a const reference, meaning it cannot be modified by the caller. The function relies on external objects sShadowAIConfig and nodes being valid.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns a formatted string representation of the shadow AI configuration timestamp and LINESTRING coordinates.\",\n  \"overview\": \"This function constructs an ostringstream containing the current shadow AI timestamp followed by a WKT-formatted LINESTRING. It iterates through the nodes collection to append each node's display X and Y coordinates, ensuring consistent formatting for serialization or logging purposes.\",\n  \"params\": [],\n  \"returns\": \"std::ostringstream const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The returned stream object is a copy; callers should not modify it. Requires valid sShadowAIConfig and nodes to function correctly.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/TravelNode.cpp::getTotalDistance@38f9a791:qwen3-5-4b": {
@@ -19681,29 +19681,29 @@
  "src/strategy/AiObject.h::clazz@61dd54e0:qwen3-5-4b": {
   "hash": "0abf833f03e2",
   "doc": {
-   "summary": "The clazz class is a specialized AI object that inherits from BuffTrigger to manage spell-based triggers for ShadowAI bots.",
-   "overview": "This class serves as a concrete implementation of the BuffTrigger interface, specifically designed to handle trigger logic within the ShadowAI bot framework. It initializes with a reference to the parent bot's AI instance and a specific spell identifier, allowing it to evaluate conditions related to that spell. The primary functionality is encapsulated in the IsActive() method, which determines whether the current spell state warrants triggering an action.",
+   "summary": "The clazz class represents a specific AI strategy that triggers on buff events and manages its active state.",
+   "overview": "This class inherits from BuffTrigger to handle spell-based activation logic within the ShadowAI bot framework. It is initialized with a reference to the bot's AI object, allowing it to access necessary game state for decision-making. The primary functionality provided by this class is determining whether the current strategy should be executed based on active buffs.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should ensure the botAI pointer remains valid during the object's lifetime. Edge cases include scenarios where the spell state changes rapidly, potentially causing IsActive() to return inconsistent results between calls.",
+   "notes": "Callers must ensure the botAI object remains valid during the lifetime of the clazz instance.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz class is a specialized AI object that inherits from BuffTrigger to manage spell-based triggers for ShadowAI bots.\",\n  \"overview\": \"This class serves as a concrete implementation of the BuffTrigger interface, specifically designed to handle trigger logic within the ShadowAI bot framework. It initializes with a reference to the parent bot's AI instance and a specific spell identifier, allowing it to evaluate conditions related to that spell. The primary functionality is encapsulated in the IsActive() method, which determines whether the current spell state warrants triggering an action.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI pointer remains valid during the object's lifetime. Edge cases include scenarios where the spell state changes rapidly, potentially causing IsActive() to return inconsistent results between calls.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a specific AI strategy that triggers on buff events and manages its active state.\",\n  \"overview\": \"This class inherits from BuffTrigger to handle spell-based activation logic within the ShadowAI bot framework. It is initialized with a reference to the bot's AI object, allowing it to access necessary game state for decision-making. The primary functionality provided by this class is determining whether the current strategy should be executed based on active buffs.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI object remains valid during the lifetime of the clazz instance.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@4c4df2e9:qwen3-5-4b": {
   "hash": "519c50b3af4b",
   "doc": {
-   "summary": "The clazz constructor initializes a ShadowAI strategy object by delegating to the parent BuffOnPartyTrigger class with the bot AI and spell.",
-   "overview": "This class serves as a specialized strategy implementation for ShadowAI, inheriting functionality from BuffOnPartyTrigger. Its primary role is to manage party-based buff triggers within the game's artificial intelligence system. The constructor binds the specific bot instance and spell data required for operation upon initialization.",
+   "summary": "The clazz class represents a Shadow AI buff trigger that activates when a party member is affected by a specific spell.",
+   "overview": "This class inherits from BuffOnPartyTrigger and initializes itself with a reference to the bot's AI instance and the associated spell. It overrides the IsActive method to determine if the current buff state should be active based on game conditions. The implementation relies on the parent class logic for party member tracking while providing custom activation criteria.",
    "params": [],
-   "returns": "void",
+   "returns": "bool",
    "side_effects": "None",
-   "notes": "The class relies on the IsActive() method to determine current operational status; callers should verify this before invoking strategy logic.",
+   "notes": "Callers must ensure the botAI instance is valid before instantiation; edge cases include scenarios where the spell target leaves the party or the buff duration expires.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz constructor initializes a ShadowAI strategy object by delegating to the parent BuffOnPartyTrigger class with the bot AI and spell.\",\n  \"overview\": \"This class serves as a specialized strategy implementation for ShadowAI, inheriting functionality from BuffOnPartyTrigger. Its primary role is to manage party-based buff triggers within the game's artificial intelligence system. The constructor binds the specific bot instance and spell data required for operation upon initialization.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The class relies on the IsActive() method to determine current operational status; callers should verify this before invoking strategy logic.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a Shadow AI buff trigger that activates when a party member is affected by a specific spell.\",\n  \"overview\": \"This class inherits from BuffOnPartyTrigger and initializes itself with a reference to the bot's AI instance and the associated spell. It overrides the IsActive method to determine if the current buff state should be active based on game conditions. The implementation relies on the parent class logic for party member tracking while providing custom activation criteria.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI instance is valid before instantiation; edge cases include scenarios where the spell target leaves the party or the buff duration expires.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@f314b4e8:qwen3-5-4b": {
@@ -19714,24 +19714,24 @@
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers must ensure the botAI reference remains valid during the object's lifetime; edge cases include rapid state toggling where IsActive() may return inconsistent results if spell logic is not fully updated.",
+   "notes": "Callers must ensure the botAI reference remains valid during the object's lifetime. Edge cases include scenarios where the underlying spell state changes while IsActive() is being evaluated.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz class represents a debuff trigger mechanism within the ShadowAI bot system.\",\n  \"overview\": \"This class inherits from DebuffTrigger and is initialized with a reference to the ShadowAI bot instance. It serves as a lightweight wrapper for managing specific debuff logic without exposing internal spell details directly to callers. The primary functionality provided is through the IsActive() method, which determines whether the current debuff state should be active.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI reference remains valid during the object's lifetime; edge cases include rapid state toggling where IsActive() may return inconsistent results if spell logic is not fully updated.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a debuff trigger mechanism within the ShadowAI bot system.\",\n  \"overview\": \"This class inherits from DebuffTrigger and is initialized with a reference to the ShadowAI bot instance. It serves as a lightweight wrapper for managing specific debuff logic without exposing internal spell details directly to callers. The primary functionality provided is through the IsActive() method, which determines whether the current debuff state should be active.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI reference remains valid during the object's lifetime. Edge cases include scenarios where the underlying spell state changes while IsActive() is being evaluated.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@445cba17:qwen3-5-4b": {
   "hash": "6cd925170dd6",
   "doc": {
-   "summary": "The clazz class represents a debuff effect applied to an attacker that triggers upon specific conditions, managed by the ShadowAI bot.",
-   "overview": "This class extends DebuffOnAttackerTrigger to handle debuffs specifically triggered by the ShadowAI bot's logic. It initializes with a reference to the bot AI and a spell definition, then provides functionality to check if the current debuff state is active.",
+   "summary": "The clazz class represents a debuff effect applied to an attacker that triggers upon their attack action.",
+   "overview": "This class inherits from DebuffOnAttackerTrigger and is initialized with a reference to the ShadowAI bot instance. It manages the active state of the debuff, which is determined by whether the attacker has successfully executed an attack while under this effect's influence.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should verify IsActive() before applying further effects; edge cases include scenarios where the attacker has left the combat zone or the spell duration has expired.",
+   "notes": "The IsActive() method should be called frequently during gameplay to determine if the debuff is currently active on the target.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz class represents a debuff effect applied to an attacker that triggers upon specific conditions, managed by the ShadowAI bot.\",\n  \"overview\": \"This class extends DebuffOnAttackerTrigger to handle debuffs specifically triggered by the ShadowAI bot's logic. It initializes with a reference to the bot AI and a spell definition, then provides functionality to check if the current debuff state is active.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify IsActive() before applying further effects; edge cases include scenarios where the attacker has left the combat zone or the spell duration has expired.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a debuff effect applied to an attacker that triggers upon their attack action.\",\n  \"overview\": \"This class inherits from DebuffOnAttackerTrigger and is initialized with a reference to the ShadowAI bot instance. It manages the active state of the debuff, which is determined by whether the attacker has successfully executed an attack while under this effect's influence.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The IsActive() method should be called frequently during gameplay to determine if the debuff is currently active on the target.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@e1cf1261:qwen3-5-4b": {
@@ -19770,15 +19770,15 @@
  "src/strategy/AiObject.h::clazz@f5306a48:qwen3-5-4b": {
   "hash": "3e70bdbcf1b6",
   "doc": {
-   "summary": "The clazz constructor initializes a Shadow AI object by delegating to the base SpellCanBeCastTrigger class with a reference to the bot AI and spell.",
-   "overview": "This class serves as a specialized implementation for Shadow AI logic within the game server, inheriting from SpellCanBeCastTrigger. Its primary responsibility is to manage the active state of the spell cast trigger through its IsActive() method. The constructor establishes the necessary context by passing the bot AI instance and the specific spell being targeted.",
+   "summary": "The clazz class represents a specific AI strategy object that inherits from SpellCanBeCastTrigger and manages its active state.",
+   "overview": "This class serves as the primary container for an individual AI strategy within the ShadowAI system, delegating spell-related logic to its parent class. It is initialized with a reference to the bot's AI instance and a specific spell definition, allowing it to evaluate whether that spell can be cast based on current game conditions. The IsActive() method provides a boolean check to determine if the strategy is currently enabled or running.",
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "Callers should ensure the botAI pointer is valid before instantiation; IsActive() returns true only when the spell trigger condition is met.",
+   "notes": "Callers should ensure the botAI pointer remains valid during the object's lifetime; edge cases include scenarios where the spell definition becomes invalid mid-execution.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz constructor initializes a Shadow AI object by delegating to the base SpellCanBeCastTrigger class with a reference to the bot AI and spell.\",\n  \"overview\": \"This class serves as a specialized implementation for Shadow AI logic within the game server, inheriting from SpellCanBeCastTrigger. Its primary responsibility is to manage the active state of the spell cast trigger through its IsActive() method. The constructor establishes the necessary context by passing the bot AI instance and the specific spell being targeted.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI pointer is valid before instantiation; IsActive() returns true only when the spell trigger condition is met.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a specific AI strategy object that inherits from SpellCanBeCastTrigger and manages its active state.\",\n  \"overview\": \"This class serves as the primary container for an individual AI strategy within the ShadowAI system, delegating spell-related logic to its parent class. It is initialized with a reference to the bot's AI instance and a specific spell definition, allowing it to evaluate whether that spell can be cast based on current game conditions. The IsActive() method provides a boolean check to determine if the strategy is currently enabled or running.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI pointer remains valid during the object's lifetime; edge cases include scenarios where the spell definition becomes invalid mid-execution.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@6fd105f4:qwen3-5-4b": {
@@ -19803,38 +19803,38 @@
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "Callers should ensure the botAI reference remains valid throughout the spell's lifecycle; edge cases include scenarios where the interrupt condition is never met, resulting in IsActive() always returning false.",
+   "notes": "Callers should ensure the botAI reference remains valid throughout the spell's lifecycle.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz class represents a spell trigger mechanism within the Shadow AI system that inherits from InterruptSpellTrigger.\",\n  \"overview\": \"This class serves as a specialized container for managing interrupt spells triggered by specific game events. It initializes with a reference to the ShadowAI bot and a spell object, delegating core logic to its parent class while providing an override method to check the current activation status.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI reference remains valid throughout the spell's lifecycle; edge cases include scenarios where the interrupt condition is never met, resulting in IsActive() always returning false.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a spell trigger mechanism within the Shadow AI system that inherits from InterruptSpellTrigger.\",\n  \"overview\": \"This class serves as a specialized container for managing interrupt spells triggered by specific game events. It initializes with a reference to the ShadowAI bot and a spell object, delegating core logic to its parent class while providing an override method to check the current activation status.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI reference remains valid throughout the spell's lifecycle.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@08b144c4:qwen3-5-4b": {
   "hash": "142429b38ce2",
   "doc": {
    "summary": "The clazz constructor initializes a Shadow AI object by delegating to the base class HasAuraTrigger with references to the bot AI and spell.",
-   "overview": "This class serves as a specialized implementation of the HasAuraTrigger interface, specifically designed for Shadow AI mechanics within the game server. The constructor accepts a pointer to the ShadowAI bot instance and a spell reference, passing them directly to the parent class to establish necessary state management. It provides an override method IsActive() to determine the current operational status of the aura trigger.",
+   "overview": "This class serves as a specialized implementation of the HasAuraTrigger interface, specifically designed for Shadow AI mechanics within the game server. The constructor accepts a pointer to the bot AI instance and the associated spell, passing them directly to the base class initializer to establish necessary state. It provides an override method IsActive() to determine the current operational status of the aura trigger.",
    "params": [],
    "returns": "void",
    "side_effects": "None",
    "notes": "",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz constructor initializes a Shadow AI object by delegating to the base class HasAuraTrigger with references to the bot AI and spell.\",\n  \"overview\": \"This class serves as a specialized implementation of the HasAuraTrigger interface, specifically designed for Shadow AI mechanics within the game server. The constructor accepts a pointer to the ShadowAI bot instance and a spell reference, passing them directly to the parent class to establish necessary state management. It provides an override method IsActive() to determine the current operational status of the aura trigger.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz constructor initializes a Shadow AI object by delegating to the base class HasAuraTrigger with references to the bot AI and spell.\",\n  \"overview\": \"This class serves as a specialized implementation of the HasAuraTrigger interface, specifically designed for Shadow AI mechanics within the game server. The constructor accepts a pointer to the bot AI instance and the associated spell, passing them directly to the base class initializer to establish necessary state. It provides an override method IsActive() to determine the current operational status of the aura trigger.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@c7ce191b:qwen3-5-4b": {
   "hash": "cff830b7a548",
   "doc": {
-   "summary": "The AiObject class represents a snare target trigger managed by the Shadow AI bot.",
-   "overview": "This class extends SnareTargetTrigger to handle specific logic for shadow-based snares within the game's strategy system. It is initialized with a reference to the ShadowAI bot and a spell object, delegating core functionality to its parent class while providing an override method to check active status.",
+   "summary": "The clazz class represents a snare target trigger mechanism within the Shadow AI system.",
+   "overview": "This class inherits from SnareTargetTrigger and is initialized with a reference to the ShadowAI bot instance. It serves as a specialized component for managing snare-related logic during gameplay interactions. The IsActive() method allows external systems to query whether the current snare state is active.",
    "params": [],
-   "returns": "void",
+   "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should ensure the bot AI is valid before invoking IsActive(); edge cases include scenarios where the spell has expired or the target no longer exists.",
+   "notes": "Callers should ensure thread safety when invoking IsActive() as it interacts with bot AI state.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The AiObject class represents a snare target trigger managed by the Shadow AI bot.\",\n  \"overview\": \"This class extends SnareTargetTrigger to handle specific logic for shadow-based snares within the game's strategy system. It is initialized with a reference to the ShadowAI bot and a spell object, delegating core functionality to its parent class while providing an override method to check active status.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot AI is valid before invoking IsActive(); edge cases include scenarios where the spell has expired or the target no longer exists.\"\n}",
+  "raw": "{\n  \"summary\": \"The clazz class represents a snare target trigger mechanism within the Shadow AI system.\",\n  \"overview\": \"This class inherits from SnareTargetTrigger and is initialized with a reference to the ShadowAI bot instance. It serves as a specialized component for managing snare-related logic during gameplay interactions. The IsActive() method allows external systems to query whether the current snare state is active.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure thread safety when invoking IsActive() as it interacts with bot AI state.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@a8fe6c2e:qwen3-5-4b": {
@@ -19869,28 +19869,28 @@
   "hash": "e5ca5009788b",
   "doc": {
    "summary": "The ShadowAI class represents a shadow-based artificial intelligence entity that inherits from BoostTrigger and manages its active state.",
-   "overview": "This class serves as the primary implementation for shadow AI logic within the game server, extending the base BoostTrigger functionality to handle specific shadow mechanics. It initializes with a reference to the bot's main AI instance and a spell identifier, allowing it to trigger effects based on shadow-related conditions. The IsActive method provides a critical query point for the game engine to determine if the shadow AI is currently operational.",
+   "overview": "This class serves as the primary implementation for shadow AI logic within the game server, extending the BoostTrigger base class to handle specific spell interactions. It initializes with a reference to the bot's AI system and a spell identifier, allowing it to trigger events based on defined conditions. The IsActive() method provides a critical status check to determine if the shadow AI is currently operational.",
    "params": [],
-   "returns": "bool",
+   "returns": "void",
    "side_effects": "None",
-   "notes": "Callers must ensure the botAI pointer remains valid throughout the lifetime of the ShadowAI instance. Edge cases include scenarios where the spell associated with the trigger has expired or been modified, which may affect IsActive() behavior.",
+   "notes": "Callers should verify IsActive() before attempting to execute shadow-related actions to prevent undefined behavior.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The ShadowAI class represents a shadow-based artificial intelligence entity that inherits from BoostTrigger and manages its active state.\",\n  \"overview\": \"This class serves as the primary implementation for shadow AI logic within the game server, extending the base BoostTrigger functionality to handle specific shadow mechanics. It initializes with a reference to the bot's main AI instance and a spell identifier, allowing it to trigger effects based on shadow-related conditions. The IsActive method provides a critical query point for the game engine to determine if the shadow AI is currently operational.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI pointer remains valid throughout the lifetime of the ShadowAI instance. Edge cases include scenarios where the spell associated with the trigger has expired or been modified, which may affect IsActive() behavior.\"\n}",
+  "raw": "{\n  \"summary\": \"The ShadowAI class represents a shadow-based artificial intelligence entity that inherits from BoostTrigger and manages its active state.\",\n  \"overview\": \"This class serves as the primary implementation for shadow AI logic within the game server, extending the BoostTrigger base class to handle specific spell interactions. It initializes with a reference to the bot's AI system and a spell identifier, allowing it to trigger events based on defined conditions. The IsActive() method provides a critical status check to determine if the shadow AI is currently operational.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify IsActive() before attempting to execute shadow-related actions to prevent undefined behavior.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@599fb4b5:qwen3-5-4b": {
   "hash": "121202787f97",
   "doc": {
-   "summary": "The ShadowAI class is a specialized interrupt trigger that extends InterruptEnemyHealerTrigger to manage shadow-based enemy healing interruptions.",
-   "overview": "This class serves as the primary logic handler for shadow AI behaviors within the game server, specifically focusing on interrupting enemy healers. It inherits from InterruptEnemyHealerTrigger and initializes with a reference to the ShadowAI bot instance, delegating core trigger mechanics to its parent class while maintaining shadow-specific state.",
+   "summary": "The ShadowAI class represents a shadow-themed enemy healer trigger that inherits from InterruptEnemyHealerTrigger and manages its active state.",
+   "overview": "This C++ class defines the core logic for a shadow-based healing mechanism within the game's AI system. It extends the InterruptEnemyHealerTrigger base class, initializing with a reference to the ShadowAI bot instance and a specific spell object. The primary functionality is encapsulated in the IsActive() method, which determines whether the trigger should currently be active.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should ensure the botAI pointer remains valid during the object's lifetime; IsActive() returns true only when the shadow AI is actively targeting and attempting to interrupt a healer.",
+   "notes": "Callers must ensure the ShadowAI bot instance remains valid during the object's lifetime. The spell parameter is implicitly passed to the base class constructor and should not be modified externally.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The ShadowAI class is a specialized interrupt trigger that extends InterruptEnemyHealerTrigger to manage shadow-based enemy healing interruptions.\",\n  \"overview\": \"This class serves as the primary logic handler for shadow AI behaviors within the game server, specifically focusing on interrupting enemy healers. It inherits from InterruptEnemyHealerTrigger and initializes with a reference to the ShadowAI bot instance, delegating core trigger mechanics to its parent class while maintaining shadow-specific state.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI pointer remains valid during the object's lifetime; IsActive() returns true only when the shadow AI is actively targeting and attempting to interrupt a healer.\"\n}",
+  "raw": "{\n  \"summary\": \"The ShadowAI class represents a shadow-themed enemy healer trigger that inherits from InterruptEnemyHealerTrigger and manages its active state.\",\n  \"overview\": \"This C++ class defines the core logic for a shadow-based healing mechanism within the game's AI system. It extends the InterruptEnemyHealerTrigger base class, initializing with a reference to the ShadowAI bot instance and a specific spell object. The primary functionality is encapsulated in the IsActive() method, which determines whether the trigger should currently be active.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the ShadowAI bot instance remains valid during the object's lifetime. The spell parameter is implicitly passed to the base class constructor and should not be modified externally.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@0536db0d:qwen3-5-4b": {
@@ -19910,29 +19910,29 @@
  "src/strategy/AiObject.h::clazz@91683ac1:qwen3-5-4b": {
   "hash": "eafd2abdfb7f",
   "doc": {
-   "summary": "A C++ class representing a melee spell cast action for a Shadow AI bot.",
-   "overview": "This class inherits from CastMeleeSpellAction and serves as the specific implementation for shadow-based melee spells within the game's strategy system. It initializes with a reference to the ShadowAI bot instance and provides an override method to determine if the current spell is beneficial for the bot's current state.",
+   "summary": "A C++ class representing a melee spell action cast by a Shadow AI bot.",
+   "overview": "This class inherits from CastMeleeSpellAction and serves as the specific implementation for melee spells within the Shadow AI strategy. It initializes with a reference to the bot's AI instance and overrides the isUseful method to determine if the current spell should be executed based on game state.",
    "params": [],
-   "returns": "void",
+   "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should ensure the botAI object remains valid during the action's execution.",
+   "notes": "Callers must ensure the botAI object remains valid during the action's lifetime.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"A C++ class representing a melee spell cast action for a Shadow AI bot.\",\n  \"overview\": \"This class inherits from CastMeleeSpellAction and serves as the specific implementation for shadow-based melee spells within the game's strategy system. It initializes with a reference to the ShadowAI bot instance and provides an override method to determine if the current spell is beneficial for the bot's current state.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI object remains valid during the action's execution.\"\n}",
+  "raw": "{\n  \"summary\": \"A C++ class representing a melee spell action cast by a Shadow AI bot.\",\n  \"overview\": \"This class inherits from CastMeleeSpellAction and serves as the specific implementation for melee spells within the Shadow AI strategy. It initializes with a reference to the bot's AI instance and overrides the isUseful method to determine if the current spell should be executed based on game state.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI object remains valid during the action's lifetime.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@e090a48c:qwen3-5-4b": {
   "hash": "f1c71dcf9104",
   "doc": {
    "summary": "The ShadowAI constructor initializes a custom spell-casting action by delegating to the base CastSpellAction class with the bot AI and action name.",
-   "overview": "This class serves as a specialized implementation of the CastSpellAction strategy within the ShadowAI framework. It acts as a lightweight wrapper that ensures the parent class receives the correct context (botAI) and identifier (name) during initialization. By inheriting from CastSpellAction, it automatically gains spell-casting logic while maintaining its own identity in the action queue.",
+   "overview": "This class serves as a specialized implementation of the CastSpellAction strategy within the ShadowAI framework. It inherits all functionality from its parent class while providing a direct constructor that binds the specific bot instance and spell name required for execution. The design ensures seamless integration into the broader AI decision-making process without requiring additional boilerplate code.",
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "Callers should ensure the botAI pointer is valid before instantiation. This class does not perform any I/O or network operations itself; those are handled by the base CastSpellAction implementation.",
+   "notes": "",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The ShadowAI constructor initializes a custom spell-casting action by delegating to the base CastSpellAction class with the bot AI and action name.\",\n  \"overview\": \"This class serves as a specialized implementation of the CastSpellAction strategy within the ShadowAI framework. It acts as a lightweight wrapper that ensures the parent class receives the correct context (botAI) and identifier (name) during initialization. By inheriting from CastSpellAction, it automatically gains spell-casting logic while maintaining its own identity in the action queue.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the botAI pointer is valid before instantiation. This class does not perform any I/O or network operations itself; those are handled by the base CastSpellAction implementation.\"\n}",
+  "raw": "{\n  \"summary\": \"The ShadowAI constructor initializes a custom spell-casting action by delegating to the base CastSpellAction class with the bot AI and action name.\",\n  \"overview\": \"This class serves as a specialized implementation of the CastSpellAction strategy within the ShadowAI framework. It inherits all functionality from its parent class while providing a direct constructor that binds the specific bot instance and spell name required for execution. The design ensures seamless integration into the broader AI decision-making process without requiring additional boilerplate code.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@756d6847:qwen3-5-4b": {
@@ -19943,10 +19943,10 @@
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "Callers should ensure the 'useful' member variable is set correctly before instantiation, as it directly influences the spell's execution decision.",
+   "notes": "",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"A specialized healing spell action class for Shadow AI bots that inherits from CastHealingSpellAction.\",\n  \"overview\": \"This class extends the base CastHealingSpellAction to provide tailored behavior for Shadow AI entities. It initializes with a reference to the bot's AI system and a specific spell, delegating core casting logic to the parent class while overriding the isUseful method to determine spell viability based on the useful flag.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the 'useful' member variable is set correctly before instantiation, as it directly influences the spell's execution decision.\"\n}",
+  "raw": "{\n  \"summary\": \"A specialized healing spell action class for Shadow AI bots that inherits from CastHealingSpellAction.\",\n  \"overview\": \"This class extends the base CastHealingSpellAction to provide tailored behavior for Shadow AI entities. It initializes with a reference to the bot's AI system and a specific spell, delegating core casting logic to the parent class while overriding the isUseful method to determine spell viability based on the useful flag.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@3008b48b:qwen3-5-4b": {
@@ -19980,15 +19980,15 @@
  "src/strategy/AiObject.h::clazz@9bb1540d:qwen3-5-4b": {
   "hash": "d3e84aa51232",
   "doc": {
-   "summary": "A specialized AI strategy class that inherits from CastBuffSpellAction to manage and evaluate the utility of casting buffs.",
-   "overview": "This class extends the base CastBuffSpellAction functionality specifically for ShadowAI bots, initializing with a reference to the bot's AI instance. It provides an override method to determine if a specific buff spell is currently beneficial based on game state variables. The implementation relies on the parent class for core spell casting logic while adding custom utility checks.",
+   "summary": "A specialized AI strategy class that inherits from CastBuffSpellAction to manage shadow-based buff spells.",
+   "overview": "This class extends the base CastBuffSpellAction functionality specifically for ShadowAI bots, initializing with a reference to the bot's AI instance and a spell object. It overrides the isUseful method to provide custom logic for determining if the current buff action should be executed based on the 'useful' flag.",
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "The constructor requires a valid ShadowAI pointer and spell object; callers must ensure these are initialized before instantiation.",
+   "notes": "",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"A specialized AI strategy class that inherits from CastBuffSpellAction to manage and evaluate the utility of casting buffs.\",\n  \"overview\": \"This class extends the base CastBuffSpellAction functionality specifically for ShadowAI bots, initializing with a reference to the bot's AI instance. It provides an override method to determine if a specific buff spell is currently beneficial based on game state variables. The implementation relies on the parent class for core spell casting logic while adding custom utility checks.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The constructor requires a valid ShadowAI pointer and spell object; callers must ensure these are initialized before instantiation.\"\n}",
+  "raw": "{\n  \"summary\": \"A specialized AI strategy class that inherits from CastBuffSpellAction to manage shadow-based buff spells.\",\n  \"overview\": \"This class extends the base CastBuffSpellAction functionality specifically for ShadowAI bots, initializing with a reference to the bot's AI instance and a spell object. It overrides the isUseful method to provide custom logic for determining if the current buff action should be executed based on the 'useful' flag.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@85520582:qwen3-5-4b": {
@@ -20050,15 +20050,15 @@
  "src/strategy/AiObject.h::clazz@438e81db:qwen3-5-4b": {
   "hash": "dac1f9ba5e24",
   "doc": {
-   "summary": "A base class for AI spell casting actions that initializes the action with a ShadowAI bot instance and a specific spell name.",
-   "overview": "This class serves as a foundational template for various AI action types, including debuff spells, standard spells, melee spells, and party buffs. It is designed to be subclassed by specific action implementations, each of which overrides the constructor to initialize its own parent logic while maintaining the core ShadowAI integration.",
+   "summary": "A base class for AI actions that casts debuffs, spells, melee attacks, or party buffs.",
+   "overview": "This class serves as a common interface for various action types used by the ShadowAI bot system. It provides constructors and static factory methods to initialize specific action nodes for casting debuffs, spells, melee attacks, and buffing allies. The implementation relies on inheritance from specialized action classes like CastDebuffSpellAction or BuffOnPartyAction.",
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "The provided definition contains multiple static ActionNode* name() functions with different signatures and implementations, which appears to be a documentation artifact or template expansion rather than the actual class constructor. The primary constructor signature is clazz(ShadowAI* botAI), which takes a pointer to the ShadowAI bot as its sole argument.",
+   "notes": "The static name() methods are overloaded to return different ActionNode structures depending on the specific action type required.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"A base class for AI spell casting actions that initializes the action with a ShadowAI bot instance and a specific spell name.\",\n  \"overview\": \"This class serves as a foundational template for various AI action types, including debuff spells, standard spells, melee spells, and party buffs. It is designed to be subclassed by specific action implementations, each of which overrides the constructor to initialize its own parent logic while maintaining the core ShadowAI integration.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The provided definition contains multiple static ActionNode* name() functions with different signatures and implementations, which appears to be a documentation artifact or template expansion rather than the actual class constructor. The primary constructor signature is clazz(ShadowAI* botAI), which takes a pointer to the ShadowAI bot as its sole argument.\"\n}",
+  "raw": "{\n  \"summary\": \"A base class for AI actions that casts debuffs, spells, melee attacks, or party buffs.\",\n  \"overview\": \"This class serves as a common interface for various action types used by the ShadowAI bot system. It provides constructors and static factory methods to initialize specific action nodes for casting debuffs, spells, melee attacks, and buffing allies. The implementation relies on inheritance from specialized action classes like CastDebuffSpellAction or BuffOnPartyAction.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The static name() methods are overloaded to return different ActionNode structures depending on the specific action type required.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@1794f565:qwen3-5-4b": {
@@ -20078,15 +20078,15 @@
  "src/strategy/AiObject.h::clazz@140c05ed:qwen3-5-4b": {
   "hash": "62a6f4251d2e",
   "doc": {
-   "summary": "The clazz constructor initializes a Shadow AI action by delegating to the parent CastReachTargetSpellAction with specific spell and range parameters.",
-   "overview": "This class serves as a specialized implementation of the CastReachTargetSpellAction within the Shadow AI strategy. It inherits functionality from its parent class but overrides the isUseful method to provide custom logic for determining action viability based on the 'useful' flag. The constructor ensures that the spell and range are correctly bound during initialization.",
+   "summary": "The ShadowAI class represents a custom AI agent that extends the base CastReachTargetSpellAction to manage shadow-based targeting logic.",
+   "overview": "This class inherits from CastReachTargetSpellAction and initializes with a reference to a ShadowAI bot instance, delegating spell casting parameters to the parent constructor. It overrides the isUseful method to provide custom logic for determining if the current action should be executed based on specific shadow game conditions.",
    "params": [],
    "returns": "void",
    "side_effects": "None",
-   "notes": "Callers should ensure the 'useful' flag is set appropriately before invoking this action.",
+   "notes": "Callers must ensure the botAI pointer remains valid during the object's lifetime; edge cases include scenarios where useful is false, which will prevent spell casting despite target availability.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"The clazz constructor initializes a Shadow AI action by delegating to the parent CastReachTargetSpellAction with specific spell and range parameters.\",\n  \"overview\": \"This class serves as a specialized implementation of the CastReachTargetSpellAction within the Shadow AI strategy. It inherits functionality from its parent class but overrides the isUseful method to provide custom logic for determining action viability based on the 'useful' flag. The constructor ensures that the spell and range are correctly bound during initialization.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the 'useful' flag is set appropriately before invoking this action.\"\n}",
+  "raw": "{\n  \"summary\": \"The ShadowAI class represents a custom AI agent that extends the base CastReachTargetSpellAction to manage shadow-based targeting logic.\",\n  \"overview\": \"This class inherits from CastReachTargetSpellAction and initializes with a reference to a ShadowAI bot instance, delegating spell casting parameters to the parent constructor. It overrides the isUseful method to provide custom logic for determining if the current action should be executed based on specific shadow game conditions.\",\n  \"params\": [],\n  \"returns\": \"void\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the botAI pointer remains valid during the object's lifetime; edge cases include scenarios where useful is false, which will prevent spell casting despite target availability.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/AiObject.h::clazz@8ab66eaf:qwen3-5-4b": {
@@ -21457,19 +21457,19 @@
   "hash": "e874a3061409",
   "doc": {
    "summary": "Accepts an item template and returns true if its name contains the current strategy's name.",
-   "overview": "This function implements the visitor pattern by accepting an ItemTemplate pointer to check for a specific condition. It verifies that the provided template is not null and that its Name1 field is non-empty before performing a case-insensitive substring search. The method returns true only if the strategy's internal name is found within the item's name.",
+   "overview": "This function implements the visitor pattern by checking if a provided item template matches the current strategy. It verifies that the template is not null and that its name field includes the strategy's own name as a substring, returning false otherwise.",
    "params": [
     {
      "name": "proto",
-     "desc": "Pointer to an ItemTemplate object containing the item's metadata, specifically the Name1 field."
+     "desc": "Pointer to an ItemTemplate object containing the item's metadata."
     }
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "The function relies on the internal 'name' variable of the strategy class for the substring comparison. It performs a case-insensitive search using strstri, which may behave differently than standard string matching depending on locale settings.",
+   "notes": "Caller must ensure proto is not null before invoking; returns false if proto->Name1 does not contain name.c_str().",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Accepts an item template and returns true if its name contains the current strategy's name.\",\n  \"overview\": \"This function implements the visitor pattern by accepting an ItemTemplate pointer to check for a specific condition. It verifies that the provided template is not null and that its Name1 field is non-empty before performing a case-insensitive substring search. The method returns true only if the strategy's internal name is found within the item's name.\",\n  \"params\": [\n    {\n      \"name\": \"proto\",\n      \"desc\": \"Pointer to an ItemTemplate object containing the item's metadata, specifically the Name1 field.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on the internal 'name' variable of the strategy class for the substring comparison. It performs a case-insensitive search using strstri, which may behave differently than standard string matching depending on locale settings.\"\n}",
+  "raw": "{\n  \"summary\": \"Accepts an item template and returns true if its name contains the current strategy's name.\",\n  \"overview\": \"This function implements the visitor pattern by checking if a provided item template matches the current strategy. It verifies that the template is not null and that its name field includes the strategy's own name as a substring, returning false otherwise.\",\n  \"params\": [\n    {\n      \"name\": \"proto\",\n      \"desc\": \"Pointer to an ItemTemplate object containing the item's metadata.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure proto is not null before invoking; returns false if proto->Name1 does not contain name.c_str().\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/ItemVisitors.cpp::usage@da337ca9:qwen3-5-4b": {
@@ -22442,29 +22442,29 @@
  "src/strategy/Value.cpp::Format@10254b10:qwen3-5-4b": {
   "hash": "4a6857f5762b",
   "doc": {
-   "summary": "Returns a JSON-formatted string containing the raw GUID values of all calculated game objects.",
-   "overview": "This function serializes the results of an internal calculation into a compact JSON array format. It first invokes Calculate() to retrieve a list of ObjectGuids, then iterates through them to extract their raw hexadecimal values and construct a string enclosed in curly braces with comma separators.",
+   "summary": "Returns a JSON-formatted string containing the raw GUID values of all entities calculated by the strategy.",
+   "overview": "This function serializes the list of entity GUIDs into a compact JSON array format. It first invokes Calculate() to retrieve the current set of active entity IDs, then iterates through them to construct the output string using std::ostringstream.",
    "params": [],
    "returns": "std::string const",
    "side_effects": "None",
-   "notes": "The caller should expect the output to be a valid JSON array representation of GUIDs, suitable for logging or transmission. Edge cases include an empty result if Calculate() returns no objects, which will produce a string containing only '{}'. The function relies on internal state from Calculate(), so it is not thread-safe unless that calculation itself is atomic.",
+   "notes": "The caller should ensure the result is parsed as a JSON array before use. Edge cases include an empty list, which returns '{}'. The function relies on the internal state of Calculate() to determine which entities are included.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns a JSON-formatted string containing the raw GUID values of all calculated game objects.\",\n  \"overview\": \"This function serializes the results of an internal calculation into a compact JSON array format. It first invokes Calculate() to retrieve a list of ObjectGuids, then iterates through them to extract their raw hexadecimal values and construct a string enclosed in curly braces with comma separators.\",\n  \"params\": [],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The caller should expect the output to be a valid JSON array representation of GUIDs, suitable for logging or transmission. Edge cases include an empty result if Calculate() returns no objects, which will produce a string containing only '{}'. The function relies on internal state from Calculate(), so it is not thread-safe unless that calculation itself is atomic.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns a JSON-formatted string containing the raw GUID values of all entities calculated by the strategy.\",\n  \"overview\": \"This function serializes the list of entity GUIDs into a compact JSON array format. It first invokes Calculate() to retrieve the current set of active entity IDs, then iterates through them to construct the output string using std::ostringstream.\",\n  \"params\": [],\n  \"returns\": \"std::string const\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The caller should ensure the result is parsed as a JSON array before use. Edge cases include an empty list, which returns '{}'. The function relies on the internal state of Calculate() to determine which entities are included.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/Value.cpp::Get@fec4fb36:qwen3-5-4b": {
   "hash": "68955679ce28",
   "doc": {
    "summary": "Returns the current unit value if it exists and is within the world, otherwise returns null.",
-   "overview": "This function retrieves the active unit value for a strategy context by checking if a stored value object exists and has not been removed from the game world. It performs a simple existence and state check before returning the appropriate unit pointer or null.",
+   "overview": "This function retrieves the active unit value for a strategy context by checking if a stored value object exists and has not been removed from the game world. It performs a simple existence check before returning the unit pointer to ensure callers do not attempt to use invalid or out-of-world entities.",
    "params": [],
    "returns": "Unit*",
    "side_effects": "None",
-   "notes": "Callers should handle the potential null return value to avoid dereferencing errors.",
+   "notes": "Callers must verify the returned pointer is non-null before dereferencing. The function relies on the internal state of the value object, so callers should ensure the strategy context remains valid.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns the current unit value if it exists and is within the world, otherwise returns null.\",\n  \"overview\": \"This function retrieves the active unit value for a strategy context by checking if a stored value object exists and has not been removed from the game world. It performs a simple existence and state check before returning the appropriate unit pointer or null.\",\n  \"params\": [],\n  \"returns\": \"Unit*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should handle the potential null return value to avoid dereferencing errors.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns the current unit value if it exists and is within the world, otherwise returns null.\",\n  \"overview\": \"This function retrieves the active unit value for a strategy context by checking if a stored value object exists and has not been removed from the game world. It performs a simple existence check before returning the unit pointer to ensure callers do not attempt to use invalid or out-of-world entities.\",\n  \"params\": [],\n  \"returns\": \"Unit*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must verify the returned pointer is non-null before dereferencing. The function relies on the internal state of the value object, so callers should ensure the strategy context remains valid.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/Value.h::FleeInfo@a3f6bd45:qwen3-5-4b": {
@@ -22909,7 +22909,7 @@
   "hash": "257527d9bb28",
   "doc": {
    "summary": "Executes the logic for a bot to accept and complete a quest based on the provided event.",
-   "overview": "This function retrieves the bot instance and identifies the quest owner from the event, defaulting to the master if no owner is specified. It validates that the quest template exists and checks whether the bot can take the quest before proceeding. If successful, it adds the quest to the bot's inventory, completes it if possible, and casts any associated source spell.",
+   "overview": "This function retrieves the bot instance and identifies the quest owner from the event, defaulting to the master if no owner is specified. It validates that the quest template exists and that the bot is capable of taking the quest before proceeding. If successful, it adds the quest to the bot's inventory, completes it immediately if possible, and casts any associated source spell.",
    "params": [
     {
      "name": "event",
@@ -22917,11 +22917,11 @@
     }
    ],
    "returns": "bool",
-   "side_effects": "I/O, global state",
-   "notes": "Reads from the event's WorldPacket; modifies bot inventory and quest status; may cast spells.",
+   "side_effects": "Network (modifies event packet), Global state (updates bot quest status and casts spells)",
+   "notes": "Returns false if the quest template is missing, the bot cannot take the quest, or the bot cannot add the quest. The function modifies the input event's packet to clear position data.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the logic for a bot to accept and complete a quest based on the provided event.\",\n  \"overview\": \"This function retrieves the bot instance and identifies the quest owner from the event, defaulting to the master if no owner is specified. It validates that the quest template exists and checks whether the bot can take the quest before proceeding. If successful, it adds the quest to the bot's inventory, completes it if possible, and casts any associated source spell.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the quest ID in its packet data.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O, global state\",\n  \"notes\": \"Reads from the event's WorldPacket; modifies bot inventory and quest status; may cast spells.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the logic for a bot to accept and complete a quest based on the provided event.\",\n  \"overview\": \"This function retrieves the bot instance and identifies the quest owner from the event, defaulting to the master if no owner is specified. It validates that the quest template exists and that the bot is capable of taking the quest before proceeding. If successful, it adds the quest to the bot's inventory, completes it immediately if possible, and casts any associated source spell.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the quest ID in its packet data.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (modifies event packet), Global state (updates bot quest status and casts spells)\",\n  \"notes\": \"Returns false if the quest template is missing, the bot cannot take the quest, or the bot cannot add the quest. The function modifies the input event's packet to clear position data.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/AcceptQuestAction.h::AcceptAllQuestsAction@45f7a02c:qwen3-5-4b": {
@@ -23078,19 +23078,19 @@
   "hash": "797c67d6c556",
   "doc": {
    "summary": "Adds loot to a player's inventory by validating the object GUID and delegating the actual addition logic to AddAllLootAction.",
-   "overview": "This function initializes a LootObject instance using the provided ObjectGuid and retrieves its associated WorldObject. It performs several critical checks, including verifying that the loot is not empty, the world object exists, a skill ID is assigned, and the loot can be added by the current bot. If any of these conditions fail, the function returns false immediately; otherwise, it delegates the operation to AddAllLootAction::AddLoot.",
+   "overview": "This function retrieves the world object associated with the provided ObjectGuid and performs several validation checks before proceeding. It ensures the loot is not empty, has a valid skill ID, and is possible for the bot to acquire before calling the parent class method to finalize the action.",
    "params": [
     {
      "name": "guid",
-     "desc": "The ObjectGuid representing the loot item to be added."
+     "desc": "The ObjectGuid of the item or loot source to be added."
     }
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers must ensure the provided GUID corresponds to a valid lootable object. The function relies on internal state within LootObject and WorldObject, so callers should verify preconditions regarding bot permissions and loot availability.",
+   "notes": "Returns false if the object is empty, lacks a skill ID, or cannot be looted by the bot; otherwise returns true after successfully adding the loot.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Adds loot to a player's inventory by validating the object GUID and delegating the actual addition logic to AddAllLootAction.\",\n  \"overview\": \"This function initializes a LootObject instance using the provided ObjectGuid and retrieves its associated WorldObject. It performs several critical checks, including verifying that the loot is not empty, the world object exists, a skill ID is assigned, and the loot can be added by the current bot. If any of these conditions fail, the function returns false immediately; otherwise, it delegates the operation to AddAllLootAction::AddLoot.\",\n  \"params\": [\n    {\n      \"name\": \"guid\",\n      \"desc\": \"The ObjectGuid representing the loot item to be added.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the provided GUID corresponds to a valid lootable object. The function relies on internal state within LootObject and WorldObject, so callers should verify preconditions regarding bot permissions and loot availability.\"\n}",
+  "raw": "{\n  \"summary\": \"Adds loot to a player's inventory by validating the object GUID and delegating the actual addition logic to AddAllLootAction.\",\n  \"overview\": \"This function retrieves the world object associated with the provided ObjectGuid and performs several validation checks before proceeding. It ensures the loot is not empty, has a valid skill ID, and is possible for the bot to acquire before calling the parent class method to finalize the action.\",\n  \"params\": [\n    {\n      \"name\": \"guid\",\n      \"desc\": \"The ObjectGuid of the item or loot source to be added.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns false if the object is empty, lacks a skill ID, or cannot be looted by the bot; otherwise returns true after successfully adding the loot.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/AddLootAction.h::AddLootAction@efa2a31e:qwen3-5-4b": {
@@ -23232,15 +23232,15 @@
  "src/strategy/actions/AttackAction.cpp::Execute@99556895:qwen3-5-4b": {
   "hash": "7ec0a61dd02f",
   "doc": {
-   "summary": "Executes a duel attack action by targeting the AI-controlled unit.",
-   "overview": "This function serves as an entry point for performing a specific combat maneuver within the game's strategy system. It delegates the actual execution logic to the Attack method, passing the current event context while ignoring it due to its optional nature. The operation is strictly internal to the AI decision-making process and does not require external input.",
+   "summary": "Executes a duel attack action by targeting the AI value associated with the current unit.",
+   "overview": "This function serves as an entry point for performing a specific combat maneuver within the game's strategy system. It delegates the actual execution logic to the Attack method, passing the target determined by the AI configuration for the current unit. The implementation relies on the duel target mechanism to identify which entity should be engaged in the conflict.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "",
+   "notes": "The event parameter is marked as [[maybe_unused]], indicating it does not influence the execution flow. Callers should ensure the current unit has a valid AI value configured for duel targets before invoking this function.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a duel attack action by targeting the AI-controlled unit.\",\n  \"overview\": \"This function serves as an entry point for performing a specific combat maneuver within the game's strategy system. It delegates the actual execution logic to the Attack method, passing the current event context while ignoring it due to its optional nature. The operation is strictly internal to the AI decision-making process and does not require external input.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a duel attack action by targeting the AI value associated with the current unit.\",\n  \"overview\": \"This function serves as an entry point for performing a specific combat maneuver within the game's strategy system. It delegates the actual execution logic to the Attack method, passing the target determined by the AI configuration for the current unit. The implementation relies on the duel target mechanism to identify which entity should be engaged in the conflict.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The event parameter is marked as [[maybe_unused]], indicating it does not influence the execution flow. Callers should ensure the current unit has a valid AI value configured for duel targets before invoking this function.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/AttackAction.cpp::Attack@eda96713:qwen3-5-4b": {
@@ -23631,14 +23631,14 @@
   "hash": "c3940d21fb91",
   "doc": {
    "summary": "Executes a strategy action to determine if the bot is currently inside a battleground and whether it should reset its strategies.",
-   "overview": "This function checks if the bot is inside a battleground by verifying both that the bot is in a battleground state and that a specific battleground object exists. If the bot is not in a battleground but has a non-combat strategy set, it resets all strategies and returns true to indicate success. Conversely, if the bot is inside a battleground but lacks the required non-combat strategy, it also resets strategies and returns false.",
+   "overview": "This function checks if the bot is inside a battleground by verifying both that the bot is in a battleground state and that a specific battleground object exists. If the bot is not in a battleground but has a non-combat strategy set, or if it is in a battleground without a corresponding non-combat strategy, the function resets all strategies and returns a status indicating whether the reset occurred.",
    "params": [],
    "returns": "bool",
    "side_effects": "Global state (botAI->ResetStrategies())",
-   "notes": "The 'event' parameter is marked as [[maybe_unused]] and does not influence the logic. The function relies on internal bot state regarding battleground membership and strategy configuration.",
+   "notes": "Called by BattleGroundJoinAction; edge case involves checking for specific strategy flags based on battleground presence.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a strategy action to determine if the bot is currently inside a battleground and whether it should reset its strategies.\",\n  \"overview\": \"This function checks if the bot is inside a battleground by verifying both that the bot is in a battleground state and that a specific battleground object exists. If the bot is not in a battleground but has a non-combat strategy set, it resets all strategies and returns true to indicate success. Conversely, if the bot is inside a battleground but lacks the required non-combat strategy, it also resets strategies and returns false.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Global state (botAI->ResetStrategies())\",\n  \"notes\": \"The 'event' parameter is marked as [[maybe_unused]] and does not influence the logic. The function relies on internal bot state regarding battleground membership and strategy configuration.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a strategy action to determine if the bot is currently inside a battleground and whether it should reset its strategies.\",\n  \"overview\": \"This function checks if the bot is inside a battleground by verifying both that the bot is in a battleground state and that a specific battleground object exists. If the bot is not in a battleground but has a non-combat strategy set, or if it is in a battleground without a corresponding non-combat strategy, the function resets all strategies and returns a status indicating whether the reset occurred.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Global state (botAI->ResetStrategies())\",\n  \"notes\": \"Called by BattleGroundJoinAction; edge case involves checking for specific strategy flags based on battleground presence.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/BattleGroundJoinAction.cpp::gatherArenaTeam@fa695f42:qwen3-5-4b": {
@@ -23687,37 +23687,37 @@
   "hash": "47ffcf6a5dbf",
   "doc": {
    "summary": "Determines whether a bot should join a specific battleground queue and bracket based on team eligibility, group leadership, and available slots for rated or standard modes.",
-   "overview": "This function evaluates if a bot is eligible to join a battleground by first verifying the existence of the battleground template and checking that the bot is a group leader. It then calculates the required number of bots based on the arena type (rated or skirmish) or standard battleground rules, comparing available slots against current player and bot counts stored in the random shadow manager. The function returns true only if the bot meets all criteria for joining without exceeding capacity limits.",
+   "overview": "This function evaluates if a bot is eligible to join a battleground by first verifying the existence of the battleground template and checking that the bot is a group leader. It then calculates the required number of bots based on the arena type (rated or skirmish) or standard battleground rules, comparing available slots against current player and bot counts stored in the random shadow manager.",
    "params": [
     {
      "name": "queueTypeId",
-     "desc": "The unique identifier for the battleground queue type, used to look up template data and arena configurations."
+     "desc": "The unique identifier for the battleground queue type being evaluated."
     },
     {
      "name": "bracketId",
-     "desc": "The specific bracket or instance ID within the queue, used to access detailed slot counts for bots and players."
+     "desc": "The specific bracket or instance configuration ID within the selected queue."
     }
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Reads from BattlegroundMgr, ArenaTeamMgr, and RandomShadowMgr; relies on bot being a valid group leader with an assigned team ID.",
+   "notes": "Reads from BattlegroundMgr, ArenaTeamMgr, and RandomShadowMgr to access template data and current queue statistics; updates rated arena bot counts if a join is approved for a rated arena.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines whether a bot should join a specific battleground queue and bracket based on team eligibility, group leadership, and available slots for rated or standard modes.\",\n  \"overview\": \"This function evaluates if a bot is eligible to join a battleground by first verifying the existence of the battleground template and checking that the bot is a group leader. It then calculates the required number of bots based on the arena type (rated or skirmish) or standard battleground rules, comparing available slots against current player and bot counts stored in the random shadow manager. The function returns true only if the bot meets all criteria for joining without exceeding capacity limits.\",\n  \"params\": [\n    {\n      \"name\": \"queueTypeId\",\n      \"desc\": \"The unique identifier for the battleground queue type, used to look up template data and arena configurations.\"\n    },\n    {\n      \"name\": \"bracketId\",\n      \"desc\": \"The specific bracket or instance ID within the queue, used to access detailed slot counts for bots and players.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Reads from BattlegroundMgr, ArenaTeamMgr, and RandomShadowMgr; relies on bot being a valid group leader with an assigned team ID.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines whether a bot should join a specific battleground queue and bracket based on team eligibility, group leadership, and available slots for rated or standard modes.\",\n  \"overview\": \"This function evaluates if a bot is eligible to join a battleground by first verifying the existence of the battleground template and checking that the bot is a group leader. It then calculates the required number of bots based on the arena type (rated or skirmish) or standard battleground rules, comparing available slots against current player and bot counts stored in the random shadow manager.\",\n  \"params\": [\n    {\n      \"name\": \"queueTypeId\",\n      \"desc\": \"The unique identifier for the battleground queue type being evaluated.\"\n    },\n    {\n      \"name\": \"bracketId\",\n      \"desc\": \"The specific bracket or instance configuration ID within the selected queue.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Reads from BattlegroundMgr, ArenaTeamMgr, and RandomShadowMgr to access template data and current queue statistics; updates rated arena bot counts if a join is approved for a rated arena.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/BattleGroundJoinAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
   "hash": "f150c929bc6e",
   "doc": {
    "summary": "Returns true if the bot is currently in a battleground queue.",
-   "overview": "This function checks whether the bot instance has successfully joined a battleground queue by querying its internal state. It serves as a utility for action systems to determine if a bot is ready to engage in combat or needs to wait for matchmaking completion. The implementation relies on the `InBattlegroundQueue()` method of the bot object.",
+   "overview": "This function checks whether the bot instance has successfully joined a battleground queue by querying its internal state. It serves as a utility for strategy actions to determine if further processing related to battleground participation is necessary. The implementation relies on the `InBattlegroundQueue()` method of the bot object to make this determination.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should ensure the bot pointer is valid before invoking this function to avoid undefined behavior.",
+   "notes": "Callers should ensure the bot pointer is valid before invoking this function. Returns false if the bot has not entered any battleground queue yet.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns true if the bot is currently in a battleground queue.\",\n  \"overview\": \"This function checks whether the bot instance has successfully joined a battleground queue by querying its internal state. It serves as a utility for action systems to determine if a bot is ready to engage in combat or needs to wait for matchmaking completion. The implementation relies on the `InBattlegroundQueue()` method of the bot object.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot pointer is valid before invoking this function to avoid undefined behavior.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns true if the bot is currently in a battleground queue.\",\n  \"overview\": \"This function checks whether the bot instance has successfully joined a battleground queue by querying its internal state. It serves as a utility for strategy actions to determine if further processing related to battleground participation is necessary. The implementation relies on the `InBattlegroundQueue()` method of the bot object to make this determination.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the bot pointer is valid before invoking this function. Returns false if the bot has not entered any battleground queue yet.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/BattleGroundJoinAction.cpp::JoinQueue@696939ee:qwen3-5-4b": {
@@ -23962,14 +23962,14 @@
   "hash": "e30355e64042",
   "doc": {
    "summary": "Executes battle ground tactics for a bot by validating prerequisites and handling specific scenarios like leaving the battleground, LOS repositioning, or moving to center.",
-   "overview": "This function first checks if the bot is currently in a battleground; if not, it resets strategies and returns false. It then verifies that the battleground status is active and the bot is alive and stationary before proceeding. The logic handles special cases such as waiting to leave, line-of-sight obstructions requiring pathfinding and repositioning, or combat initiation by moving the bot to the center.",
+   "overview": "This function first checks if the bot is currently in a battleground; if not, it resets strategies and returns false. It then verifies that the battleground status is active and the bot is alive and stationary before proceeding. The logic handles special cases such as waiting to leave, lack of combat, or line-of-sight obstructions by calculating paths and repositioning.",
    "params": [],
    "returns": "bool",
    "side_effects": "network, global state",
-   "notes": "Called by higher-level strategy managers; edge cases include bots outside battlegrounds, dead units, or those in motion.",
+   "notes": "Called by the bot AI system during gameplay; edge cases include bots outside battlegrounds, dead units, or those moving between locations.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes battle ground tactics for a bot by validating prerequisites and handling specific scenarios like leaving the battleground, LOS repositioning, or moving to center.\",\n  \"overview\": \"This function first checks if the bot is currently in a battleground; if not, it resets strategies and returns false. It then verifies that the battleground status is active and the bot is alive and stationary before proceeding. The logic handles special cases such as waiting to leave, line-of-sight obstructions requiring pathfinding and repositioning, or combat initiation by moving the bot to the center.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network, global state\",\n  \"notes\": \"Called by higher-level strategy managers; edge cases include bots outside battlegrounds, dead units, or those in motion.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes battle ground tactics for a bot by validating prerequisites and handling specific scenarios like leaving the battleground, LOS repositioning, or moving to center.\",\n  \"overview\": \"This function first checks if the bot is currently in a battleground; if not, it resets strategies and returns false. It then verifies that the battleground status is active and the bot is alive and stationary before proceeding. The logic handles special cases such as waiting to leave, lack of combat, or line-of-sight obstructions by calculating paths and repositioning.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network, global state\",\n  \"notes\": \"Called by the bot AI system during gameplay; edge cases include bots outside battlegrounds, dead units, or those moving between locations.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/BattleGroundTactics.cpp::moveToStart@d6f1588c:qwen3-5-4b": {
@@ -24344,28 +24344,28 @@
   "hash": "8c6d3fa6244a",
   "doc": {
    "summary": "Checks if the current boss has active shadow resistance status.",
-   "overview": "This function evaluates whether the boss currently possesses an active shadow resistance aura by querying its internal state. It is typically used within decision-making logic to determine if specific offensive or defensive actions should be taken against the boss. The result directly influences subsequent gameplay mechanics based on the presence of this resistance effect.",
+   "overview": "This function evaluates whether the specific boss currently targeted possesses an active shadow resistance aura. It instantiates a trigger object for the boss's name and returns the boolean state of its activity, allowing game logic to determine if certain mechanics should be bypassed or modified based on this resistance.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Called by action selection systems to filter available moves; returns true only if the shadow resistance trigger is currently active.",
+   "notes": "The function relies on the `bossShadowResistanceTrigger` object being correctly initialized with the current bot AI and boss name; callers should ensure the target boss is valid before invoking this check.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Checks if the current boss has active shadow resistance status.\",\n  \"overview\": \"This function evaluates whether the boss currently possesses an active shadow resistance aura by querying its internal state. It is typically used within decision-making logic to determine if specific offensive or defensive actions should be taken against the boss. The result directly influences subsequent gameplay mechanics based on the presence of this resistance effect.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Called by action selection systems to filter available moves; returns true only if the shadow resistance trigger is currently active.\"\n}",
+  "raw": "{\n  \"summary\": \"Checks if the current boss has active shadow resistance status.\",\n  \"overview\": \"This function evaluates whether the specific boss currently targeted possesses an active shadow resistance aura. It instantiates a trigger object for the boss's name and returns the boolean state of its activity, allowing game logic to determine if certain mechanics should be bypassed or modified based on this resistance.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on the `bossShadowResistanceTrigger` object being correctly initialized with the current bot AI and boss name; callers should ensure the target boss is valid before invoking this check.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/BossAuraActions.cpp::Execute@99556895:qwen3-5-4b": {
   "hash": "89b35dcbd1ff",
   "doc": {
    "summary": "Executes the shadow resistance aura action for a Paladin Shadow Resistance Strategy by switching to combat state and performing the specific action.",
-   "overview": "This function triggers the deployment of the shadow resistance aura by first ensuring the bot AI is in combat mode. It then invokes the specific action handler with the correct parameters to apply the aura effect, returning success upon completion.",
+   "overview": "This function triggers the deployment of the shadow resistance aura by first ensuring the bot AI is in combat mode. It then invokes the DoSpecificAction method with the appropriate action name, effectively applying the defensive buff to the character.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
    "notes": "",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the shadow resistance aura action for a Paladin Shadow Resistance Strategy by switching to combat state and performing the specific action.\",\n  \"overview\": \"This function triggers the deployment of the shadow resistance aura by first ensuring the bot AI is in combat mode. It then invokes the specific action handler with the correct parameters to apply the aura effect, returning success upon completion.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the shadow resistance aura action for a Paladin Shadow Resistance Strategy by switching to combat state and performing the specific action.\",\n  \"overview\": \"This function triggers the deployment of the shadow resistance aura by first ensuring the bot AI is in combat mode. It then invokes the DoSpecificAction method with the appropriate action name, effectively applying the defensive buff to the character.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/BossAuraActions.h::BossFireResistanceAction@a04b4b07:qwen3-5-4b": {
@@ -24623,34 +24623,34 @@
  "src/strategy/actions/CastCustomSpellAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
   "hash": "57a4c60d9126",
   "doc": {
-   "summary": "Executes a custom spell by parsing the event name to identify a target and selecting a valid spell from the player's inventory.",
-   "overview": "This function retrieves the list of available spells for the bot and determines the target based on the event parameter, falling back to the bot's current target or master if none is specified. It iterates through the spell map to find castable spells that match the target's location and the bot's inventory, prioritizing them by spell ID. The function then randomly selects up to five candidate spells and attempts to cast one, handling multi-cast scenarios for nearby targets.",
+   "summary": "Executes a custom spell by parsing the event name to identify targets and selecting a valid spell from the player's inventory.",
+   "overview": "This function retrieves the master player and parses the event parameter to determine the intended target, falling back to the bot or master if no specific target is provided. It iterates through the available spell list, filtering for spells that can be cast on the identified target or location, and sorts them by priority. The function then randomly selects up to five candidate spells and attempts to cast one, handling multi-cast scenarios via a whisper command if necessary.",
    "params": [
     {
      "name": "event",
-     "desc": "An Event object containing parameters; the 'getParam' method is used to retrieve the spell name or target identifier."
+     "desc": "The event object containing the spell name or identifier as a parameter."
     }
    ],
    "returns": "bool",
-   "side_effects": "Network (chat commands), Global State (bot AI state)",
-   "notes": "Calls GetSpellList, GetMaster, and various botAI methods; relies on sSpellMgr for spell information. Edge case: returns false if no valid spells are found or castable targets exist.",
+   "side_effects": "Network (whisper command), Global state (bot AI logic)",
+   "notes": "Calls GetSpellList, GetMaster, chat->parseGameobjects, botAI->GetUnit/GameObject, sSpellMgr->GetSpellInfo, AcceptSpell, GetSpellPriority, botAI->CanCastSpell, urand, and castSpell. Edge case: Returns false if no valid spells are found or casting fails.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a custom spell by parsing the event name to identify a target and selecting a valid spell from the player's inventory.\",\n  \"overview\": \"This function retrieves the list of available spells for the bot and determines the target based on the event parameter, falling back to the bot's current target or master if none is specified. It iterates through the spell map to find castable spells that match the target's location and the bot's inventory, prioritizing them by spell ID. The function then randomly selects up to five candidate spells and attempts to cast one, handling multi-cast scenarios for nearby targets.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"An Event object containing parameters; the 'getParam' method is used to retrieve the spell name or target identifier.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (chat commands), Global State (bot AI state)\",\n  \"notes\": \"Calls GetSpellList, GetMaster, and various botAI methods; relies on sSpellMgr for spell information. Edge case: returns false if no valid spells are found or castable targets exist.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a custom spell by parsing the event name to identify targets and selecting a valid spell from the player's inventory.\",\n  \"overview\": \"This function retrieves the master player and parses the event parameter to determine the intended target, falling back to the bot or master if no specific target is provided. It iterates through the available spell list, filtering for spells that can be cast on the identified target or location, and sorts them by priority. The function then randomly selects up to five candidate spells and attempts to cast one, handling multi-cast scenarios via a whisper command if necessary.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the spell name or identifier as a parameter.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (whisper command), Global state (bot AI logic)\",\n  \"notes\": \"Calls GetSpellList, GetMaster, chat->parseGameobjects, botAI->GetUnit/GameObject, sSpellMgr->GetSpellInfo, AcceptSpell, GetSpellPriority, botAI->CanCastSpell, urand, and castSpell. Edge case: Returns false if no valid spells are found or casting fails.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/CastCustomSpellAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
   "hash": "6c2f1171d5b2",
   "doc": {
-   "summary": "Determines if the bot AI can cast a custom spell by checking for the Enchanting skill and combat status.",
-   "overview": "This function evaluates whether a bot is capable of performing a specific action based on its current skills and engagement state. It returns true only if the bot possesses the SKILL_ENCHANTING ability and is not currently involved in combat, ensuring spells are cast during appropriate moments. The logic relies on external AI and bot state checks to prevent invalid spell usage.",
+   "summary": "Determines if a bot can cast a custom spell by checking for the Enchanting skill and combat status.",
+   "overview": "This function evaluates whether a specific bot is eligible to perform a custom spell action. It verifies that the bot possesses the required Enchanting skill and ensures the bot is not currently engaged in combat, as spells are typically unavailable during active fights.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Depends on the availability of botAI and bot objects; may return false if the bot lacks the required skill or is in combat.",
+   "notes": "Callers should ensure this check is performed before attempting to execute the spell action to prevent errors or unintended behavior.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines if the bot AI can cast a custom spell by checking for the Enchanting skill and combat status.\",\n  \"overview\": \"This function evaluates whether a bot is capable of performing a specific action based on its current skills and engagement state. It returns true only if the bot possesses the SKILL_ENCHANTING ability and is not currently involved in combat, ensuring spells are cast during appropriate moments. The logic relies on external AI and bot state checks to prevent invalid spell usage.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Depends on the availability of botAI and bot objects; may return false if the bot lacks the required skill or is in combat.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines if a bot can cast a custom spell by checking for the Enchanting skill and combat status.\",\n  \"overview\": \"This function evaluates whether a specific bot is eligible to perform a custom spell action. It verifies that the bot possesses the required Enchanting skill and ensures the bot is not currently engaged in combat, as spells are typically unavailable during active fights.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure this check is performed before attempting to execute the spell action to prevent errors or unintended behavior.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/CastCustomSpellAction.cpp::castString@0eaf2863:qwen3-5-4b": {
@@ -24676,26 +24676,26 @@
   "hash": "e0067de31d1f",
   "doc": {
    "summary": "AcceptSpell validates whether a custom spell action can be executed by checking if the specified effect is an enchant item and has available reagents.",
-   "overview": "This function determines if a CastCustomSpellAction is valid by examining the provided SpellInfo structure. It specifically checks for the presence of EFFECT_0, verifying that its associated effect type matches SPELL_EFFECT_ENCHANT_ITEM and that the required reagent count exceeds zero. The function returns true only when both conditions are satisfied, otherwise it returns false.",
+   "overview": "This function determines if a CastCustomSpellAction is valid by examining the provided SpellInfo structure. It specifically checks if the first defined effect corresponds to SPELL_EFFECT_ENCHANT_ITEM and ensures that at least one reagent exists for this effect before returning true.",
    "params": [
     {
      "name": "spellInfo",
-     "desc": "Pointer to a SpellInfo structure containing details about the spell, including effects and reagents."
+     "desc": "Pointer to a SpellInfo structure containing details about the spell, including its effects and required reagents."
     }
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Caller must ensure spellInfo is not null before invoking. Effect index EFFECT_0 must be defined in the SpellInfo structure; otherwise, behavior is undefined.",
+   "notes": "Caller must ensure spellInfo is not null before invoking; returns false if the effect index exceeds bounds or reagent count is zero.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"AcceptSpell validates whether a custom spell action can be executed by checking if the specified effect is an enchant item and has available reagents.\",\n  \"overview\": \"This function determines if a CastCustomSpellAction is valid by examining the provided SpellInfo structure. It specifically checks for the presence of EFFECT_0, verifying that its associated effect type matches SPELL_EFFECT_ENCHANT_ITEM and that the required reagent count exceeds zero. The function returns true only when both conditions are satisfied, otherwise it returns false.\",\n  \"params\": [\n    {\n      \"name\": \"spellInfo\",\n      \"desc\": \"Pointer to a SpellInfo structure containing details about the spell, including effects and reagents.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure spellInfo is not null before invoking. Effect index EFFECT_0 must be defined in the SpellInfo structure; otherwise, behavior is undefined.\"\n}",
+  "raw": "{\n  \"summary\": \"AcceptSpell validates whether a custom spell action can be executed by checking if the specified effect is an enchant item and has available reagents.\",\n  \"overview\": \"This function determines if a CastCustomSpellAction is valid by examining the provided SpellInfo structure. It specifically checks if the first defined effect corresponds to SPELL_EFFECT_ENCHANT_ITEM and ensures that at least one reagent exists for this effect before returning true.\",\n  \"params\": [\n    {\n      \"name\": \"spellInfo\",\n      \"desc\": \"Pointer to a SpellInfo structure containing details about the spell, including its effects and required reagents.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure spellInfo is not null before invoking; returns false if the effect index exceeds bounds or reagent count is zero.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/CastCustomSpellAction.cpp::GetSpellPriority@31f43c90:qwen3-5-4b": {
   "hash": "8fe840cbfa26",
   "doc": {
    "summary": "Returns a priority value of 1 or 10 based on whether the spell enchants an item and grants a skill up.",
-   "overview": "This function evaluates a custom spell to determine its casting priority within the bot's action system. It specifically checks if the spell targets an item that provides a skill increase upon enchanting, assigning it a high priority of 10 in such cases. Otherwise, it defaults to a standard priority of 1.",
+   "overview": "This function evaluates a custom spell to determine its execution priority within the bot's action queue. It specifically checks if the spell targets an item enchantment that results in a skill increase, assigning it a high priority of 10 to ensure it runs before other actions. If no such condition is met, the function defaults to a standard priority of 1.",
    "params": [
     {
      "name": "spellInfo",
@@ -24704,10 +24704,10 @@
    ],
    "returns": "uint32",
    "side_effects": "None",
-   "notes": "The function relies on external bot state via AI_VALUE2 for item usage checks. Priority 10 is reserved exclusively for spells that enchant items granting skill points.",
+   "notes": "The function relies on external bot state via AI_VALUE2 for item usage validation. Priority 10 is used to prioritize skill-granting enchantments over other actions.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns a priority value of 1 or 10 based on whether the spell enchants an item and grants a skill up.\",\n  \"overview\": \"This function evaluates a custom spell to determine its casting priority within the bot's action system. It specifically checks if the spell targets an item that provides a skill increase upon enchanting, assigning it a high priority of 10 in such cases. Otherwise, it defaults to a standard priority of 1.\",\n  \"params\": [\n    {\n      \"name\": \"spellInfo\",\n      \"desc\": \"Pointer to the spell information structure containing details about the spell's effects and target.\"\n    }\n  ],\n  \"returns\": \"uint32\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on external bot state via AI_VALUE2 for item usage checks. Priority 10 is reserved exclusively for spells that enchant items granting skill points.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns a priority value of 1 or 10 based on whether the spell enchants an item and grants a skill up.\",\n  \"overview\": \"This function evaluates a custom spell to determine its execution priority within the bot's action queue. It specifically checks if the spell targets an item enchantment that results in a skill increase, assigning it a high priority of 10 to ensure it runs before other actions. If no such condition is met, the function defaults to a standard priority of 1.\",\n  \"params\": [\n    {\n      \"name\": \"spellInfo\",\n      \"desc\": \"Pointer to the spell information structure containing details about the spell's effects and target.\"\n    }\n  ],\n  \"returns\": \"uint32\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on external bot state via AI_VALUE2 for item usage validation. Priority 10 is used to prioritize skill-granting enchantments over other actions.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/CastCustomSpellAction.cpp::castSpell@a5ad14ab:qwen3-5-4b": {
@@ -24867,20 +24867,20 @@
  "src/strategy/actions/ChangeStrategyAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
   "hash": "d7ce0673672f",
   "doc": {
-   "summary": "Executes a strategy change command by retrieving the action text from the event and applying it to the bot AI while the bot is in a dead state.",
-   "overview": "This function processes an incoming event to trigger a strategic modification within the game's artificial intelligence system. It extracts the specific action string defined in the event parameters and passes it along with the current dead state to the bot AI for execution. The operation returns true upon successful completion, indicating that the strategy has been updated.",
+   "summary": "Executes a strategy change command by extracting the action text from an event and applying it to the bot AI while the bot is in a dead state.",
+   "overview": "This function processes incoming events to trigger a strategic shift in the bot's behavior. It retrieves the specific action string defined within the event parameters and passes it along with the current dead state to the bot AI for execution, ensuring the strategy update occurs only when the bot is incapacitated.",
    "params": [
     {
      "name": "event",
-     "desc": "The input event object containing the command text to be executed."
+     "desc": "The incoming event object containing the action text as a parameter."
     }
    ],
    "returns": "bool",
-   "side_effects": "Calls botAI->ChangeStrategy which may modify internal AI state; no direct I/O or network operations.",
-   "notes": "Relies on the bot being in BOT_STATE_DEAD as specified in the function call; callers should ensure event.getParam() is valid before invocation.",
+   "side_effects": "None",
+   "notes": "Callers should ensure the event contains valid parameters before invoking this function to avoid undefined behavior during string extraction.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a strategy change command by retrieving the action text from the event and applying it to the bot AI while the bot is in a dead state.\",\n  \"overview\": \"This function processes an incoming event to trigger a strategic modification within the game's artificial intelligence system. It extracts the specific action string defined in the event parameters and passes it along with the current dead state to the bot AI for execution. The operation returns true upon successful completion, indicating that the strategy has been updated.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The input event object containing the command text to be executed.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Calls botAI->ChangeStrategy which may modify internal AI state; no direct I/O or network operations.\",\n  \"notes\": \"Relies on the bot being in BOT_STATE_DEAD as specified in the function call; callers should ensure event.getParam() is valid before invocation.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a strategy change command by extracting the action text from an event and applying it to the bot AI while the bot is in a dead state.\",\n  \"overview\": \"This function processes incoming events to trigger a strategic shift in the bot's behavior. It retrieves the specific action string defined within the event parameters and passes it along with the current dead state to the bot AI for execution, ensuring the strategy update occurs only when the bot is incapacitated.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The incoming event object containing the action text as a parameter.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the event contains valid parameters before invoking this function to avoid undefined behavior during string extraction.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ChangeStrategyAction.h::ChangeCombatStrategyAction@74a4f1de:qwen3-5-4b": {
@@ -25152,14 +25152,14 @@
   "hash": "5fe4d43b8674",
   "doc": {
    "summary": "Executes a chat shortcut that resets the bot's AI state and applies specific battle-walking strategies.",
-   "overview": "This function retrieves the master player instance and returns false if none exists, ensuring the action only proceeds when a valid target is present. It then initializes the bot's artificial intelligence by resetting its current state before applying two distinct strategy configurations for both non-combat and combat scenarios. Finally, it notifies the master of the applied strategies via a dedicated communication channel.",
+   "overview": "This function retrieves the master player instance and verifies its existence before proceeding. It then resets the bot's artificial intelligence, switches it to non-combat mode with the '+bwl' strategy, and immediately reverts it to combat mode while notifying the master of the action.",
    "params": [],
    "returns": "bool",
    "side_effects": "AI state modification, internal messaging",
-   "notes": "The '[[maybe_unused]]' attribute on the Event parameter indicates callers may pass an event object without needing to utilize it within this function.",
+   "notes": "The '[[maybe_unused]]' parameter indicates this function accepts an Event argument that is not utilized in the current implementation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a chat shortcut that resets the bot's AI state and applies specific battle-walking strategies.\",\n  \"overview\": \"This function retrieves the master player instance and returns false if none exists, ensuring the action only proceeds when a valid target is present. It then initializes the bot's artificial intelligence by resetting its current state before applying two distinct strategy configurations for both non-combat and combat scenarios. Finally, it notifies the master of the applied strategies via a dedicated communication channel.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"AI state modification, internal messaging\",\n  \"notes\": \"The '[[maybe_unused]]' attribute on the Event parameter indicates callers may pass an event object without needing to utilize it within this function.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a chat shortcut that resets the bot's AI state and applies specific battle-walking strategies.\",\n  \"overview\": \"This function retrieves the master player instance and verifies its existence before proceeding. It then resets the bot's artificial intelligence, switches it to non-combat mode with the '+bwl' strategy, and immediately reverts it to combat mode while notifying the master of the action.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"AI state modification, internal messaging\",\n  \"notes\": \"The '[[maybe_unused]]' parameter indicates this function accepts an Event argument that is not utilized in the current implementation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ChatShortcutActions.h::PositionsResetAction@4a1e48e9:qwen3-5-4b": {
@@ -25965,29 +25965,29 @@
  "src/strategy/actions/ChooseTargetActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
   "hash": "99e05d32d4e7",
   "doc": {
-   "summary": "Returns true unless the bot AI contains a heal strategy, indicating the action is useful for other purposes.",
-   "overview": "This function evaluates whether a target selection action is beneficial by checking if the bot's current AI configuration includes a healing strategy. If a heal strategy is detected, it returns false to prevent redundant or conflicting actions; otherwise, it defaults to true. The logic ensures that non-healing strategies can proceed with their designated actions without interference.",
+   "summary": "Returns true unless the bot AI currently employs a heal strategy.",
+   "overview": "This function evaluates whether a target action is viable by checking if the bot's active strategy includes healing. If a heal strategy is detected, it returns false to prevent conflicting actions; otherwise, it proceeds normally.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Callers should verify the bot's strategy type before relying on this return value to avoid unintended behavior in multi-strategy scenarios.",
+   "notes": "Callers should ensure this check occurs before executing any action that might interfere with healing logic.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Returns true unless the bot AI contains a heal strategy, indicating the action is useful for other purposes.\",\n  \"overview\": \"This function evaluates whether a target selection action is beneficial by checking if the bot's current AI configuration includes a healing strategy. If a heal strategy is detected, it returns false to prevent redundant or conflicting actions; otherwise, it defaults to true. The logic ensures that non-healing strategies can proceed with their designated actions without interference.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify the bot's strategy type before relying on this return value to avoid unintended behavior in multi-strategy scenarios.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns true unless the bot AI currently employs a heal strategy.\",\n  \"overview\": \"This function evaluates whether a target action is viable by checking if the bot's active strategy includes healing. If a heal strategy is detected, it returns false to prevent conflicting actions; otherwise, it proceeds normally.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure this check occurs before executing any action that might interfere with healing logic.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ChooseTargetActions.cpp::Execute@99556895:qwen3-5-4b": {
   "hash": "45e959fe2ad5",
   "doc": {
-   "summary": "Executes an attack action against a specified RTI target if it exists, is in the world, and shares the same map as the bot.",
-   "overview": "This function attempts to locate and engage a specific target designated by the 'rti target' value. It first validates that the target exists within the game world and resides on the same map as the executing bot before proceeding. If validation passes, it sets the prioritized targets list, initiates an attack, and updates the pull target context upon success.",
+   "summary": "Executes a prioritized attack on the specified RTI target if it exists, is in the world, and shares the bot's map.",
+   "overview": "This function attempts to initiate an attack on a specific unit designated as the RTI target. It first validates that the target exists, is currently in the game world, and resides on the same map as the executing bot. If these conditions are met, it sets the target in the AI context's prioritized targets list and proceeds with the attack action.",
    "params": [],
    "returns": "bool",
-   "side_effects": "network",
-   "notes": "The function relies on external AI values for target selection and map synchronization; it may fail if the target is missing or on a different map.",
+   "side_effects": "AI Context modification, Unit attack execution, potential error logging",
+   "notes": "The function relies on the 'rtiTarget' parameter being set externally; if unset or invalid, it logs an error and returns false. It modifies the AI context's prioritized targets list upon success.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes an attack action against a specified RTI target if it exists, is in the world, and shares the same map as the bot.\",\n  \"overview\": \"This function attempts to locate and engage a specific target designated by the 'rti target' value. It first validates that the target exists within the game world and resides on the same map as the executing bot before proceeding. If validation passes, it sets the prioritized targets list, initiates an attack, and updates the pull target context upon success.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network\",\n  \"notes\": \"The function relies on external AI values for target selection and map synchronization; it may fail if the target is missing or on a different map.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a prioritized attack on the specified RTI target if it exists, is in the world, and shares the bot's map.\",\n  \"overview\": \"This function attempts to initiate an attack on a specific unit designated as the RTI target. It first validates that the target exists, is currently in the game world, and resides on the same map as the executing bot. If these conditions are met, it sets the target in the AI context's prioritized targets list and proceeds with the attack action.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"AI Context modification, Unit attack execution, potential error logging\",\n  \"notes\": \"The function relies on the 'rtiTarget' parameter being set externally; if unset or invalid, it logs an error and returns false. It modifies the AI context's prioritized targets list upon success.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ChooseTargetActions.cpp::Execute@9b55cef5:qwen3-5-4b": {
@@ -26644,14 +26644,14 @@
   "hash": "0860c276e9fe",
   "doc": {
    "summary": "Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.",
-   "overview": "This function evaluates if a Hunter bot is in a position to perform close-range attacks by checking for sufficient ammunition and valid target conditions. It first verifies the presence of ammo and then assesses whether the current target is within an acceptable distance or if the bot is not currently engaged in combat. The logic ensures that actions are only taken when strategic proximity and resource availability align with the bot's active combat state.",
+   "overview": "This function evaluates if a Hunter bot is in a position to perform close-range attacks by checking for sufficient ammunition and valid target conditions. It first verifies the presence of ammo and then assesses whether the current target is within an acceptable distance or if the bot is not currently engaged in combat, returning true only when these criteria are met.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on AI_VALUE macros for target retrieval and ammo counting; distance threshold is hardcoded at 8.0f.",
+   "notes": "Relies on external AI values for ammo count and target distance; callers should ensure the bot has a valid target before invoking.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.\",\n  \"overview\": \"This function evaluates if a Hunter bot is in a position to perform close-range attacks by checking for sufficient ammunition and valid target conditions. It first verifies the presence of ammo and then assesses whether the current target is within an acceptable distance or if the bot is not currently engaged in combat. The logic ensures that actions are only taken when strategic proximity and resource availability align with the bot's active combat state.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on AI_VALUE macros for target retrieval and ammo counting; distance threshold is hardcoded at 8.0f.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines whether a Hunter bot should execute close-range combat actions based on target proximity, ammo availability, and combat state.\",\n  \"overview\": \"This function evaluates if a Hunter bot is in a position to perform close-range attacks by checking for sufficient ammunition and valid target conditions. It first verifies the presence of ammo and then assesses whether the current target is within an acceptable distance or if the bot is not currently engaged in combat, returning true only when these criteria are met.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external AI values for ammo count and target distance; callers should ensure the bot has a valid target before invoking.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/CombatActions.h::SwitchToMeleeAction@d91e6fcf:qwen3-5-4b": {
@@ -27044,20 +27044,20 @@
  "src/strategy/actions/DropQuestAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
   "hash": "9b1bfeffcef4",
   "doc": {
-   "summary": "Executes the DropQuestAction strategy by iterating through a bot's active quests and removing those that are significantly lower level than the bot itself.",
-   "overview": "This function first validates that an event owner exists, defaulting to the Master if none is found, and checks if the global configuration allows dropping obsolete quests. It then calculates a dynamic threshold for 'trivial' quest levels based on the bot's current level, ranging from 5 to 8 depending on whether the bot has reached level 20, 30, or 40. Any active quest where the difference between the bot's level and the quest's level exceeds this calculated trivial threshold is removed from the log.",
+   "summary": "Executes a strategy action to remove low-level or trivial quests from a bot's inventory based on configurable thresholds.",
+   "overview": "This function processes an event to identify and discard quests that are significantly lower in level than the bot, defined as 'trivial' by dynamic thresholds. It first validates that an event owner exists and checks if the drop obsolete quests configuration is enabled before iterating through the quest log. For each valid quest, it compares the bot's level against the quest's level to determine if removal is necessary.",
    "params": [
     {
      "name": "event",
-     "desc": "The event object containing the owner of the action, used to identify the bot or master performing the operation."
+     "desc": "The event object containing the owner of the action."
     }
    ],
    "returns": "bool",
-   "side_effects": "Quest removal from log, item source collection, quest status update, reward removal, and potential logging/speech output.",
-   "notes": "The function relies on global configuration via sShadowAIConfig and assumes access to bot state and quest templates. It modifies the bot's internal quest log and rewards directly.",
+   "side_effects": "I/O, global state",
+   "notes": "Calls GetQuestTemplate and modifies bot quest status; relies on sShadowAIConfig->dropObsoleteQuests being true to proceed.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the DropQuestAction strategy by iterating through a bot's active quests and removing those that are significantly lower level than the bot itself.\",\n  \"overview\": \"This function first validates that an event owner exists, defaulting to the Master if none is found, and checks if the global configuration allows dropping obsolete quests. It then calculates a dynamic threshold for 'trivial' quest levels based on the bot's current level, ranging from 5 to 8 depending on whether the bot has reached level 20, 30, or 40. Any active quest where the difference between the bot's level and the quest's level exceeds this calculated trivial threshold is removed from the log.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the owner of the action, used to identify the bot or master performing the operation.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Quest removal from log, item source collection, quest status update, reward removal, and potential logging/speech output.\",\n  \"notes\": \"The function relies on global configuration via sShadowAIConfig and assumes access to bot state and quest templates. It modifies the bot's internal quest log and rewards directly.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a strategy action to remove low-level or trivial quests from a bot's inventory based on configurable thresholds.\",\n  \"overview\": \"This function processes an event to identify and discard quests that are significantly lower in level than the bot, defined as 'trivial' by dynamic thresholds. It first validates that an event owner exists and checks if the drop obsolete quests configuration is enabled before iterating through the quest log. For each valid quest, it compares the bot's level against the quest's level to determine if removal is necessary.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the owner of the action.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"I/O, global state\",\n  \"notes\": \"Calls GetQuestTemplate and modifies bot quest status; relies on sShadowAIConfig->dropObsoleteQuests being true to proceed.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/DropQuestAction.cpp::DropQuestType@934ab5b1:qwen3-5-4b": {
@@ -27398,20 +27398,20 @@
  "src/strategy/actions/EquipAction.cpp::Execute@9b55cef5:qwen3-5-4b": {
   "hash": "505d557f4d12",
   "doc": {
-   "summary": "Executes the auto-equip strategy for loot items when trading status is accepted or during random bot gameplay.",
-   "overview": "This function determines if an item should be automatically equipped by checking specific configuration flags and player types. It processes trade status packets to ensure only accepted trades trigger the action, then iterates through all bags to identify items with specific usage requirements. Finally, it calls EquipItems to handle the actual equipping logic for qualifying items.",
+   "summary": "Executes the auto-equip strategy by collecting items from the player's bags and equipping them when specific trade or usage conditions are met.",
+   "overview": "This function checks if automatic loot upgrading is enabled for Shadow AI bots, skipping execution otherwise. It processes incoming trade status packets to verify acceptance before iterating through all items in the player's inventory. Items with valid usage parameters matching equip, replace, or bad equip categories are collected and passed to the EquipItems system.",
    "params": [
     {
      "name": "event",
-     "desc": "The game event object containing packet data and source information."
+     "desc": "The game event packet containing the trade status or other relevant data."
     }
    ],
    "returns": "bool",
-   "side_effects": "Network (packet parsing), Global state (item equipping)",
-   "notes": "Called by the Shadow AI strategy system; returns false if auto-equip is disabled or the player is not a random bot, and only processes trade events with ACCEPT status.",
+   "side_effects": "network, global state",
+   "notes": "Relies on sShadowAIConfig and sRandomShadowMgr for bot identification; modifies global item usage state via EquipItems.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes the auto-equip strategy for loot items when trading status is accepted or during random bot gameplay.\",\n  \"overview\": \"This function determines if an item should be automatically equipped by checking specific configuration flags and player types. It processes trade status packets to ensure only accepted trades trigger the action, then iterates through all bags to identify items with specific usage requirements. Finally, it calls EquipItems to handle the actual equipping logic for qualifying items.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The game event object containing packet data and source information.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (packet parsing), Global state (item equipping)\",\n  \"notes\": \"Called by the Shadow AI strategy system; returns false if auto-equip is disabled or the player is not a random bot, and only processes trade events with ACCEPT status.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the auto-equip strategy by collecting items from the player's bags and equipping them when specific trade or usage conditions are met.\",\n  \"overview\": \"This function checks if automatic loot upgrading is enabled for Shadow AI bots, skipping execution otherwise. It processes incoming trade status packets to verify acceptance before iterating through all items in the player's inventory. Items with valid usage parameters matching equip, replace, or bad equip categories are collected and passed to the EquipItems system.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The game event packet containing the trade status or other relevant data.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network, global state\",\n  \"notes\": \"Relies on sShadowAIConfig and sRandomShadowMgr for bot identification; modifies global item usage state via EquipItems.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/EquipAction.cpp::EquipItems@62d0205f:qwen3-5-4b": {
@@ -27681,28 +27681,28 @@
   "hash": "949bea924475",
   "doc": {
    "summary": "Executes a follow action by checking distance to the master target and reporting status via network messages.",
-   "overview": "This function initiates a tracking sequence by first verifying if the bot can follow the designated master target. It calculates the distance between itself and the target, then conditionally sends status updates to the master based on proximity thresholds or random chance. Finally, it sets a delay for the next check before returning success.",
+   "overview": "This function initiates a tracking sequence by first verifying if the bot can follow its designated master target. It calculates the distance between itself and the target, then conditionally sends status updates to the master based on proximity thresholds or random chance. Finally, it sets a delay for the next check before returning success.",
    "params": [],
    "returns": "bool",
-   "side_effects": "Network (botAI->TellMaster), Global state (botAI->SetNextCheckDelay)",
-   "notes": "Relies on external AI_VALUE macro for target retrieval; uses random chance logic for status reporting.",
+   "side_effects": "Network (botAI->TellMaster), Global State (botAI->SetNextCheckDelay)",
+   "notes": "Relies on external AI values and configuration; may trigger multiple network messages depending on distance and randomness.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a follow action by checking distance to the master target and reporting status via network messages.\",\n  \"overview\": \"This function initiates a tracking sequence by first verifying if the bot can follow the designated master target. It calculates the distance between itself and the target, then conditionally sends status updates to the master based on proximity thresholds or random chance. Finally, it sets a delay for the next check before returning success.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (botAI->TellMaster), Global state (botAI->SetNextCheckDelay)\",\n  \"notes\": \"Relies on external AI_VALUE macro for target retrieval; uses random chance logic for status reporting.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a follow action by checking distance to the master target and reporting status via network messages.\",\n  \"overview\": \"This function initiates a tracking sequence by first verifying if the bot can follow its designated master target. It calculates the distance between itself and the target, then conditionally sends status updates to the master based on proximity thresholds or random chance. Finally, it sets a delay for the next check before returning success.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (botAI->TellMaster), Global State (botAI->SetNextCheckDelay)\",\n  \"notes\": \"Relies on external AI values and configuration; may trigger multiple network messages depending on distance and randomness.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/FollowActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
   "hash": "1a257ecb5f97",
   "doc": {
-   "summary": "Determines whether a bot should execute the follow action based on group master status, target alignment, and strategy configuration.",
-   "overview": "This function evaluates if a bot is currently in a state where it can validly perform the follow action. It first verifies that the bot has a designated group master and that the bot itself is not the master, ensuring the action remains directional. The function then checks for specific strategy flags and validates that the target unit allows dead-follow mechanics before returning true.",
+   "summary": "Determines whether a bot should execute the 'follow' action based on group master status, target alignment, and strategy availability.",
+   "overview": "This function evaluates if a bot is currently in a state where it can perform the follow action by checking for group master relationships and target consistency. It verifies that the bot has the necessary strategy enabled in non-combat mode and confirms that the master's target is valid for dead-follow mechanics before returning true.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on external AI_VALUE macros to access current targets; returns false if the bot lacks a group master or if the master is targeting the same unit.",
+   "notes": "Relies on external AI_VALUE macros to retrieve current targets; returns false if the bot is its own group master or if the master's target cannot be followed.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines whether a bot should execute the follow action based on group master status, target alignment, and strategy configuration.\",\n  \"overview\": \"This function evaluates if a bot is currently in a state where it can validly perform the follow action. It first verifies that the bot has a designated group master and that the bot itself is not the master, ensuring the action remains directional. The function then checks for specific strategy flags and validates that the target unit allows dead-follow mechanics before returning true.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external AI_VALUE macros to access current targets; returns false if the bot lacks a group master or if the master is targeting the same unit.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines whether a bot should execute the 'follow' action based on group master status, target alignment, and strategy availability.\",\n  \"overview\": \"This function evaluates if a bot is currently in a state where it can perform the follow action by checking for group master relationships and target consistency. It verifies that the bot has the necessary strategy enabled in non-combat mode and confirms that the master's target is valid for dead-follow mechanics before returning true.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external AI_VALUE macros to retrieve current targets; returns false if the bot is its own group master or if the master's target cannot be followed.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/FollowActions.cpp::CanDeadFollow@414ffdb0:qwen3-5-4b": {
@@ -27769,15 +27769,15 @@
  "src/strategy/actions/GenericActions.cpp::Execute@99556895:qwen3-5-4b": {
   "hash": "e9b4e718ef41",
   "doc": {
-   "summary": "Executes a command attack for the bot's guardian pet against its current target.",
-   "overview": "This function initiates an attack by the bot's guardian pet if it is available, has a valid target, and is not in a passive state. It clears existing follow states, sets the new target, and configures charm information to ensure the pet attacks without following or returning.",
+   "summary": "Executes a command attack action for the bot's guardian pet against its current target.",
+   "overview": "This function initiates an attack by the bot's guardian pet if it is available, has a valid target, and is not in a passive state. It clears existing follow states, sets the new target, and configures charm information to ensure the pet attacks without following or returning to its owner.",
    "params": [],
    "returns": "bool",
-   "side_effects": "Network (pet AI commands), Global State (bot pet state)",
-   "notes": "Requires a valid guardian pet with an active target; returns false if the pet is missing, has no target, or is in REACT_PASSIVE mode.",
+   "side_effects": "None",
+   "notes": "Requires a valid guardian pet and a valid attack target; returns false if either is missing or the pet is passive.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a command attack for the bot's guardian pet against its current target.\",\n  \"overview\": \"This function initiates an attack by the bot's guardian pet if it is available, has a valid target, and is not in a passive state. It clears existing follow states, sets the new target, and configures charm information to ensure the pet attacks without following or returning.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (pet AI commands), Global State (bot pet state)\",\n  \"notes\": \"Requires a valid guardian pet with an active target; returns false if the pet is missing, has no target, or is in REACT_PASSIVE mode.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a command attack action for the bot's guardian pet against its current target.\",\n  \"overview\": \"This function initiates an attack by the bot's guardian pet if it is available, has a valid target, and is not in a passive state. It clears existing follow states, sets the new target, and configures charm information to ensure the pet attacks without following or returning to its owner.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Requires a valid guardian pet and a valid attack target; returns false if either is missing or the pet is passive.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GenericActions.cpp::Execute@aa855b55:qwen3-5-4b": {
@@ -27867,29 +27867,29 @@
  "src/strategy/actions/GenericSpellActions.cpp::Execute@99556895:qwen3-5-4b": {
   "hash": "77cec84d6cba",
   "doc": {
-   "summary": "Executes available trinkets in the specified inventory slot by attempting to use them sequentially.",
-   "overview": "This function attempts to activate a trinket equipped in either of two specific inventory slots within the bot's bag. It retrieves items from the first and second trinket slots, checks if they are usable, and returns true upon successful activation or false if neither item can be used.",
+   "summary": "Executes available trinkets in the specified inventory slot for the bot.",
+   "overview": "This function attempts to use any equipped trinket from the bag inventory by checking two specific equipment slots sequentially. It returns true if a trinket is successfully used, or false if no trinket is found or usable.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
    "notes": "",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes available trinkets in the specified inventory slot by attempting to use them sequentially.\",\n  \"overview\": \"This function attempts to activate a trinket equipped in either of two specific inventory slots within the bot's bag. It retrieves items from the first and second trinket slots, checks if they are usable, and returns true upon successful activation or false if neither item can be used.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
+  "raw": "{\n  \"summary\": \"Executes available trinkets in the specified inventory slot for the bot.\",\n  \"overview\": \"This function attempts to use any equipped trinket from the bag inventory by checking two specific equipment slots sequentially. It returns true if a trinket is successfully used, or false if no trinket is found or usable.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GenericSpellActions.cpp::isPossible@033f8826:qwen3-5-4b": {
   "hash": "b71f0830bee1",
   "doc": {
-   "summary": "Determines if a vehicle spell can be cast by the current bot AI.",
-   "overview": "This function checks whether the bot's artificial intelligence is capable of casting a specific vehicle spell. It retrieves the spell ID from the provided spell object and delegates the validation logic to the botAI system, passing along the target entity for context.",
+   "summary": "Determines if a vehicle spell can be cast by the current bot AI based on the spell ID and target.",
+   "overview": "This function checks whether the bot's artificial intelligence is capable of casting a specific vehicle spell. It retrieves the spell ID from the provided spell object and delegates the validation logic to the botAI system, which evaluates factors such as cooldowns, resource availability, and target validity.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Returns false if the spell is invalid or the bot AI cannot cast it.",
+   "notes": "Callers should ensure the spell object is valid before invoking this function. The result depends entirely on the botAI configuration and current game state.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines if a vehicle spell can be cast by the current bot AI.\",\n  \"overview\": \"This function checks whether the bot's artificial intelligence is capable of casting a specific vehicle spell. It retrieves the spell ID from the provided spell object and delegates the validation logic to the botAI system, passing along the target entity for context.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns false if the spell is invalid or the bot AI cannot cast it.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines if a vehicle spell can be cast by the current bot AI based on the spell ID and target.\",\n  \"overview\": \"This function checks whether the bot's artificial intelligence is capable of casting a specific vehicle spell. It retrieves the spell ID from the provided spell object and delegates the validation logic to the botAI system, which evaluates factors such as cooldowns, resource availability, and target validity.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the spell object is valid before invoking this function. The result depends entirely on the botAI configuration and current game state.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GenericSpellActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
@@ -27900,10 +27900,10 @@
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on GetTarget() and CastAuraSpellAction::isUseful(); requires valid AI_VALUE configuration for estimated group dps.",
+   "notes": "Relies on GetTarget() and CastAuraSpellAction::isUseful(); assumes AI_VALUE macro provides correct float conversion.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines if a spell action is viable by verifying the target's existence and health relative to estimated damage output.\",\n  \"overview\": \"This function evaluates whether executing a specific spell action on a given unit is beneficial. It first validates that the target exists, is alive, and remains within the game world before proceeding with calculations. The core logic compares the target's current health against an estimated duration of life based on group damage per second to decide if the action should be performed.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on GetTarget() and CastAuraSpellAction::isUseful(); requires valid AI_VALUE configuration for estimated group dps.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines if a spell action is viable by verifying the target's existence and health relative to estimated damage output.\",\n  \"overview\": \"This function evaluates whether executing a specific spell action on a given unit is beneficial. It first validates that the target exists, is alive, and remains within the game world before proceeding with calculations. The core logic compares the target's current health against an estimated duration of life based on group damage per second to decide if the action should be performed.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on GetTarget() and CastAuraSpellAction::isUseful(); assumes AI_VALUE macro provides correct float conversion.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GenericSpellActions.cpp::CastSpellAction@d7c0525b:qwen3-5-4b": {
@@ -27980,14 +27980,14 @@
   "hash": "294254dd46f9",
   "doc": {
    "summary": "Retrieves the value of the 'main tank' unit for a given spell from the game context.",
-   "overview": "This function acts as a utility within the GenericSpellActions module to identify the primary target unit, specifically the main tank, for a specific spell. It delegates the actual lookup logic to the context object by querying it with the key 'main tank' and the provided spell identifier. The returned value is expected to be a pointer to a Unit object representing that tank.",
+   "overview": "This function acts as a utility to fetch the target unit designated as the main tank for a specific spell within the current game context. It delegates the actual lookup logic to the context object, ensuring that the correct unit is identified based on the spell's configuration and the active game state.",
    "params": [],
    "returns": "Value<Unit*>",
    "side_effects": "None",
-   "notes": "Callers must ensure the context contains the necessary data for the 'main tank' key; otherwise, the returned value may be null or undefined depending on implementation details.",
+   "notes": "Callers should ensure the spell exists in the context before invoking this function to avoid potential null pointer issues. The result may be null if no main tank is defined for the spell.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Retrieves the value of the 'main tank' unit for a given spell from the game context.\",\n  \"overview\": \"This function acts as a utility within the GenericSpellActions module to identify the primary target unit, specifically the main tank, for a specific spell. It delegates the actual lookup logic to the context object by querying it with the key 'main tank' and the provided spell identifier. The returned value is expected to be a pointer to a Unit object representing that tank.\",\n  \"params\": [],\n  \"returns\": \"Value<Unit*>\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers must ensure the context contains the necessary data for the 'main tank' key; otherwise, the returned value may be null or undefined depending on implementation details.\"\n}",
+  "raw": "{\n  \"summary\": \"Retrieves the value of the 'main tank' unit for a given spell from the game context.\",\n  \"overview\": \"This function acts as a utility to fetch the target unit designated as the main tank for a specific spell within the current game context. It delegates the actual lookup logic to the context object, ensuring that the correct unit is identified based on the spell's configuration and the active game state.\",\n  \"params\": [],\n  \"returns\": \"Value<Unit*>\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should ensure the spell exists in the context before invoking this function to avoid potential null pointer issues. The result may be null if no main tank is defined for the spell.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GenericSpellActions.cpp::CastSpellAction@67a9ad44:qwen3-5-4b": {
@@ -28744,28 +28744,28 @@
   "hash": "cfef74a0afc1",
   "doc": {
    "summary": "Retrieves the party member who currently lacks water.",
-   "overview": "This function identifies a specific unit within the player's party that has not met their hydration requirements. It is typically used by action handlers to determine which character should receive an item or resource to restore water levels.",
+   "overview": "This function identifies a specific unit within the player's party that has not received water, typically used to trigger actions like giving items or healing. It relies on the AI_VALUE macro to query game state and return the appropriate target unit.",
    "params": [],
    "returns": "Unit*",
    "side_effects": "None",
    "notes": "Returns null if no party member is without water.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Retrieves the party member who currently lacks water.\",\n  \"overview\": \"This function identifies a specific unit within the player's party that has not met their hydration requirements. It is typically used by action handlers to determine which character should receive an item or resource to restore water levels.\",\n  \"params\": [],\n  \"returns\": \"Unit*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns null if no party member is without water.\"\n}",
+  "raw": "{\n  \"summary\": \"Retrieves the party member who currently lacks water.\",\n  \"overview\": \"This function identifies a specific unit within the player's party that has not received water, typically used to trigger actions like giving items or healing. It relies on the AI_VALUE macro to query game state and return the appropriate target unit.\",\n  \"params\": [],\n  \"returns\": \"Unit*\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Returns null if no party member is without water.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GiveItemAction.cpp::isUseful@a4a78026:qwen3-5-4b": {
   "hash": "e81a8de6496e",
   "doc": {
-   "summary": "Determines whether an item given to a target is useful by checking if the target is a random bot with food cheats enabled.",
-   "overview": "This function evaluates the utility of an item based on the target's identity and cheat status. It first verifies that a valid target exists, then checks if the target is a random bot possessing the food cheat; if such a bot exists, the item is considered useless unless the bot lacks this specific cheat.",
+   "summary": "Determines whether an item should be given to a target based on player status and cheat flags.",
+   "overview": "This function evaluates if an item is useful for a specific target by checking their identity and associated cheat permissions. It first verifies that a valid target exists, then identifies if the target is a random bot controlled by the Shadow system. The logic ultimately returns true only if the target is not a random bot or if they possess the food cheat enabled.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on external state from GetTarget(), sRandomShadowMgr, and botAI; may return false for random bots with food cheats enabled.",
+   "notes": "Relies on external state from GetTarget(), sRandomShadowMgr, and botAI; callers must ensure these objects are initialized before invocation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines whether an item given to a target is useful by checking if the target is a random bot with food cheats enabled.\",\n  \"overview\": \"This function evaluates the utility of an item based on the target's identity and cheat status. It first verifies that a valid target exists, then checks if the target is a random bot possessing the food cheat; if such a bot exists, the item is considered useless unless the bot lacks this specific cheat.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external state from GetTarget(), sRandomShadowMgr, and botAI; may return false for random bots with food cheats enabled.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines whether an item should be given to a target based on player status and cheat flags.\",\n  \"overview\": \"This function evaluates if an item is useful for a specific target by checking their identity and associated cheat permissions. It first verifies that a valid target exists, then identifies if the target is a random bot controlled by the Shadow system. The logic ultimately returns true only if the target is not a random bot or if they possess the food cheat enabled.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external state from GetTarget(), sRandomShadowMgr, and botAI; callers must ensure these objects are initialized before invocation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GiveItemAction.h::GiveItemAction@836ecfa1:qwen3-5-4b": {
@@ -29116,15 +29116,15 @@
  "src/strategy/actions/GuildCreateActions.cpp::Execute@99556895:qwen3-5-4b": {
   "hash": "994991dcc776",
   "doc": {
-   "summary": "Executes a guild creation action by attempting to purchase an item and setting the Tabard Designer NPC as the travel target.",
-   "overview": "This function first checks if the bot AI can perform a buy action for item ID 5976, returning true only if the purchase is successful. It then initializes a new TravelTarget object for the Tabard Designer NPC and verifies that the target was found and remains active before setting it as the current travel destination.",
+   "summary": "Executes a guild creation action by verifying the bot can purchase item 5976 and successfully setting a target on the Tabard Designer NPC.",
+   "overview": "This function attempts to buy item 5976 using the bot's AI logic. If the purchase is successful, it retrieves the current travel target, creates a new TravelTarget instance for the Tabard Designer NPC (UNIT_NPC_FLAG_TABARDDESIGNER), and sets this as the active target with an interaction radius.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on botAI, chat, context, and global constants like INTERACTION_DISTANCE; assumes item ID 5976 corresponds to the Tabard Designer's sellable item.",
+   "notes": "Relies on botAI->DoSpecificAction, chat->FormatQItem, SetNpcFlagTarget, and setNewTarget. Returns false if the item cannot be bought or the target cannot be established.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a guild creation action by attempting to purchase an item and setting the Tabard Designer NPC as the travel target.\",\n  \"overview\": \"This function first checks if the bot AI can perform a buy action for item ID 5976, returning true only if the purchase is successful. It then initializes a new TravelTarget object for the Tabard Designer NPC and verifies that the target was found and remains active before setting it as the current travel destination.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on botAI, chat, context, and global constants like INTERACTION_DISTANCE; assumes item ID 5976 corresponds to the Tabard Designer's sellable item.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a guild creation action by verifying the bot can purchase item 5976 and successfully setting a target on the Tabard Designer NPC.\",\n  \"overview\": \"This function attempts to buy item 5976 using the bot's AI logic. If the purchase is successful, it retrieves the current travel target, creates a new TravelTarget instance for the Tabard Designer NPC (UNIT_NPC_FLAG_TABARDDESIGNER), and sets this as the active target with an interaction radius.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on botAI->DoSpecificAction, chat->FormatQItem, SetNpcFlagTarget, and setNewTarget. Returns false if the item cannot be bought or the target cannot be established.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildCreateActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
@@ -29135,10 +29135,10 @@
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Called by GuildCreateActions logic; returns false if the bot is in a non-capital zone or lacks required resources.",
+   "notes": "The function relies on global state accessed via sAreaTableStore and bot context; callers must ensure the bot object is valid before invocation.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Determines if a bot should initiate guild creation based on capital location, existing guild status, item count, funds, and travel state.\",\n  \"overview\": \"This function evaluates whether a bot is in a suitable position to create a new guild by checking its current zone for the capital flag. It verifies that the bot does not already possess a guild, has fewer than five items, holds at least ten thousand gold, and is not currently traveling to another location.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Called by GuildCreateActions logic; returns false if the bot is in a non-capital zone or lacks required resources.\"\n}",
+  "raw": "{\n  \"summary\": \"Determines if a bot should initiate guild creation based on capital location, existing guild status, item count, funds, and travel state.\",\n  \"overview\": \"This function evaluates whether a bot is in a suitable position to create a new guild by checking its current zone for the capital flag. It verifies that the bot does not already possess a guild, has fewer than five items, holds at least ten thousand gold, and is not currently traveling to another location.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"The function relies on global state accessed via sAreaTableStore and bot context; callers must ensure the bot object is valid before invocation.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildCreateActions.cpp::canBuyPetition@f025cfd0:qwen3-5-4b": {
@@ -29269,41 +29269,41 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::Execute@9b55cef5:qwen3-5-4b": {
-  "hash": "82f0012d89e1",
+  "hash": "b63fd808dd92",
   "doc": {
-   "summary": "Executes a guild management action by validating the player, sending their name via network packet, and returning success.",
-   "overview": "This function retrieves the player associated with the provided event and performs basic validity checks to ensure the player exists, is not invalid, and is not a bot. Upon validation, it constructs a WorldPacket containing the player's name and transmits it over the network before returning true.",
+   "summary": "Executes a guild leave action for the event owner after verifying shadow security permissions.",
+   "overview": "This function processes a guild leave request by first validating that the event owner possesses the required Shadow Security level. If the permission check fails, it sends an error message to the bot and returns false; otherwise, it constructs a GuildLeave packet and handles the opcode to finalize the departure.",
    "params": [
     {
      "name": "event",
-     "desc": "The event object containing context information, specifically used to retrieve the associated Player pointer."
+     "desc": "The event object containing the player who initiated the guild leave action."
     }
    ],
    "returns": "bool",
-   "side_effects": "network",
-   "notes": "Caller must ensure the event contains a valid player reference; returns false if the player is invalid or a bot.",
+   "side_effects": "Network (handles GuildLeave opcode), Global state (bot AI security check)",
+   "notes": "Caller must ensure the event represents a valid guild leave context; returns false if the owner lacks Shadow Security INVITE permission.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a guild management action by validating the player, sending their name via network packet, and returning success.\",\n  \"overview\": \"This function retrieves the player associated with the provided event and performs basic validity checks to ensure the player exists, is not invalid, and is not a bot. Upon validation, it constructs a WorldPacket containing the player's name and transmits it over the network before returning true.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing context information, specifically used to retrieve the associated Player pointer.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network\",\n  \"notes\": \"Caller must ensure the event contains a valid player reference; returns false if the player is invalid or a bot.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a guild leave action for the event owner after verifying shadow security permissions.\",\n  \"overview\": \"This function processes a guild leave request by first validating that the event owner possesses the required Shadow Security level. If the permission check fails, it sends an error message to the bot and returns false; otherwise, it constructs a GuildLeave packet and handles the opcode to finalize the departure.\",\n  \"params\": [\n    {\n      \"name\": \"event\",\n      \"desc\": \"The event object containing the player who initiated the guild leave action.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"Network (handles GuildLeave opcode), Global state (bot AI security check)\",\n  \"notes\": \"Caller must ensure the event represents a valid guild leave context; returns false if the owner lacks Shadow Security INVITE permission.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::PlayerIsValid@0f0e2c00:qwen3-5-4b": {
-  "hash": "aca4a563394f",
+  "hash": "724b872c0960",
   "doc": {
-   "summary": "Validates whether a player belongs to the same guild as the bot and holds a rank strictly lower than the bot's.",
-   "overview": "This function checks if a specific player is eligible for an action by verifying their guild affiliation and relative rank compared to the bot. It returns true only if the player shares the bot's guild ID and possesses a rank that is at least two levels below the bot's current rank, ensuring strict hierarchy enforcement.",
+   "summary": "Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.",
+   "overview": "This function checks two conditions: whether the provided player is a member of the same guild as the current bot instance, and whether the bot's rank is higher than that of the player. It returns true only if both conditions are satisfied, ensuring that actions requiring superior authority can be performed by the bot.",
    "params": [
     {
      "name": "member",
-     "desc": "Pointer to the Player object whose eligibility is being checked."
+     "desc": "Pointer to the Player object whose guild membership and rank are being evaluated."
     }
    ],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Caller must ensure 'member' is not null before invoking; returns false if ranks are equal or member's rank exceeds bot's by less than two levels.",
+   "notes": "Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank than the bot.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Validates whether a player belongs to the same guild as the bot and holds a rank strictly lower than the bot's.\",\n  \"overview\": \"This function checks if a specific player is eligible for an action by verifying their guild affiliation and relative rank compared to the bot. It returns true only if the player shares the bot's guild ID and possesses a rank that is at least two levels below the bot's current rank, ensuring strict hierarchy enforcement.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose eligibility is being checked.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking; returns false if ranks are equal or member's rank exceeds bot's by less than two levels.\"\n}",
+  "raw": "{\n  \"summary\": \"Verifies if a player belongs to the same guild as the bot and holds a lower rank than the bot.\",\n  \"overview\": \"This function checks two conditions: whether the provided player is a member of the same guild as the current bot instance, and whether the bot's rank is higher than that of the player. It returns true only if both conditions are satisfied, ensuring that actions requiring superior authority can be performed by the bot.\",\n  \"params\": [\n    {\n      \"name\": \"member\",\n      \"desc\": \"Pointer to the Player object whose guild membership and rank are being evaluated.\"\n    }\n  ],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Caller must ensure 'member' is not null before invoking. Edge case: returns false if player is in a different guild or has equal/greater rank than the bot.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::GetRankId@a8ae41b2:qwen3-5-4b": {
@@ -29326,36 +29326,36 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::isUseful@a4a78026:qwen3-5-4b": {
-  "hash": "e2b3188fd22f",
+  "hash": "cd7b8d8f966f",
   "doc": {
-   "summary": "Checks if the bot has the authority to demote another member within its guild.",
-   "overview": "This function verifies whether a specific bot possesses the necessary rank rights to perform a demotion action on another member. It first confirms that the bot belongs to a valid guild and then checks the guild manager for the specific GR_RIGHT_DEMOTE permission associated with that bot's role.",
+   "summary": "Returns true if the guild ID is set on the bot, indicating the guild management action is applicable.",
+   "overview": "This function checks whether a guild has been assigned to the current bot instance by retrieving its unique identifier. It serves as a guard condition for guild-specific actions, ensuring that subsequent logic only executes when a valid guild context exists. The implementation relies on the bot object's internal state to determine availability.",
    "params": [],
    "returns": "bool",
    "side_effects": "None",
-   "notes": "Relies on external state from bot->GetGuildId() and sGuildMgr->GetGuildById(); returns false if the bot lacks guild membership or the required demotion rank.",
+   "notes": "Callers should verify this result before attempting to interact with guild resources.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Checks if the bot has the authority to demote another member within its guild.\",\n  \"overview\": \"This function verifies whether a specific bot possesses the necessary rank rights to perform a demotion action on another member. It first confirms that the bot belongs to a valid guild and then checks the guild manager for the specific GR_RIGHT_DEMOTE permission associated with that bot's role.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on external state from bot->GetGuildId() and sGuildMgr->GetGuildById(); returns false if the bot lacks guild membership or the required demotion rank.\"\n}",
+  "raw": "{\n  \"summary\": \"Returns true if the guild ID is set on the bot, indicating the guild management action is applicable.\",\n  \"overview\": \"This function checks whether a guild has been assigned to the current bot instance by retrieving its unique identifier. It serves as a guard condition for guild-specific actions, ensuring that subsequent logic only executes when a valid guild context exists. The implementation relies on the bot object's internal state to determine availability.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Callers should verify this result before attempting to interact with guild resources.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::SendPacket@d96affb9:qwen3-5-4b": {
-  "hash": "61d6dbd7c9de",
+  "hash": "e0b8b9ce284a",
   "doc": {
-   "summary": "This function sends a Guild Demote Member packet to the game server.",
-   "overview": "The SendPacket function constructs a Guild Demote Member packet from the provided WorldPacket data and routes it through the bot's session handler. It relies on the underlying WorldPackets::Guild::GuildDemoteMember structure to parse the incoming packet before invoking the specific opcode handler. This action is typically used by bots to execute guild management tasks such as demoting members.",
+   "summary": "Executes the guild officer remove member opcode by parsing the packet and forwarding it to the session handler.",
+   "overview": "This function processes a GuildOfficerRemoveMember packet within the GuildManagementActions strategy module. It deserializes the incoming WorldPacket into a specific data structure and immediately triggers the corresponding server-side handling routine via the bot's session object. The operation is designed to be called by external modules or other action handlers that need to simulate or process guild member removal events.",
    "params": [
     {
      "name": "packet",
-     "desc": "A WorldPacket containing the Guild Demote Member data to be processed."
+     "desc": "The WorldPacket containing the GuildOfficerRemoveMember opcode and associated data."
     }
    ],
    "returns": "void",
-   "side_effects": "Network",
-   "notes": "Callers must ensure the packet contains valid Guild Demote Member data before invoking this function. Edge cases include malformed packets that may fail during parsing in the WorldPacket constructor.",
+   "side_effects": "Network (internal packet processing), Global state (session handling)",
+   "notes": "Callers should ensure the packet is valid before invoking this function to avoid undefined behavior during deserialization. Edge cases include packets with missing required fields, which may cause the internal HandleGuildRemoveOpcode call to fail or throw exceptions.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"This function sends a Guild Demote Member packet to the game server.\",\n  \"overview\": \"The SendPacket function constructs a Guild Demote Member packet from the provided WorldPacket data and routes it through the bot's session handler. It relies on the underlying WorldPackets::Guild::GuildDemoteMember structure to parse the incoming packet before invoking the specific opcode handler. This action is typically used by bots to execute guild management tasks such as demoting members.\",\n  \"params\": [\n    {\n      \"name\": \"packet\",\n      \"desc\": \"A WorldPacket containing the Guild Demote Member data to be processed.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network\",\n  \"notes\": \"Callers must ensure the packet contains valid Guild Demote Member data before invoking this function. Edge cases include malformed packets that may fail during parsing in the WorldPacket constructor.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes the guild officer remove member opcode by parsing the packet and forwarding it to the session handler.\",\n  \"overview\": \"This function processes a GuildOfficerRemoveMember packet within the GuildManagementActions strategy module. It deserializes the incoming WorldPacket into a specific data structure and immediately triggers the corresponding server-side handling routine via the bot's session object. The operation is designed to be called by external modules or other action handlers that need to simulate or process guild member removal events.\",\n  \"params\": [\n    {\n      \"name\": \"packet\",\n      \"desc\": \"The WorldPacket containing the GuildOfficerRemoveMember opcode and associated data.\"\n    }\n  ],\n  \"returns\": \"void\",\n  \"side_effects\": \"Network (internal packet processing), Global state (session handling)\",\n  \"notes\": \"Callers should ensure the packet is valid before invoking this function to avoid undefined behavior during deserialization. Edge cases include packets with missing required fields, which may cause the internal HandleGuildRemoveOpcode call to fail or throw exceptions.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/GuildManagementActions.cpp::Execute@99556895:qwen3-5-4b": {
