@@ -644,7 +644,6 @@ public:
     bool IsAirDismountFollow();
     bool DoAirDismountFollow();
     void DismountBotForFall();
-    void ClearStaleRootFlag();
     static float GetItemScoreMultiplier(ItemQualities quality);
     static bool IsHealingSpell(uint32 spellFamilyName, flag96 spelFalimyFlags);
     static SpellFamilyNames Class2SpellFamilyName(uint8 cls);

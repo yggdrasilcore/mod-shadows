@@ -257,7 +257,12 @@ void ShadowAI::UpdateAI(uint32 elapsed, bool minimal)
         bot->IsDuringRemoveFromWorld())
         return;
 
-    ClearStaleRootFlag();
+    if (bot->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) && !bot->HasUnitState(UNIT_STATE_ROOT) &&
+        !bot->HasUnitState(UNIT_STATE_STUNNED))
+    {
+        bot->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        bot->SendMovementFlagUpdate();
+    }
 
     // Handle cheat options (set bot health and power if cheats are enabled)
     if (bot->IsAlive() &&
@@ -404,21 +409,6 @@ void ShadowAI::DismountBotForFall()
         bot->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
         bot->SendMovementFlagUpdate();
     }
-}
-
-// Bots have no client to acknowledge a force-unroot, so the ack never arrives and
-// MOVEMENTFLAG_ROOT can outlive the root or stun that set it. While it is set, every
-// spline launched for the bot goes out without MOVEMENTFLAG_MASK_MOVING, which renders
-// as sliding instead of running. Clear it on the bot's own tick so the cleanup does not
-// depend on the native movement actions, which Lua-driven movement never goes through.
-void ShadowAI::ClearStaleRootFlag()
-{
-    if (!bot->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) || bot->HasUnitState(UNIT_STATE_ROOT) ||
-        bot->HasUnitState(UNIT_STATE_STUNNED))
-        return;
-
-    bot->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
-    bot->SendMovementFlagUpdate();
 }
 
 void ShadowAI::TrackMasterMountState()
