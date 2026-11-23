@@ -257,6 +257,13 @@ void ShadowAI::UpdateAI(uint32 elapsed, bool minimal)
         bot->IsDuringRemoveFromWorld())
         return;
 
+    if (bot->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) && !bot->HasUnitState(UNIT_STATE_ROOT) &&
+        !bot->HasUnitState(UNIT_STATE_STUNNED))
+    {
+        bot->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        bot->SendMovementFlagUpdate();
+    }
+
     // Handle cheat options (set bot health and power if cheats are enabled)
     if (bot->IsAlive() &&
         (static_cast<uint32>(GetCheat()) > 0 || static_cast<uint32>(sShadowAIConfig->botCheatMask) > 0))
