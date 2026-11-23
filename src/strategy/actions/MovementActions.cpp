@@ -1115,13 +1115,6 @@ void MovementAction::UpdateMovementState()
         // CC just ended - refresh movement state to ensure animations play correctly
         bot->SendMovementFlagUpdate();
     }
-    
-    // Clear leftover root from missing unroot ack packet
-    if (bot->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT) && !bot->HasUnitState(UNIT_STATE_ROOT) && !bot->HasUnitState(UNIT_STATE_STUNNED))
-    {
-        bot->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ROOT);
-        bot->SendMovementFlagUpdate();
-    }
 
     // Save current state for the next check
     wasMovementRestricted = isCurrentlyRestricted;
