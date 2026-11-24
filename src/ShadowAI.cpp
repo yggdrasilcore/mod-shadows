@@ -257,10 +257,24 @@ void ShadowAI::UpdateAI(uint32 elapsed, bool minimal)
         bot->IsDuringRemoveFromWorld())
         return;
 
+    // Clear a root flag left behind by a missing unroot ack. Bots have no client to
+    // acknowledge a force-unroot, so the flag can outlive the root or stun that set it,
+    // and every spline launched meanwhile goes out without MOVEMENTFLAG_MASK_MOVING.
     if (bot->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) && !bot->HasUnitState(UNIT_STATE_ROOT) &&
         !bot->HasUnitState(UNIT_STATE_STUNNED))
     {
         bot->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        bot->SendMovementFlagUpdate();
+    }
+
+    // Bots never refresh movement state for observers on their own. A script that kills
+    // or replaces the spline mid-flight can leave clients rendering only the endpoint,
+    // which looks like the bot teleporting on every move. A heartbeat every second keeps
+    // them in sync no matter what issued the movement.
+    uint32 now = getMSTime();
+    if (now - lastHeartbeat >= 1000)
+    {
+        lastHeartbeat = now;
         bot->SendMovementFlagUpdate();
     }
 
