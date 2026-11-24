@@ -343,6 +343,13 @@ public:
     bool IsActive() override;
 };
 
+class IccBpcDisallowNucleusTrigger : public Trigger
+{
+public:
+    IccBpcDisallowNucleusTrigger(ShadowAI* botAI) : Trigger(botAI, "icc bpc disallow nucleus") {}
+    bool IsActive() override;
+};
+
 // Sister Svalna
 class IccValkyreSpearTrigger : public Trigger
 {
@@ -852,6 +859,13 @@ public:
     bool Execute(Event event) override;
 };
 
+class IccBpcDisallowNucleusAction : public Action
+{
+public:
+    IccBpcDisallowNucleusAction(ShadowAI* botAI) : Action(botAI, "icc bpc disallow nucleus") {}
+    bool Execute(Event event) override;
+};
+
 // Sister Svalna
 class IccValkyreSpearAction : public AttackAction
 {
@@ -1095,6 +1109,7 @@ public:
         creators["icc bpc empowered vortex"] = &RaidIccActionContext::icc_bpc_empowered_vortex;
         creators["icc bpc kinetic bomb"] = &RaidIccActionContext::icc_bpc_kinetic_bomb;
         creators["icc bpc ball of flame"] = &RaidIccActionContext::icc_bpc_ball_of_flame;
+        creators["icc bpc disallow nucleus"] = &RaidIccActionContext::icc_bpc_disallow_nucleus;
 
         creators["icc valkyre spear"] = &RaidIccActionContext::icc_valkyre_spear;
         creators["icc sister svalna"] = &RaidIccActionContext::icc_sister_svalna;
@@ -1144,6 +1159,7 @@ private:
     static Action* icc_bpc_empowered_vortex(ShadowAI* ai) { return new IccBpcEmpoweredVortexAction(ai); }
     static Action* icc_bpc_kinetic_bomb(ShadowAI* ai) { return new IccBpcKineticBombAction(ai); }
     static Action* icc_bpc_ball_of_flame(ShadowAI* ai) { return new IccBpcBallOfFlameAction(ai); }
+    static Action* icc_bpc_disallow_nucleus(ShadowAI* ai) { return new IccBpcDisallowNucleusAction(ai); }
 
     static Action* icc_valkyre_spear(ShadowAI* ai) { return new IccValkyreSpearAction(ai); }
     static Action* icc_sister_svalna(ShadowAI* ai) { return new IccSisterSvalnaAction(ai); }
@@ -1202,6 +1218,7 @@ public:
         creators["icc bpc empowered vortex"] = &RaidIccTriggerContext::icc_bpc_empowered_vortex;
         creators["icc bpc kinetic bomb"] = &RaidIccTriggerContext::icc_bpc_kinetic_bomb;
         creators["icc bpc ball of flame"] = &RaidIccTriggerContext::icc_bpc_ball_of_flame;
+        creators["icc bpc disallow nucleus"] = &RaidIccTriggerContext::icc_bpc_disallow_nucleus;
 
         creators["icc valkyre spear"] = &RaidIccTriggerContext::icc_valkyre_spear;
         creators["icc sister svalna"] = &RaidIccTriggerContext::icc_sister_svalna;
@@ -1253,6 +1270,7 @@ private:
     static Trigger* icc_bpc_empowered_vortex(ShadowAI* ai) { return new IccBpcEmpoweredVortexTrigger(ai); }
     static Trigger* icc_bpc_kinetic_bomb(ShadowAI* ai) { return new IccBpcKineticBombTrigger(ai); }
     static Trigger* icc_bpc_ball_of_flame(ShadowAI* ai) { return new IccBpcBallOfFlameTrigger(ai); }
+    static Trigger* icc_bpc_disallow_nucleus(ShadowAI* ai) { return new IccBpcDisallowNucleusTrigger(ai); }
 
     static Trigger* icc_valkyre_spear(ShadowAI* ai) { return new IccValkyreSpearTrigger(ai); }
     static Trigger* icc_sister_svalna(ShadowAI* ai) { return new IccSisterSvalnaTrigger(ai); }

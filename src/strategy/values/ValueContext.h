@@ -116,6 +116,7 @@ public:
         creators["possible triggers"] = &ValueContext::possible_triggers;
         creators["possible adds"] = &ValueContext::possible_adds;
         creators["prioritized targets"] = &ValueContext::prioritized_targets;
+        creators["disallowed targets"] = &ValueContext::disallowed_targets;
         creators["all targets"] = &ValueContext::all_targets;
         creators["possible rpg targets"] = &ValueContext::possible_rpg_targets;
         creators["possible new rpg targets"] = &ValueContext::possible_new_rpg_targets;
@@ -421,6 +422,7 @@ private:
     }
     static UntypedValue* possible_adds(ShadowAI* botAI) { return new PossibleAddsValue(botAI); }
     static UntypedValue* prioritized_targets(ShadowAI* botAI) { return new PrioritizedTargetsValue(botAI); }
+    static UntypedValue* disallowed_targets(ShadowAI* botAI) { return new DisallowedTargetsValue(botAI); }
     static UntypedValue* all_targets(ShadowAI* botAI) { return new AllTargetsValue(botAI); }
     static UntypedValue* nearest_adds(ShadowAI* botAI) { return new NearestAddsValue(botAI); }
     static UntypedValue* party_member_without_aura(ShadowAI* botAI)

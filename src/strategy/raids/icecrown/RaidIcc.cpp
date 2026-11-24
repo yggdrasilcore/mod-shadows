@@ -407,6 +407,19 @@ bool IccBpcBallOfFlameTrigger::IsActive()
      return true;
 }
 
+bool IccBpcDisallowNucleusTrigger::IsActive()
+{
+    Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
+    Unit* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
+    Unit* keleseth = AI_VALUE2(Unit*, "find target", "prince keleseth");
+
+    if (!(valanar || taldaram || keleseth))
+        return false;
+
+    // The Keleseth tank collects Dark Nuclei; everyone else must ignore them.
+    return !botAI->IsAssistTank(bot);
+}
+
 // Sister Svalna
 bool IccValkyreSpearTrigger::IsActive()
 {
@@ -4090,6 +4103,19 @@ bool IccBpcBallOfFlameAction::Execute(Event event [[maybe_unused]])
                 }
             }
         }
+    }
+
+    return false;
+}
+
+bool IccBpcDisallowNucleusAction::Execute(Event event [[maybe_unused]])
+{
+    GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
+    for (ObjectGuid const guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (unit && unit->IsAlive() && unit->GetEntry() == NPC_DARK_NUCLEUS)
+            botAI->DisallowTarget(guid);
     }
 
     return false;
@@ -9521,6 +9547,9 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc bpc ball of flame",
                         NextAction::array(0, new NextAction("icc bpc ball of flame", ACTION_RAID + 7), nullptr)));
+
+    triggers.push_back(new TriggerNode("icc bpc disallow nucleus",
+        NextAction::array(0, new NextAction("icc bpc disallow nucleus", ACTION_RAID + 2), nullptr)));
 
     //Sister Svalna
     triggers.push_back(new TriggerNode("icc valkyre spear",

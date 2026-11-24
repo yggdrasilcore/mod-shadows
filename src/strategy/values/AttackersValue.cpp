@@ -5,6 +5,8 @@
 
 #include "AttackersValue.h"
 
+#include <algorithm>
+
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -162,6 +164,11 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range [
 
     auto attackerBotAI = GET_SHADOW_AI(bot);
     if (!attackerBotAI)
+        return false;
+
+    GuidVector& disallowed =
+        attackerBotAI->GetAiObjectContext()->GetValue<GuidVector>("disallowed targets")->RefGet();
+    if (std::find(disallowed.begin(), disallowed.end(), attacker->GetGUID()) != disallowed.end())
         return false;
 
     bool leaderHasThreat = false;

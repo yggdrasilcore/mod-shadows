@@ -622,6 +622,14 @@ public:
     void ClearTargetingSuppression();
     bool IsTargetingSuppressed() const;
 
+    // Per-bot targets that mod-shadows must never acquire or attack on its
+    // own. Disallowing a target also drops it as the current, prioritized and
+    // pull target so the bot stops attacking it immediately.
+    void DisallowTarget(ObjectGuid guid);
+    void AllowTarget(ObjectGuid guid);
+    void ClearDisallowedTargets();
+    bool IsTargetDisallowed(ObjectGuid guid);
+
     static bool IsRealGuild(uint32 guildId);
     bool IsInRealGuild();
     static std::vector<std::string> dispel_whitelist;
