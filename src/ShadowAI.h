@@ -679,6 +679,7 @@ private:
     bool _isBotInitializing = false;
     // getMSTime() deadline for movement suppression (0 = not suppressed).
     uint32 movementSuppressedUntil = 0;
+    uint32 lastHeartbeat = 0;
     // getMSTime() deadline for targeting suppression (0 = not suppressed).
     uint32 targetingSuppressedUntil = 0;
 

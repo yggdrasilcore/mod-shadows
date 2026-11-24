@@ -257,10 +257,19 @@ void ShadowAI::UpdateAI(uint32 elapsed, bool minimal)
         bot->IsDuringRemoveFromWorld())
         return;
 
+    // Clear a root flag left behind by a missing unroot ack.
     if (bot->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) && !bot->HasUnitState(UNIT_STATE_ROOT) &&
         !bot->HasUnitState(UNIT_STATE_STUNNED))
     {
         bot->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        bot->SendMovementFlagUpdate();
+    }
+
+    // Clients that miss a spline render only the endpoint, so resync them once a second.
+    uint32 now = getMSTime();
+    if (now - lastHeartbeat >= 1000)
+    {
+        lastHeartbeat = now;
         bot->SendMovementFlagUpdate();
     }
 
