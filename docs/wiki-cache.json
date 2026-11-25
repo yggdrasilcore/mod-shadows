@@ -29672,17 +29672,17 @@
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ImbueAction.cpp::Execute@99556895:qwen3-5-4b": {
-  "hash": "2404c9059335",
+  "hash": "b1210a4f4c1a",
   "doc": {
-   "summary": "Executes a prioritized healing strategy by checking mana constraints, bandage availability, and applying consumable items.",
-   "overview": "This function implements a conditional healing logic for the bot AI, first verifying that the bot is in heal mode and has sufficient mana before proceeding. It attempts to use a bandage if no attacker count value exists and the bot lacks a specific aura, otherwise it iterates through a list of prioritized healing items to apply them sequentially.",
+   "summary": "Executes a stealth imbuing action by removing existing stealth auras and applying an oil enchantment to the main hand weapon if combat is not active.",
+   "overview": "This function checks whether the bot is currently in combat before proceeding with any actions. If the bot has an active stealth aura, it removes that aura first, then ensures the bot is standing. The function attempts to find and apply an oil enchantment to the main hand weapon if one is available and not already enchanted.",
    "params": [],
    "returns": "bool",
-   "side_effects": "None",
-   "notes": "Relies on global botAI state and external arrays like uPrioritizedHealingItemIds; returns false if mana is insufficient or heal mode is not active.",
+   "side_effects": "network, global state",
+   "notes": "Called by action handlers; returns false if bot is in combat or fails to apply oil.",
    "ai": true
   },
-  "raw": "{\n  \"summary\": \"Executes a prioritized healing strategy by checking mana constraints, bandage availability, and applying consumable items.\",\n  \"overview\": \"This function implements a conditional healing logic for the bot AI, first verifying that the bot is in heal mode and has sufficient mana before proceeding. It attempts to use a bandage if no attacker count value exists and the bot lacks a specific aura, otherwise it iterates through a list of prioritized healing items to apply them sequentially.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"None\",\n  \"notes\": \"Relies on global botAI state and external arrays like uPrioritizedHealingItemIds; returns false if mana is insufficient or heal mode is not active.\"\n}",
+  "raw": "{\n  \"summary\": \"Executes a stealth imbuing action by removing existing stealth auras and applying an oil enchantment to the main hand weapon if combat is not active.\",\n  \"overview\": \"This function checks whether the bot is currently in combat before proceeding with any actions. If the bot has an active stealth aura, it removes that aura first, then ensures the bot is standing. The function attempts to find and apply an oil enchantment to the main hand weapon if one is available and not already enchanted.\",\n  \"params\": [],\n  \"returns\": \"bool\",\n  \"side_effects\": \"network, global state\",\n  \"notes\": \"Called by action handlers; returns false if bot is in combat or fails to apply oil.\"\n}",
   "model": "qwen3.5:4b"
  },
  "src/strategy/actions/ImbueAction.cpp::Action@4af87259:qwen3-5-4b": {
