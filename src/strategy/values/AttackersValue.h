@@ -52,4 +52,13 @@ public:
     void SetForced(GuidVector val);
 };
 
+class DisallowedTargetsValue : public ManualSetValue<GuidVector>
+{
+public:
+    DisallowedTargetsValue(ShadowAI* botAI, std::string const name = "disallowed targets")
+        : ManualSetValue(botAI, GuidVector(), name)
+    {
+    }
+};
+
 #endif

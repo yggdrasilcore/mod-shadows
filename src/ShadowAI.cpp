@@ -5,6 +5,7 @@
 
 #include "ShadowAI.h"
 
+#include <algorithm>
 #include <cmath>
 #include <mutex>
 #include <sstream>
@@ -6558,6 +6559,67 @@ void ShadowAI::ClearTargetingSuppression() { targetingSuppressedUntil = 0; }
 bool ShadowAI::IsTargetingSuppressed() const
 {
     return targetingSuppressedUntil && getMSTime() < targetingSuppressedUntil;
+}
+
+void ShadowAI::DisallowTarget(ObjectGuid guid)
+{
+    if (!guid)
+        return;
+
+    GuidVector& disallowed = aiObjectContext->GetValue<GuidVector>("disallowed targets")->RefGet();
+    if (std::find(disallowed.begin(), disallowed.end(), guid) == disallowed.end())
+        disallowed.push_back(guid);
+
+    // Keep the list current even while an external driver controls targeting,
+    // but leave its target state untouched.
+    if (IsTargetingSuppressed())
+        return;
+
+    if (auto* prioritized = dynamic_cast<PrioritizedTargetsValue*>(
+            aiObjectContext->GetValue<GuidVector>("prioritized targets")))
+    {
+        GuidVector targets = prioritized->Get();
+        targets.erase(std::remove(targets.begin(), targets.end(), guid), targets.end());
+        prioritized->SetForced(targets);
+    }
+
+    if (auto* pullTarget =
+            dynamic_cast<PullTargetValue*>(aiObjectContext->GetValue<ObjectGuid>("pull target")))
+    {
+        if (pullTarget->Get() == guid)
+            pullTarget->SetForced(ObjectGuid::Empty);
+    }
+
+    Unit* currentTarget = GetTarget();
+    if (bot->GetTarget() != guid && (!currentTarget || currentTarget->GetGUID() != guid))
+        return;
+
+    if (auto* value = dynamic_cast<CurrentTargetValue*>(aiObjectContext->GetValue<Unit*>("current target")))
+        value->SetForced(nullptr);
+    aiObjectContext->GetValue<Unit*>("old target")->Set(nullptr);
+    bot->SetTarget(ObjectGuid::Empty);
+    bot->SetSelection(ObjectGuid());
+    bot->AttackStop();
+
+    if (Pet* pet = bot->GetPet())
+        pet->AttackStop();
+}
+
+void ShadowAI::AllowTarget(ObjectGuid guid)
+{
+    GuidVector& disallowed = aiObjectContext->GetValue<GuidVector>("disallowed targets")->RefGet();
+    disallowed.erase(std::remove(disallowed.begin(), disallowed.end(), guid), disallowed.end());
+}
+
+void ShadowAI::ClearDisallowedTargets() { aiObjectContext->GetValue<GuidVector>("disallowed targets")->Reset(); }
+
+bool ShadowAI::IsTargetDisallowed(ObjectGuid guid)
+{
+    if (!guid)
+        return false;
+
+    GuidVector& disallowed = aiObjectContext->GetValue<GuidVector>("disallowed targets")->RefGet();
+    return std::find(disallowed.begin(), disallowed.end(), guid) != disallowed.end();
 }
 
 bool ShadowAI::CanMove()
